@@ -1,0 +1,14 @@
+client/.env
+server/.env
+
+client/node_modules/
+client/dist/
+client/build/
+
+server/server       
+server/.exe
+server/go.work      
+
+.DS_Store
+.vscode/
+.idea/
