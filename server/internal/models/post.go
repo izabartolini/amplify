@@ -7,12 +7,12 @@ import (
 )
 
 type Post struct {
-	ID        uint           `gorm:"primaryKey"`
-	UserID    uint           `gorm:"not null"`
-	Subtitle  string         
-	CreatedAt time.Time      
-	UpdatedAt time.Time      
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	ID             uint           `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
+	UserID         uint           `gorm:"not null"`
+	Subtitle  	   string         
+	CreatedAt      time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt      time.Time      `gorm:"autoUpdateTime"`
+	DeletedAt      gorm.DeletedAt `gorm:"index"`
 
 	Medias    []Media        `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE;"`
 	Likes     []Like         `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE;"`
@@ -20,18 +20,18 @@ type Post struct {
 }
 
 type Like struct {
-	ID        uint           `gorm:"primaryKey"`
+	ID        uint           `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
 	UserID    uint           `gorm:"not null"` 
 	PostID    uint           `gorm:"not null"`
-	CreatedAt time.Time      
+	CreatedAt      time.Time      `gorm:"autoCreateTime"`  
 }
 
 type Comment struct {
-	ID        uint           `gorm:"primaryKey"`
+	ID        uint           `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
 	UserID    uint           `gorm:"not null"`
 	PostID    uint           `gorm:"not null"`
 	Text      string         `gorm:"not null"`
-	CreatedAt time.Time      
-	UpdatedAt time.Time      
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	CreatedAt      time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt      time.Time      `gorm:"autoUpdateTime"`
+	DeletedAt      gorm.DeletedAt `gorm:"index"`
 }
