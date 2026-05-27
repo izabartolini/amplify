@@ -2,7 +2,9 @@ package main
 
 import (
 	"amplify/server/config"
-	"github.com/gin-gonic/gin"        
+	"amplify/server/internal/routes"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -13,5 +15,7 @@ func main() {
 		c.JSON(200, gin.H{"message": "pong"})
 	})
 	
+	routes.SetupRoutes(r)
+
 	r.Run(":8080")
 }
