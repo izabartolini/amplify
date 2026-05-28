@@ -7,19 +7,21 @@ import (
 )
 
 type User struct {
-	ID             uint           `gorm:"primaryKey"`
+	ID             uint           `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
 	Name           string         `gorm:"not null"`
 	Email          string         `gorm:"unique;not null"`
-	Password       string         `gorm:"not null"`
+	Username       string         `gorm:"unique;not null"`
+	Password       string         `gorm:"not null;not null"`
 	ProfilePicture string         
-	CPF            string         `gorm:"unique"`
+	CPF            string         `gorm:"unique;not null"`
+	Bio 	       string          
 	Instrument     string         
 	Level          string         
 	City           string         
 	State          string         
 	Country        string         
-	CreatedAt      time.Time      
-	UpdatedAt      time.Time      
+	CreatedAt      time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt      time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt      gorm.DeletedAt `gorm:"index"` 
 
 	Posts          []Post         `gorm:"foreignKey:UserID"`
@@ -33,9 +35,9 @@ type User struct {
 }
 
 type Follow struct {
-	ID          uint           `gorm:"primaryKey"`
+	ID          uint           `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
 	FollowerID  uint           `gorm:"not null"` 
 	FollowingID uint           `gorm:"not null"`
-	CreatedAt   time.Time      
-	DeletedAt   gorm.DeletedAt `gorm:"index"`
+	CreatedAt      time.Time      `gorm:"autoCreateTime"`
+	DeletedAt      gorm.DeletedAt `gorm:"index"`
 }

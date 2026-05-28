@@ -1,7 +1,7 @@
 package models
 
 type Media struct {
-	ID      uint   `gorm:"primaryKey"`
+	ID      uint   `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
 	Url     string `gorm:"not null"`
 	Type    string `gorm:"not null"` 
 	Order   int    `gorm:"not null"`
