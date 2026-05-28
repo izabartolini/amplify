@@ -19,26 +19,10 @@ func (r *Repository) GetUsers() ([]models.User, error) {
 	return users, err
 }
 
-// func (r *Repository) GetUsers() ([]models.User, error) {
-// 	rows, err := r.db.Query("SELECT email, password FROM users")
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (r *Repository) GetUsersByName(findName string)([] models.User, error){
 
-// 	defer rows.Close()
+	var users []models.User
+	err := r.db.Where("name ILIKE ?", "%"+findName+"%").Find(&users).Error
 
-// 	usuarios := []models.User{}
-
-// 	for rows.Next() {
-
-// 		var u models.User
-
-// 		err := rows.Scan(&u.Email, &u.Password)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		usuarios = append(usuarios, u)
-// 	}
-// 	return usuarios, nil
-
-//}
+	return users, err
+}

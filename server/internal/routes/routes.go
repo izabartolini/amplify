@@ -15,4 +15,5 @@ func SetupRoutes(r *gin.Engine) {
 	controller := controllers.NewHandler(repository)
 
 	r.GET("/user", controller.GetUsers)
+	r.GET("/userByName", controller.GetUsersByName)
 }

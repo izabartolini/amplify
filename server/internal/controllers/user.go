@@ -27,3 +27,15 @@ func (h *Controller) GetUsers(c *gin.Context) {
 
 	c.JSON(200, users)
 }
+
+func (h *Controller) GetUsersByName(c *gin.Context){
+	users, err := h.repository.GetUsersByName(c.Query("name"))
+	if err != nil {
+		c.JSON(500, gin.H{
+			"erro": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, users)
+}
