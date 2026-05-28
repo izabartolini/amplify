@@ -6,7 +6,7 @@ import (
 )
 
 type Event struct {
-	ID          uint           `gorm:"primaryKey"`
+	ID          uint           `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
 	UserID      uint           `gorm:"not null"`
 	Name        string         `gorm:"not null"`
 	Description string
@@ -16,16 +16,16 @@ type Event struct {
 	City        string
 	State       string
 	Country     string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   gorm.DeletedAt `gorm:"index"`
+	CreatedAt      time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt      time.Time      `gorm:"autoUpdateTime"`
+	DeletedAt      gorm.DeletedAt `gorm:"index"`
 
 	Medias      []Media        `gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE;"`
 	Participants []Participate `gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE;"`
 }
 
 type Participate struct {
-	ID        uint      `gorm:"primaryKey"`
+	ID        uint      `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
 	UserID    uint      `gorm:"not null"`
 	EventID   uint      `gorm:"not null"`
 	Joined    time.Time `gorm:"autoCreateTime"`
