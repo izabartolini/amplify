@@ -14,31 +14,14 @@ func (r *Repository) GetUsers() ([]models.User, error) {
 
 	var users []models.User
 
-	err := r.db.Find(&users).Error
+	err := r.db.Select("email, name").Find(&users).Error
 
 	return users, err
 }
 
-// func (r *Repository) GetUsers() ([]models.User, error) {
-// 	rows, err := r.db.Query("SELECT email, password FROM users")
-// 	if err != nil {
-// 		return nil, err
-// 	}
 
-// 	defer rows.Close()
 
-// 	usuarios := []models.User{}
+func (r *Repository) PostUser(user *models.User) error {
 
-// 	for rows.Next() {
-
-// 		var u models.User
-
-// 		err := rows.Scan(&u.Email, &u.Password)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		usuarios = append(usuarios, u)
-// 	}
-// 	return usuarios, nil
-
-//}
+	return r.db.Create(user).Error
+}
