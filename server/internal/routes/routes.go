@@ -11,9 +11,17 @@ import (
 func SetupRoutes(r *gin.Engine) {
 
 	repository := repositories.NewRepository(config.DB)
-
 	controller := controllers.NewHandler(repository)
 
 	r.GET("/user", controller.GetUsers)
 	r.POST("/createUser", controller.CreateUsers)
+
+	
+	api := r.Group("/api")
+	{
+		auth := api.Group("/auth") //acho que tem que trocar pra usergo de controllers
+		{
+			auth.POST("/register", controller.Register)
+		}
+	}
 }
