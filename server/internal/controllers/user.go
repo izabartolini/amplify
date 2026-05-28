@@ -1,22 +1,24 @@
 package controllers
 
-import(
-	"amplify/server/internal/repositories"
+import (
+	service "amplify/server/internal/services"
+
 	"github.com/gin-gonic/gin"
 )
 type Controller struct {
-	repository *repositories.Repository
-
+	service *service.Service
 }
 
-func NewHandler(repository *repositories.Repository) *Controller {
+func NewHandler(service *service.Service) *Controller {
 	return &Controller{
-		repository: repository,
+		service: service,
 	}
 }
 
+
+
 func (h *Controller) GetUsers(c *gin.Context) {
-	users, err := h.repository.GetUsers()
+	users, err := h.service.GetUsers()
 
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -29,7 +31,7 @@ func (h *Controller) GetUsers(c *gin.Context) {
 }
 
 func (h *Controller) GetUsersByName(c *gin.Context){
-	users, err := h.repository.GetUsersByName(c.Query("name"))
+	users, err := h.service.GetUsersByName(c.Query("name"))
 	if err != nil {
 		c.JSON(500, gin.H{
 			"erro": err.Error(),

@@ -19,10 +19,24 @@ func (r *Repository) GetUsers() ([]models.User, error) {
 	return users, err
 }
 
-func (r *Repository) GetUsersByName(findName string)([] models.User, error){
+func (r *Repository) GetUsersByName(findName string) ([]models.User, error) {
 
 	var users []models.User
 	err := r.db.Where("name ILIKE ?", "%"+findName+"%").Find(&users).Error
 
 	return users, err
+}
+
+func (r *Repository) GetUserByEmail(findEmail string) (*models.User, error) {
+	var user models.User
+	err := r.db.
+		Where("email = ?", findEmail).
+		First(&user).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+
 }
