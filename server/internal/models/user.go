@@ -14,6 +14,7 @@ type User struct {
 	Password       string         `gorm:"not null;not null"`
 	ProfilePicture string         
 	CPF            string         `gorm:"unique;not null"`
+	Bio 	       string          
 	Instrument     string         
 	Level          string         
 	City           string         
