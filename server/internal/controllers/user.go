@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
 type Controller struct {
 	service *service.Service
 }
@@ -14,8 +15,6 @@ func NewHandler(service *service.Service) *Controller {
 		service: service,
 	}
 }
-
-
 
 func (h *Controller) GetUsers(c *gin.Context) {
 	users, err := h.service.GetUsers()
@@ -30,7 +29,7 @@ func (h *Controller) GetUsers(c *gin.Context) {
 	c.JSON(200, users)
 }
 
-func (h *Controller) GetUsersByName(c *gin.Context){
+func (h *Controller) GetUsersByName(c *gin.Context) {
 	users, err := h.service.GetUsersByName(c.Query("name"))
 	if err != nil {
 		c.JSON(500, gin.H{

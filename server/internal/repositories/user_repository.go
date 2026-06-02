@@ -27,6 +27,14 @@ func (r *Repository) GetUsersByName(findName string) ([]models.User, error) {
 	return users, err
 }
 
+func (r *Repository) GetUsersByUsername(findName string) ([]models.User, error) {
+
+	var users []models.User
+	err := r.db.Where("username ILIKE ?", "%"+findName+"%").Find(&users).Error
+
+	return users, err
+}
+
 func (r *Repository) GetUserByEmail(findEmail string) (*models.User, error) {
 	var user models.User
 	err := r.db.
