@@ -10,6 +10,15 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine) {
+	r.POST("/createUser", controller.CreateUsers)
+
+	api := r.Group("/api")
+	{
+		auth := api.Group("/auth")
+		{
+			auth.POST("/register", controller.Register)
+		}
+	}
 
 	repository := repositories.NewRepository(config.DB)
 	service := services.NewService(repository)
