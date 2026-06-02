@@ -6,48 +6,36 @@ import (
 
 	"amplify/server/internal/models"
 	"amplify/server/internal/repositories"
-	"amplify/server/internal/services" // Import do novo pacote
+	"amplify/server/internal/services" 
 
 	"github.com/gin-gonic/gin"
 )
 
-type Handler struct {
-	Repo        *repositories.Repository
-	UserService *services.UserService // Adicionamos o service aqui
+type Controller struct {
+	service *service.Service
 }
 
-func NewHandler(repo *repositories.Repository, userService *services.UserService) *Handler {
-	return &Handler{
-		Repo:        repo,
-		UserService: userService,
+func NewHandler(service *service.Service) *Controller {
+	return &Controller{
+		service: service,
 	}
 }
 
-func (h *Handler) GetUsers(c *gin.Context) {
-	users, err := h.Repo.GetUsers()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, users)
-}
-
-func (h *Handler) CreateUsers(c *gin.Context) {
+func (h *Controller) CreateUsers(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := h.Repo.PostUser(&user); err != nil {
+	if err := h.service.PostUser(&user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusCreated, user)
 }
 
-func (h *Handler) Register(c *gin.Context) {
-	// Puxa o DTO que agora mora no pacote services
+func (h *Controller) Register(c *gin.Context) {
 	var req services.RegisterDTO
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -55,23 +43,44 @@ func (h *Handler) Register(c *gin.Context) {
 		return
 	}
 
-	// Entrega para a camada de Serviço processar a regra de negócio
 	user, err := h.UserService.RegisterUser(req)
 	if err != nil {
-		// Se o erro for de unicidade, retorna 409 Conflict
 		if strings.Contains(err.Error(), "já cadastrados") {
 			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
 		}
-		// Qualquer outro erro de validação (senha, username, etc) retorna 400 Bad Request
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user.Password = "" // Ocultar no retorno
+	user.Password = ""
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Usuário criado com sucesso",
 		"user":    user,
 	})
+
+func (h *Controller) GetUsers(c *gin.Context) {
+	users, err := h.service.GetUsers()
+
+	if err != nil {
+		c.JSON(500, gin.H{
+			"erro": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, users)
+}
+
+func (h *Controller) GetUsersByName(c *gin.Context) {
+	users, err := h.service.GetUsersByName(c.Query("name"))
+	if err != nil {
+		c.JSON(500, gin.H{
+			"erro": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, users)
 }

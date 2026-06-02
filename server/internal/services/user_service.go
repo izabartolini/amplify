@@ -14,6 +14,9 @@ import (
 
 var usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_;.]+$`)
 
+func (s *Service) PostUser(user *models.User) error {
+	return s.Repo.PostUser(user)
+}
 func validatePassword(pass string) bool {
 	if len(pass) < 8 {
 		return false
@@ -95,4 +98,13 @@ func (s *UserService) RegisterUser(req RegisterDTO) (*models.User, error) {
 	}
 
 	return &user, nil
+	"amplify/server/internal/models"
+)
+
+func (s *Service) GetUsers() ([]models.User, error) {
+	return s.repository.GetUsers()
+}
+
+func (s *Service) GetUsersByName(name string) ([]models.User, error) {
+	return s.repository.GetUsersByName(name)
 }
