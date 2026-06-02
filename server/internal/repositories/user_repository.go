@@ -32,12 +32,6 @@ func (r *Repository) CheckConflicts(email, username, cpf string) error {
 		return errors.New("email, usuário ou cpf já cadastrados")
 	}
 	return nil
-
-	var users []models.User
-
-	err := r.db.Find(&users).Error
-
-	return users, err
 }
 
 func (r *Repository) GetUsersByName(findName string) ([]models.User, error) {

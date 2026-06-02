@@ -10,8 +10,14 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine) {
-	r.POST("/createUser", controller.CreateUsers)
+	repository := repositories.NewRepository(config.DB)
+	service := services.NewService(repository)
+	controller := controllers.NewHandler(service)
 
+	r.POST("/createUser", controller.CreateUsers)
+	r.GET("/user", controller.GetUsers)
+	r.GET("/userByName", controller.GetUsersByName)
+	r.POST("/Login", controller.Login)
 	api := r.Group("/api")
 	{
 		auth := api.Group("/auth")
@@ -19,12 +25,4 @@ func SetupRoutes(r *gin.Engine) {
 			auth.POST("/register", controller.Register)
 		}
 	}
-
-	repository := repositories.NewRepository(config.DB)
-	service := services.NewService(repository)
-	controller := controllers.NewHandler(service)
-
-	r.GET("/user", controller.GetUsers)
-	r.GET("/userByName", controller.GetUsersByName)
-	r.POST("/Login", controller.Login)
 }
