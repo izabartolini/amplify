@@ -23,7 +23,13 @@ func (r *Repository) PostUser(user *models.User) error {
 
 func (r *Repository) CheckConflicts(email, username, cpf string) error {
 	var count int64
-	r.db.Model(&models.User{}).Where("email = ? OR username = ? OR cpf = ?", email, username, cpf).Count(&count)
+
+	// LOWER() do SQL para transformar a coluna e o valor buscado
+	// em minúsculo apenas durante a checagem.
+	r.db.Model(&models.User{}).
+		Where("LOWER(email) = LOWER(?) OR LOWER(username) = LOWER(?) OR cpf = ?", email, username, cpf).
+		Count(&count)
+
 	if count > 0 {
 		return errors.New("email, usuário ou cpf já cadastrados")
 	}

@@ -2,42 +2,25 @@ package controllers
 
 import (
 	"net/http"
-	"regexp"
+	"strings"
 
 	"amplify/server/internal/models"
 	"amplify/server/internal/repositories"
+	"amplify/server/internal/services" // Import do novo pacote
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
-// Handler gerencia todas as requisições relacionadas ao Usuário
 type Handler struct {
-	Repo *repositories.Repository
+	Repo        *repositories.Repository
+	UserService *services.UserService // Adicionamos o service aqui
 }
 
-func NewHandler(repo *repositories.Repository) *Handler {
-	return &Handler{Repo: repo}
-}
-
-var (
-	usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_;.]+$`)
-	passwordRegex = regexp.MustCompile(`^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$`)
-)
-
-type RegisterRequest struct {
-	Name           string `json:"name" binding:"required"`
-	Email          string `json:"email" binding:"required,email"`
-	Username       string `json:"username" binding:"required"`
-	Password       string `json:"password" binding:"required"`
-	CPF            string `json:"cpf" binding:"required"`
-	Instrument     string `json:"instrument"`
-	Level          string `json:"level"`
-	City           string `json:"city"`
-	State          string `json:"state"`
-	Country        string `json:"country"`
-	Bio            string `json:"bio"`
-	ProfilePicture string `json:"profile_picture"`
+func NewHandler(repo *repositories.Repository, userService *services.UserService) *Handler {
+	return &Handler{
+		Repo:        repo,
+		UserService: userService,
+	}
 }
 
 func (h *Handler) GetUsers(c *gin.Context) {
@@ -64,50 +47,24 @@ func (h *Handler) CreateUsers(c *gin.Context) {
 }
 
 func (h *Handler) Register(c *gin.Context) {
-	var req RegisterRequest
+	// Puxa o DTO que agora mora no pacote services
+	var req services.RegisterDTO
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Campos obrigatórios ausentes ou payload JSON inválido"})
 		return
 	}
 
-	if !usernameRegex.MatchString(req.Username) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Usuário inválido. Utilize apenas letras, números e ( _ ; . )"})
-		return
-	}
-	if !passwordRegex.MatchString(req.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "A senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial"})
-		return
-	}
-
-	if err := h.Repo.CheckConflicts(req.Email, req.Username, req.CPF); err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
-		return
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	// Entrega para a camada de Serviço processar a regra de negócio
+	user, err := h.UserService.RegisterUser(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro interno ao processar a senha"})
-		return
-	}
-
-	user := models.User{
-		Name:           req.Name,
-		Email:          req.Email,
-		Username:       req.Username,
-		Password:       string(hashedPassword),
-		CPF:            req.CPF,
-		Instrument:     req.Instrument,
-		Level:          req.Level,
-		City:           req.City,
-		State:          req.State,
-		Country:        req.Country,
-		Bio:            req.Bio,
-		ProfilePicture: req.ProfilePicture,
-	}
-
-	if err := h.Repo.PostUser(&user); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao registrar usuário no banco de dados"})
+		// Se o erro for de unicidade, retorna 409 Conflict
+		if strings.Contains(err.Error(), "já cadastrados") {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			return
+		}
+		// Qualquer outro erro de validação (senha, username, etc) retorna 400 Bad Request
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
