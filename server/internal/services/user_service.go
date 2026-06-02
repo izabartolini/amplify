@@ -7,7 +7,6 @@ import (
 	"unicode"
 
 	"amplify/server/internal/models"
-	"amplify/server/internal/repositories"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -15,7 +14,7 @@ import (
 var usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_;.]+$`)
 
 func (s *Service) PostUser(user *models.User) error {
-	return s.Repo.PostUser(user)
+	return s.repository.PostUser(user)
 }
 func validatePassword(pass string) bool {
 	if len(pass) < 8 {
@@ -35,7 +34,6 @@ func validatePassword(pass string) bool {
 	return hasUpper && hasLower && hasSpecial
 }
 
-// O DTO vem para o Service para isolar a camada
 type RegisterDTO struct {
 	Name           string `json:"name" binding:"required"`
 	Email          string `json:"email" binding:"required,email"`
@@ -51,15 +49,7 @@ type RegisterDTO struct {
 	ProfilePicture string `json:"profile_picture"`
 }
 
-type UserService struct {
-	Repo *repositories.Repository
-}
-
-func NewUserService(repo *repositories.Repository) *UserService {
-	return &UserService{Repo: repo}
-}
-
-func (s *UserService) RegisterUser(req RegisterDTO) (*models.User, error) {
+func (s *Service) RegisterUser(req RegisterDTO) (*models.User, error) {
 	req.Email = strings.ToLower(req.Email)
 
 	if !usernameRegex.MatchString(req.Username) {
@@ -69,7 +59,7 @@ func (s *UserService) RegisterUser(req RegisterDTO) (*models.User, error) {
 		return nil, errors.New("A senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial")
 	}
 
-	if err := s.Repo.CheckConflicts(req.Email, req.Username, req.CPF); err != nil {
+	if err := s.repository.CheckConflicts(req.Email, req.Username, req.CPF); err != nil {
 		return nil, err
 	}
 
@@ -93,13 +83,13 @@ func (s *UserService) RegisterUser(req RegisterDTO) (*models.User, error) {
 		ProfilePicture: req.ProfilePicture,
 	}
 
-	if err := s.Repo.PostUser(&user); err != nil {
+	if err := s.repository.PostUser(&user); err != nil {
 		return nil, errors.New("Erro ao registrar usuário no banco de dados")
 	}
 
 	return &user, nil
-	"amplify/server/internal/models"
-)
+
+}
 
 func (s *Service) GetUsers() ([]models.User, error) {
 	return s.repository.GetUsers()

@@ -5,17 +5,16 @@ import (
 	"strings"
 
 	"amplify/server/internal/models"
-	"amplify/server/internal/repositories"
-	"amplify/server/internal/services" 
+	"amplify/server/internal/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Controller struct {
-	service *service.Service
+	service *services.Service
 }
 
-func NewHandler(service *service.Service) *Controller {
+func NewHandler(service *services.Service) *Controller {
 	return &Controller{
 		service: service,
 	}
@@ -43,7 +42,7 @@ func (h *Controller) Register(c *gin.Context) {
 		return
 	}
 
-	user, err := h.UserService.RegisterUser(req)
+	user, err := h.service.RegisterUser(req)
 	if err != nil {
 		if strings.Contains(err.Error(), "já cadastrados") {
 			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
@@ -59,7 +58,7 @@ func (h *Controller) Register(c *gin.Context) {
 		"message": "Usuário criado com sucesso",
 		"user":    user,
 	})
-
+}
 func (h *Controller) GetUsers(c *gin.Context) {
 	users, err := h.service.GetUsers()
 
