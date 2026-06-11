@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strings"
 
-	"amplify/server/internal/models"
 	"amplify/server/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -18,20 +17,6 @@ func NewHandler(service *services.Service) *Controller {
 	return &Controller{
 		service: service,
 	}
-}
-
-func (h *Controller) CreateUsers(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	if err := h.service.PostUser(&user); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusCreated, user)
 }
 
 func (h *Controller) Register(c *gin.Context) {
