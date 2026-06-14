@@ -105,21 +105,40 @@ func (s *Service) GetUsersByName(name string) ([]models.User, error) {
 }
 
 func (s *Service) UpdateUser(id uint, req models.UpdateUserRequest) error {
-	if req.Name == "" {
-		return errors.New("Name is required")
+
+	updates := make(map[string]interface{})
+
+	if req.Name != "" {
+		updates["name"] = req.Name
 	}
 
-	return s.repository.UpdateUser(
-		id,
-		map[string]interface{}{
-			"name":       req.Name,
-			"username":   req.Username,
-			"bio":        req.Bio,
-			"instrument": req.Instrument,
-			"city":       req.City,
-			"state":      req.State,
-			"country":    req.Country,
-		},
-	)
+	if req.Username != "" {
+		updates["username"] = req.Username
+	}
 
+	if req.Bio != "" {
+		updates["bio"] = req.Bio
+	}
+
+	if req.Instrument != "" {
+		updates["instrument"] = req.Instrument
+	}
+
+	if req.City != "" {
+		updates["city"] = req.City
+	}
+
+	if req.State != "" {
+		updates["state"] = req.State
+	}
+
+	if req.Country != "" {
+		updates["country"] = req.Country
+	}
+
+	if len(updates) == 0 {
+		return errors.New("nenhum campo para atualizar")
+	}
+
+	return s.repository.UpdateUser(id, updates)
 }

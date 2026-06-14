@@ -15,7 +15,7 @@ func NewRepository(db *gorm.DB) *Repository { return &Repository{db: db} }
 
 func (r *Repository) GetUsers() ([]models.User, error) {
 	var users []models.User
-	err1 := r.db.Select("email, name").Find(&users).Error
+	err1 := r.db.Select("id, email, name, username, password, bio").Find(&users).Error
 	return users, err1
 }
 
