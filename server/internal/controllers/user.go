@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"amplify/server/internal/services"
+	"amplify/server/internal/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -67,4 +68,41 @@ func (h *Controller) GetUsersByName(c *gin.Context) {
 	}
 
 	c.JSON(200, users)
+}
+
+func (h *Controller) UpdateUser(c *gin.Context) {
+
+	var req models.UpdateUserRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	userID, exists := c.Get("userID")
+
+	if !exists {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
+
+	err := h.service.UpdateUser(
+		userID.(uint),
+		req,
+	)
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "profile updated successfully",
+	})
 }

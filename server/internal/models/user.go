@@ -41,3 +41,13 @@ type Follow struct {
 	CreatedAt   time.Time      `gorm:"autoCreateTime"`
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
 }
+
+type UpdateUserRequest struct {
+	Name       string `json:"name"`
+	Username   string `json:"username"`
+	Bio        string `json:"bio"`
+	Instrument string `json:"instrument"`
+	City       string `json:"city"`
+	State      string `json:"state"`
+	Country    string `json:"country"`
+}

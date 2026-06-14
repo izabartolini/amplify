@@ -55,7 +55,7 @@ func (r *Repository) GetUsersByUsername(findName string) ([]models.User, error) 
 func (r *Repository) GetUserByEmail(findEmail string) (*models.User, error) {
 	var user models.User
 	err := r.db.
-		Where("email = ?", findEmail).
+		Where("email ILIKE ?", findEmail).
 		First(&user).Error
 
 	if err != nil {
@@ -66,9 +66,13 @@ func (r *Repository) GetUserByEmail(findEmail string) (*models.User, error) {
 
 }
 
+func (r *Repository) UpdateUser(id uint, data map[string]interface{}) error {
+
+	return r.db.Model(&models.User{}).Where("id = ?", id).Updates(data).Error
+}
 func (r *Repository) SaveUserTags(userID uint, tagNames []string) {
 	var tagValidationRegex = regexp.MustCompile(`^[A-Z0-9]+$`)
-	
+
 	for _, name := range tagNames {
 		cleanName := strings.ToUpper(strings.TrimSpace(name))
 		if cleanName == "" {
@@ -80,14 +84,14 @@ func (r *Repository) SaveUserTags(userID uint, tagNames []string) {
 
 		var tag models.Tag
 		if err := r.db.FirstOrCreate(&tag, models.Tag{Name: cleanName}).Error; err != nil {
-			continue 
+			continue
 		}
 
 		userTag := models.UserTag{
 			UserID: userID,
 			TagID:  tag.ID,
 		}
-		
+
 		r.db.Create(&userTag)
 	}
 }

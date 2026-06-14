@@ -103,3 +103,23 @@ func (s *Service) GetUsers() ([]models.User, error) {
 func (s *Service) GetUsersByName(name string) ([]models.User, error) {
 	return s.repository.GetUsersByName(name)
 }
+
+func (s *Service) UpdateUser(id uint, req models.UpdateUserRequest) error {
+	if req.Name == "" {
+		return errors.New("Name is required")
+	}
+
+	return s.repository.UpdateUser(
+		id,
+		map[string]interface{}{
+			"name":       req.Name,
+			"username":   req.Username,
+			"bio":        req.Bio,
+			"instrument": req.Instrument,
+			"city":       req.City,
+			"state":      req.State,
+			"country":    req.Country,
+		},
+	)
+
+}
