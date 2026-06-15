@@ -1,0 +1,51 @@
+.profile-page {
+  min-height: 100vh;
+  background-color: #f0e6d0;
+}
+
+.profile-body {
+  display: flex;
+}
+
+.profile-content {
+  flex: 1;
+  padding: 0;
+}
+
+.profile-tabs {
+  display: flex;
+  border-bottom: 1px solid #d4c17a;
+}
+
+.tab {
+  flex: 1;
+  padding: 16px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: #6B3A2A;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+
+.tab.active {
+  background-color: #8B1A1A;
+  color: white;
+  font-weight: bold;
+  border-bottom: 3px solid #8B1A1A;
+}
+
+.tab:hover:not(.active) {
+  background-color: #e8d5a3;
+}
+
+.profile-tab-content {
+  padding: 32px;
+}
+
+.empty-state {
+  color: #6B3A2A;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 48px;
+}
