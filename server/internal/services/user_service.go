@@ -47,6 +47,7 @@ type RegisterDTO struct {
 	Country        string `json:"country"`
 	Bio            string `json:"bio"`
 	ProfilePicture string `json:"profile_picture"`
+	Tags           []string `json:"tags"`
 }
 
 func (s *Service) RegisterUser(req RegisterDTO) (*models.User, error) {
@@ -85,6 +86,10 @@ func (s *Service) RegisterUser(req RegisterDTO) (*models.User, error) {
 
 	if err := s.repository.PostUser(&user); err != nil {
 		return nil, errors.New("Erro ao registrar usuário no banco de dados")
+	}
+
+	if len(req.Tags) > 0 {
+		s.repository.SaveUserTags(user.ID, req.Tags)
 	}
 
 	return &user, nil
