@@ -157,3 +157,57 @@ func (s *Service) GetUsers() ([]models.User, error) {
 func (s *Service) GetUsersByName(name string) ([]models.User, error) {
 	return s.repository.GetUsersByName(name)
 }
+
+type UpdateUserRequest struct {
+	Name       string `json:"name"`
+	Username   string `json:"username"`
+	ProfilePicture string `json:"profile_picture"`
+	Bio        string `json:"bio"`
+	Level      string `json:"level"`
+	City       string `json:"city"`
+	State      string `json:"state"`
+	Country    string `json:"country"`
+}
+
+func (s *Service) UpdateUserProfile(id uint, req UpdateUserRequest) error {
+
+	updates := make(map[string]interface{})
+
+	if req.Name != "" {
+		updates["name"] = req.Name
+	}
+
+	if req.Username != "" {
+		updates["username"] = req.Username
+	}
+
+	if req.ProfilePicture != "" {
+		updates["profile_picture"] = req.ProfilePicture
+	}
+
+	if req.Bio != "" {
+		updates["bio"] = req.Bio
+	}
+
+	if req.Level != "" {
+		updates["level"] = req.Level
+	}
+
+	if req.City != "" {
+		updates["city"] = req.City
+	}
+
+	if req.State != "" {
+		updates["state"] = req.State
+	}
+
+	if req.Country != "" {
+		updates["country"] = req.Country
+	}
+
+	if len(updates) == 0 {
+		return errors.New("no fields to update")
+	}
+
+	return s.repository.UpdateUser(id, updates)
+}

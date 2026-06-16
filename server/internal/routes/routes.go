@@ -37,6 +37,7 @@ func SetupRoutes(r *gin.Engine) {
 			})
 		})
 
+		protectedAPI.PUT("/users/update", controller.UpdateUser)
 		//future protected routes
 	}
 }

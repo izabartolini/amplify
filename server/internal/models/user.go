@@ -40,3 +40,4 @@ type Follow struct {
 	CreatedAt   time.Time      `gorm:"autoCreateTime"`
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
 }
+
