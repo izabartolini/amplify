@@ -1,13 +1,11 @@
-
 package models
 
-import(
-
-)
+import "time"
 
 type Instrument struct{
 	ID             uint                   `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
-	Name           string                 `gorm:"not null"`
+	Name            string                `gorm:"not null;unique"`
+	CreatedAt       time.Time             `gorm:"autoCreateTime"`
 
 	PlayedBy       []UserInstrument       `gorm:"foreignKey:InstrumentID"`
 }
