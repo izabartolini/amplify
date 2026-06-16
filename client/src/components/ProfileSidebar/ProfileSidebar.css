@@ -1,0 +1,143 @@
+.profile-sidebar {
+  width: 280px;
+  min-height: 100vh;
+  background-color: #f5e6c8;
+  padding: 40px 20px;
+  border-right: 1px solid #d4c17a;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-avatar {
+  display: flex;
+  justify-content: center;
+}
+
+.sidebar-avatar img,
+.avatar-fallback {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #c0c0c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.sidebar-name-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sidebar-name-row h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #3d1f00;
+}
+
+.sidebar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-seguir {
+  background-color: #8B1A1A;
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-seguir:hover {
+  background-color: #6B1010;
+}
+
+.btn-mensagem {
+  background: none;
+  border: 1px solid #d4c17a;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.sidebar-username {
+  color: #6B3A2A;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.sidebar-follow-count {
+  display: flex;
+  gap: 16px;
+  font-size: 0.9rem;
+  color: #3d1f00;
+  cursor: pointer;
+}
+
+.sidebar-follow-count span:hover {
+  text-decoration: underline;
+}
+
+.sidebar-location {
+  color: #6B3A2A;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.sidebar-bio {
+  color: #3d1f00;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.sidebar-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.badge-instrument {
+  background-color: #6B3A2A;
+  color: white;
+}
+
+.badge-level {
+  background-color: #8B1A1A;
+  color: white;
+}
+
+.sidebar-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.tag {
+  background-color: #d4c17a;
+  color: #3d1f00;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}

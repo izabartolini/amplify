@@ -1,0 +1,35 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 32px;
+  background-color: #f5e6c8;
+  border-bottom: 1px solid #d4c17a;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-logo {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-size: 1.8rem;
+  color: #3d1f00;
+  margin: 0;
+}
+
+.navbar-search {
+  width: 40%;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #d4c17a;
+  background-color: white;
+  font-size: 0.95rem;
+}
+
+.navbar-icons {
+  display: flex;
+  gap: 20px;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
