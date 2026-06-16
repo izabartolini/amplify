@@ -56,6 +56,8 @@ func ConnectDatabase() {
     &models.UserTag{}, 
     &models.EventTag{},
     &models.PostTag{},
+    &models.Instrument{},
+    &models.UserInstrument{},
 	)
 
 	if err != nil {
