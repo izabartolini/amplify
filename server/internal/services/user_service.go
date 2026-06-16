@@ -104,7 +104,18 @@ func (s *Service) GetUsersByName(name string) ([]models.User, error) {
 	return s.repository.GetUsersByName(name)
 }
 
-func (s *Service) UpdateUser(id uint, req models.UpdateUserRequest) error {
+type UpdateUserRequest struct {
+	Name       string `json:"name"`
+	Username   string `json:"username"`
+	ProfilePicture string `json:"profile_picture"`
+	Bio        string `json:"bio"`
+	Level      string `json:"level"`
+	City       string `json:"city"`
+	State      string `json:"state"`
+	Country    string `json:"country"`
+}
+
+func (s *Service) UpdateUserProfile(id uint, req UpdateUserRequest) error {
 
 	updates := make(map[string]interface{})
 
@@ -116,12 +127,16 @@ func (s *Service) UpdateUser(id uint, req models.UpdateUserRequest) error {
 		updates["username"] = req.Username
 	}
 
+	if req.ProfilePicture != "" {
+		updates["profile_picture"] = req.ProfilePicture
+	}
+
 	if req.Bio != "" {
 		updates["bio"] = req.Bio
 	}
 
-	if req.Instrument != "" {
-		updates["instrument"] = req.Instrument
+	if req.Level != "" {
+		updates["level"] = req.Level
 	}
 
 	if req.City != "" {
@@ -137,7 +152,7 @@ func (s *Service) UpdateUser(id uint, req models.UpdateUserRequest) error {
 	}
 
 	if len(updates) == 0 {
-		return errors.New("nenhum campo para atualizar")
+		return errors.New("no fields to update")
 	}
 
 	return s.repository.UpdateUser(id, updates)

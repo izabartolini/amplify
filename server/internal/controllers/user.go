@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"amplify/server/internal/services"
-	"amplify/server/internal/models"
+
 
 	"github.com/gin-gonic/gin"
 )
@@ -72,7 +72,7 @@ func (h *Controller) GetUsersByName(c *gin.Context) {
 
 func (h *Controller) UpdateUser(c *gin.Context) {
 
-	var req models.UpdateUserRequest
+	var req services.UpdateUserRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{
@@ -90,7 +90,7 @@ func (h *Controller) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	err := h.service.UpdateUser(
+	err := h.service.UpdateUserProfile(
 		userID.(uint),
 		req,
 	)
