@@ -95,3 +95,7 @@ func (r *Repository) SaveUserTags(userID uint, tagNames []string) {
 		r.db.Create(&userTag)
 	}
 }
+func (r *Repository) DeleteUser(id uint) error {
+	result := r.db.Delete(&models.User{}, id)
+	return result.Error
+}

@@ -129,8 +129,6 @@ func (s *Service) RegisterUser(req RegisterDTO) (*models.User, error) {
 		Username:       req.Username,
 		Password:       string(hashedPassword),
 		CPF:            req.CPF,
-		Instrument:     req.Instrument,
-		Level:          req.Level,
 		City:           req.City,
 		State:          req.State,
 		Country:        req.Country,
@@ -210,4 +208,7 @@ func (s *Service) UpdateUserProfile(id uint, req UpdateUserRequest) error {
 	}
 
 	return s.repository.UpdateUser(id, updates)
+}
+func (s *Service) DeleteUserAccount(userID uint) error {
+	return s.repository.DeleteUser(userID)
 }
