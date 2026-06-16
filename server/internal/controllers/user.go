@@ -6,7 +6,6 @@ import (
 
 	"amplify/server/internal/services"
 
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -105,4 +104,20 @@ func (h *Controller) UpdateUser(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "profile updated successfully",
 	})
+}
+func (h *Controller) DeleteMe(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
+		return
+	}
+
+	id := userID.(uint)
+
+	if err := h.service.DeleteUserAccount(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao deletar conta"})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
