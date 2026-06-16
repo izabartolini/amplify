@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 	"unicode"
-
+	"strconv"
 	"amplify/server/internal/models"
 
 	"golang.org/x/crypto/bcrypt"
@@ -33,6 +33,57 @@ func validatePassword(pass string) bool {
 	}
 	return hasUpper && hasLower && hasSpecial
 }
+func validateCPF(cpf string) bool {
+	re := regexp.MustCompile(`[^0-9]`)
+	cleanCPF := re.ReplaceAllString(cpf, "")
+
+	if len(cleanCPF) != 11 {
+		return false
+	}
+
+	allSame := true
+	for i := 1; i < 11; i++ {
+		if cleanCPF[i] != cleanCPF[0] {
+			allSame = false
+			break
+		}
+	}
+	if allSame {
+		return false
+	}
+
+	sum := 0
+	for i := 0; i < 9; i++ {
+		num, _ := strconv.Atoi(string(cleanCPF[i]))
+		sum += num * (10 - i)
+	}
+	rest := sum % 11
+	d1 := 0
+	if rest >= 2 {
+		d1 = 11 - rest
+	}
+	valD1, _ := strconv.Atoi(string(cleanCPF[9]))
+	if d1 != valD1 {
+		return false
+	}
+
+	sum = 0
+	for i := 0; i < 10; i++ {
+		num, _ := strconv.Atoi(string(cleanCPF[i]))
+		sum += num * (11 - i)
+	}
+	rest = sum % 11
+	d2 := 0
+	if rest >= 2 {
+		d2 = 11 - rest
+	}
+	valD2, _ := strconv.Atoi(string(cleanCPF[10]))
+	if d2 != valD2 {
+		return false
+	}
+
+	return true
+}
 
 type RegisterDTO struct {
 	Name           string `json:"name" binding:"required"`
@@ -59,6 +110,9 @@ func (s *Service) RegisterUser(req RegisterDTO) (*models.User, error) {
 	if !validatePassword(req.Password) {
 		return nil, errors.New("A senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial")
 	}
+	if !validateCPF(req.CPF) {
+        return nil, errors.New("CPF inválido")
+    }
 
 	if err := s.repository.CheckConflicts(req.Email, req.Username, req.CPF); err != nil {
 		return nil, err
