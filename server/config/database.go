@@ -45,13 +45,17 @@ func ConnectDatabase() {
 	
 	err = database.AutoMigrate(
 		&models.User{},
-		&models.Follow{},
-		&models.Post{},
-		&models.Media{},
-		&models.Like{},
-		&models.Comment{},
-		&models.Event{},
-		&models.Participate{},
+    &models.Follow{},
+    &models.Post{},
+    &models.Media{},
+    &models.Like{},
+    &models.Comment{},
+    &models.Event{},
+    &models.Participate{},
+    &models.Tag{},     
+    &models.UserTag{}, 
+    &models.EventTag{},
+    &models.PostTag{},
 	)
 
 	if err != nil {
