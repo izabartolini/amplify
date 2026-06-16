@@ -20,8 +20,9 @@ type Event struct {
 	UpdatedAt      time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt      gorm.DeletedAt `gorm:"index"`
 
-	Medias      []Media        `gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE;"`
-	Participants []Participate `gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE;"`
+	Medias       []Media        `gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE;"`
+	Participants []Participate  `gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE;"`
+	Tag 		 []EventTag     `gorm:"foreignKey:EventID;constraint:OnDelete:CASCADE;"`
 }
 
 type Participate struct {

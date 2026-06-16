@@ -3,6 +3,8 @@ package repositories
 import (
 	"amplify/server/internal/models"
 	"errors"
+	"regexp"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -62,4 +64,30 @@ func (r *Repository) GetUserByEmail(findEmail string) (*models.User, error) {
 
 	return &user, nil
 
+}
+
+func (r *Repository) SaveUserTags(userID uint, tagNames []string) {
+	var tagValidationRegex = regexp.MustCompile(`^[A-Z0-9]+$`)
+	
+	for _, name := range tagNames {
+		cleanName := strings.ToUpper(strings.TrimSpace(name))
+		if cleanName == "" {
+			continue
+		}
+		if !tagValidationRegex.MatchString(cleanName) {
+			continue
+		}
+
+		var tag models.Tag
+		if err := r.db.FirstOrCreate(&tag, models.Tag{Name: cleanName}).Error; err != nil {
+			continue 
+		}
+
+		userTag := models.UserTag{
+			UserID: userID,
+			TagID:  tag.ID,
+		}
+		
+		r.db.Create(&userTag)
+	}
 }

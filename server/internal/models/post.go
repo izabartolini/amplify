@@ -17,6 +17,7 @@ type Post struct {
 	Medias    []Media        `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE;"`
 	Likes     []Like         `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE;"`
 	Comments  []Comment      `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE;"`
+	Tag		  []PostTag 	 `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE;"`
 }
 
 type Like struct {

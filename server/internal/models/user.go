@@ -24,13 +24,14 @@ type User struct {
 	UpdatedAt      time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt      gorm.DeletedAt `gorm:"index"`
 
-	Posts        []Post        `gorm:"foreignKey:UserID"`
-	Events       []Event       `gorm:"foreignKey:UserID"`
+	Posts        []Post        `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+	Events       []Event       `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 	Likes        []Like        `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 	Comments     []Comment     `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 	Following    []Follow      `gorm:"foreignKey:FollowerID;constraint:OnDelete:CASCADE;"`
 	Followers    []Follow      `gorm:"foreignKey:FollowingID;constraint:OnDelete:CASCADE;"`
 	Participants []Participate `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+	Tag          []UserTag     `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 }
 
 type Follow struct {
