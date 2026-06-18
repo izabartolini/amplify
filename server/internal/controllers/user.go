@@ -121,3 +121,40 @@ func (h *Controller) DeleteMe(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+func (h *Controller) UpdateUserPassword(c *gin.Context) {
+
+	var reqPassword services.UpdateUserPasswordRequest
+
+	if err := c.ShouldBindJSON(&reqPassword); err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	userID, exists := c.Get("userID")
+
+	if !exists {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
+
+	err := h.service.UpdateUserPassword(
+		userID.(uint),
+		reqPassword,
+	)
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "profile updated successfully",
+	})
+}

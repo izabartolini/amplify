@@ -6,6 +6,8 @@ import (
 	"strings"
 	"unicode"
 	"strconv"
+	
+
 	"amplify/server/internal/models"
 
 	"golang.org/x/crypto/bcrypt"
@@ -211,4 +213,49 @@ func (s *Service) UpdateUserProfile(id uint, req UpdateUserRequest) error {
 }
 func (s *Service) DeleteUserAccount(userID uint) error {
 	return s.repository.DeleteUser(userID)
+}
+ type UpdateUserPasswordRequest struct{
+	Password 		string `json:"password"`
+	NewPassword		string `json:"newPassword"`
+	ConfirmPassword string `json:"confirmPassword"`
+}
+
+func (s *Service) UpdateUserPassword(id uint, req UpdateUserPasswordRequest) error{
+	
+	user, err := s.repository.GetUserById(id)
+    if err != nil {
+		return errors.New("user not found")
+    }
+	
+	err = bcrypt.CompareHashAndPassword(
+		[]byte(user.Password),
+		[]byte(req.Password),
+	)
+
+	if err != nil {
+		return errors.New("invalid password")
+	}
+	
+	if !validatePassword(req.NewPassword) {
+		return errors.New("A nova senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial")
+	}
+	
+	if req.NewPassword != req.ConfirmPassword {
+    	return errors.New("passwords do not match")
+	}
+	
+	hash, err := bcrypt.GenerateFromPassword(
+		[]byte(req.NewPassword),
+		bcrypt.DefaultCost,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	updates := map[string]interface{}{
+		"password": string(hash),
+	}
+
+	return s.repository.UpdateUser(id, updates)
 }

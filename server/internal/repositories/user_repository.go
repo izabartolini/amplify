@@ -66,10 +66,21 @@ func (r *Repository) GetUserByEmail(findEmail string) (*models.User, error) {
 
 }
 
+func (r *Repository) GetUserById (id uint) (*models.User, error){
+	var user models.User
+	err := r.db.First(&user, id).Error
+	if err != nil {
+        return nil, err
+    }
+
+    return &user, nil
+}
+
 func (r *Repository) UpdateUser(id uint, data map[string]interface{}) error {
 
 	return r.db.Model(&models.User{}).Where("id = ?", id).Updates(data).Error
 }
+
 func (r *Repository) SaveUserTags(userID uint, tagNames []string) {
 	var tagValidationRegex = regexp.MustCompile(`^[A-Z0-9]+$`)
 
