@@ -2,19 +2,20 @@ import { useState } from 'react'
 import Navbar from '../../components/Navbar/Navbar'
 import ProfileSidebar from '../../components/ProfileSidebar/ProfileSidebar'
 import './Profile.css'
+import exemploFoto from '../../assets/kirk.jpeg'
 
 const mockUser = {
-  name: 'User',
-  username: 'username',
-  profilePicture: null,
-  bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, scelerisque in elit faucibus.',
-  instrument: '#instrumento',
-  level: '#nível',
+  name: 'João Silva',
+  username: 'joaosilva',
+  profilePicture: exemploFoto,
+  bio: 'Tocando há 8 anos, sempre em busca de gente pra formar banda e subir ao palco.',
+  instrument: '#baixo',
+  level: '#iniciante',
   city: 'Campo Mourão',
   state: 'PR',
-  followers: 123,
-  following: 321,
-  tags: ['rock', 'jazz', 'acústico'],
+  followers: 1846,
+  following: 623,
+  tags: ['rock', 'acústico', 'pop', 'experimental', 'autoral', 'cover', 'banda', 'vocal', 'guitarra', 'bateria', 'teclado', 'sintetizador'],
 }
 
 function Profile() {
