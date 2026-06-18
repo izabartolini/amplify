@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Molle:ital@1&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.amplify-logo {
+  font-family: 'Molle', cursive;
+  font-style: italic;
+  font-weight: 400;
+  background: linear-gradient(90deg, #452D20 0%, #5D3926 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: 
+    drop-shadow(1px 0px 0px rgba(0, 0, 0, 0.08))
+    drop-shadow(-1px 0px 0px rgba(0, 0, 0, 0.08))
+    drop-shadow(0px 1px 0px rgba(0, 0, 0, 0.08))
+    drop-shadow(0px -1px 0px rgba(0, 0, 0, 0.08))
+    drop-shadow(1px 1px 0px rgba(0, 0, 0, 0.08))
+    drop-shadow(-1px -1px 0px rgba(0, 0, 0, 0.08))
+    drop-shadow(1px -1px 0px rgba(0, 0, 0, 0.08))
+    drop-shadow(-1px 1px 0px rgba(0, 0, 0, 0.08))
+    drop-shadow(2px 3px 3px rgba(0, 0, 0, 0.25));
+}

@@ -1,30 +1,65 @@
 .landing-container {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(135deg, #f5e6c8 0%, #e8d5a3 50%, #d4c17a 100%);
-  gap: 40px;
+  background: radial-gradient(ellipse at center, #fdf6e3 0%, #f5e6c8 40%, #e8d5a3 70%, #d4c17a 100%);
+  gap: 60px;
+}
+
+.landing-speakers {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 280px;
+  height: 220px;
+}
+
+.speaker-connector {
+  position: absolute;
+  width: 120px;
+  height: 400px;
+  background-color: #8B1A1A;
+  border-radius: 8px;
+  z-index: 0;
+}
+
+.speaker-img {
+  position: absolute;
+  height: 440px;
+  object-fit: contain;
+  z-index: 1;
+}
+
+.speaker-left {
+  left: -170px;
+}
+
+.speaker-right {
+  right: -170px;
+  transform: scaleX(-1);
 }
 
 .landing-center {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 20px;
-  text-align: center;
+  text-align: left;
 }
 
 .logo-text {
-  font-family: 'Georgia', serif;
-  font-size: 3.5rem;
+  font-family: 'Molle', cursive;
+  font-size: 20rem;
   color: #3d1f00;
   font-style: italic;
   margin: 0;
 }
 
 .slogan {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   color: #3d1f00;
   font-weight: 500;
   line-height: 1.6;
@@ -40,23 +75,9 @@
   font-weight: bold;
   border-radius: 30px;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 0;
 }
 
 .btn-entrar:hover {
   background-color: #e6b800;
-}
-
-.landing-speakers {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.speaker {
-  width: 80px;
-  height: 120px;
-  background-color: #1a1a1a;
-  border-radius: 12px;
-  border: 3px solid #333;
 }
