@@ -4,6 +4,7 @@ import (
     "time"
     "amplify/server/internal/models"
     "amplify/server/internal/repositories"
+    "errors"
 )
 type CreateEventRequest struct {
     Name        string    `json:"name" binding:"required"`
@@ -53,4 +54,41 @@ func (s *Service) InviteUser(eventID uint, invitedUserID uint) error {
         Status:  "invited", 
     }
     return s.repository.CreateParticipation(participation)
+}
+func (s *Service) GetEvent(eventID uint, requesterUserID uint) (*models.Event, error) {
+    event, err := s.repository.GetEventByID(eventID)
+    if err != nil {
+        return nil, err
+    }
+    if !event.IsPrivate {
+        return event, nil
+    }
+    if event.UserID == requesterUserID {
+        return event, nil
+    }
+    temPermissao := false
+    for _, participante := range event.Participants {
+        if participante.UserID == requesterUserID && (participante.Status == "accepted" || participante.Status == "invited") {
+            temPermissao = true
+            break
+        }
+    }
+
+    if !temPermissao {
+        return nil, errors.New("este evento é privado e você não tem permissão para visualizá-lo")
+    }
+
+    return event, nil
+}
+func (s *Service) GetEventRequests(eventID uint, requesterUserID uint) ([]models.Participate, error) {
+    event, err := s.repository.GetEventByID(eventID)
+    if err != nil {
+        return nil, err 
+    }
+    if event.UserID != requesterUserID {
+        return nil, errors.New("acesso negado: apenas o dono do evento pode ver as solicitações")
+    }
+    participations, err := s.repository.GetPendingRequests(eventID)
+    
+    return participations, err
 }
