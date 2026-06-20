@@ -4,6 +4,7 @@ import (
     "time"
     "amplify/server/internal/models"
     "amplify/server/internal/repositories"
+    "errors"
 )
 type CreateEventRequest struct {
     Name        string    `json:"name" binding:"required"`
@@ -53,4 +54,19 @@ func (s *Service) InviteUser(eventID uint, invitedUserID uint) error {
         Status:  "invited", 
     }
     return s.repository.CreateParticipation(participation)
+}
+func (s *Service) GetEvent(eventID uint) (*models.Event, error){
+    return s.repository.GetEventByID(eventID)
+}
+func (s *Service) GetEventRequests(eventID uint, requesterUserID uint) ([]models.Participate, error) {
+    event, err := s.repository.GetEventByID(eventID)
+    if err != nil {
+        return nil, err 
+    }
+    if event.UserID != requesterUserID {
+        return nil, errors.New("acesso negado: apenas o dono do evento pode ver as solicitações")
+    }
+    participations, err := s.repository.GetPendingRequests(eventID)
+    
+    return participations, err
 }
