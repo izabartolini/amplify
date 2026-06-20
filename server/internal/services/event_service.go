@@ -55,8 +55,30 @@ func (s *Service) InviteUser(eventID uint, invitedUserID uint) error {
     }
     return s.repository.CreateParticipation(participation)
 }
-func (s *Service) GetEvent(eventID uint) (*models.Event, error){
-    return s.repository.GetEventByID(eventID)
+func (s *Service) GetEvent(eventID uint, requesterUserID uint) (*models.Event, error) {
+    event, err := s.repository.GetEventByID(eventID)
+    if err != nil {
+        return nil, err
+    }
+    if !event.IsPrivate {
+        return event, nil
+    }
+    if event.UserID == requesterUserID {
+        return event, nil
+    }
+    temPermissao := false
+    for _, participante := range event.Participants {
+        if participante.UserID == requesterUserID && (participante.Status == "accepted" || participante.Status == "invited") {
+            temPermissao = true
+            break
+        }
+    }
+
+    if !temPermissao {
+        return nil, errors.New("este evento é privado e você não tem permissão para visualizá-lo")
+    }
+
+    return event, nil
 }
 func (s *Service) GetEventRequests(eventID uint, requesterUserID uint) ([]models.Participate, error) {
     event, err := s.repository.GetEventByID(eventID)

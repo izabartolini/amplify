@@ -67,13 +67,20 @@ func (c *Controller) GetEvent(ctx *gin.Context ){
     return
     }
 
-    event, err := c.service.GetEvent(uint(eventID))
-    if err != nil {
-        ctx.JSON(http.StatusNotFound, gin.H{"error": "Evento nao encontrado"})
+    userIDInterface, exists := ctx.Get("userID")
+    if !exists {
+        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
         return
     }
-    ctx.JSON(http.StatusOK, event)
+    userID := userIDInterface.(uint)
 
+    event, err := c.service.GetEvent(uint(eventID), userID)
+    if err != nil {
+        ctx.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+        return
+    }
+
+    ctx.JSON(http.StatusOK, event)
 }
 func (c *Controller) GetEventRequests(ctx *gin.Context) {
     eventIDStr := ctx.Param("id")
