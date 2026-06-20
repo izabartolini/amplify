@@ -39,6 +39,14 @@ func SetupRoutes(r *gin.Engine) {
 
 		protectedAPI.PUT("/users/update", controller.UpdateUser)
 		protectedAPI.DELETE("/me", controller.DeleteMe)
+		eventsAPI := protectedAPI.Group("/events")
+        {
+            eventsAPI.POST("", controller.CreateEvent)
+            
+            eventsAPI.POST("/:id/requests", controller.RequestParticipation)
+            
+            eventsAPI.POST("/:id/invites", controller.InviteUser)
+        }
 		//future protected routes
 	}
 }
