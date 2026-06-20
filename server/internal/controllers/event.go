@@ -59,3 +59,41 @@ func (c *Controller) InviteUser(ctx *gin.Context) {
 
     ctx.JSON(http.StatusCreated, gin.H{"message": "Convite enviado com sucesso"})
 }
+func (c *Controller) GetEvent(ctx *gin.Context ){
+    eventIDStr := ctx.Param("id")
+    eventID, err := strconv.ParseUint(eventIDStr, 10, 20)
+    if err!= nil {
+    ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID do evento invalido"})
+    return
+    }
+
+    event, err := c.service.GetEvent(uint(eventID))
+    if err != nil {
+        ctx.JSON(http.StatusNotFound, gin.H{"error": "Evento nao encontrado"})
+        return
+    }
+    ctx.JSON(http.StatusOK, event)
+
+}
+func (c *Controller) GetEventRequests(ctx *gin.Context) {
+    eventIDStr := ctx.Param("id")
+    eventID, err := strconv.ParseUint(eventIDStr,10,32)
+    if err != nil{
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "id invalido"})
+        return
+    }
+
+    userIDInterface, exists := ctx.Get("userID")
+    if !exists{
+        ctx.JSON(http.StatusUnauthorized, gin.H{"error":"Usuario nao autenticado"})
+        return
+    }
+    userID := userIDInterface.(uint)
+
+    requests, err := c.service.GetEventRequests(uint(eventID), userID)
+    if err != nil {
+        ctx.JSON(http.StatusForbidden, gin.H{"error":"Nao e o dono do evento"})
+        return
+    }
+    ctx.JSON(http.StatusOK, requests)
+}

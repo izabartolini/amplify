@@ -46,6 +46,10 @@ func SetupRoutes(r *gin.Engine) {
             eventsAPI.POST("/:id/requests", controller.RequestParticipation)
             
             eventsAPI.POST("/:id/invites", controller.InviteUser)
+
+			eventsAPI.GET("/:id", controller.GetEvent)
+
+			eventsAPI.GET("/:id/requests", controller.GetEventRequests)
         }
 		//future protected routes
 	}
