@@ -1,12 +1,12 @@
 package services
 
 import (
+	"amplify/server/internal/models"
 	"errors"
 	"regexp"
+	"strconv"
 	"strings"
 	"unicode"
-	"strconv"
-	"amplify/server/internal/models"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -86,18 +86,18 @@ func validateCPF(cpf string) bool {
 }
 
 type RegisterDTO struct {
-	Name           string `json:"name" binding:"required"`
-	Email          string `json:"email" binding:"required,email"`
-	Username       string `json:"username" binding:"required"`
-	Password       string `json:"password" binding:"required"`
-	CPF            string `json:"cpf" binding:"required"`
-	Instrument     string `json:"instrument"`
-	Level          string `json:"level"`
-	City           string `json:"city"`
-	State          string `json:"state"`
-	Country        string `json:"country"`
-	Bio            string `json:"bio"`
-	ProfilePicture string `json:"profile_picture"`
+	Name           string   `json:"name" binding:"required"`
+	Email          string   `json:"email" binding:"required,email"`
+	Username       string   `json:"username" binding:"required"`
+	Password       string   `json:"password" binding:"required"`
+	CPF            string   `json:"cpf" binding:"required"`
+	Instrument     string   `json:"instrument"`
+	Level          string   `json:"level"`
+	City           string   `json:"city"`
+	State          string   `json:"state"`
+	Country        string   `json:"country"`
+	Bio            string   `json:"bio"`
+	ProfilePicture string   `json:"profile_picture"`
 	Tags           []string `json:"tags"`
 }
 
@@ -111,8 +111,8 @@ func (s *Service) RegisterUser(req RegisterDTO) (*models.User, error) {
 		return nil, errors.New("A senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial")
 	}
 	if !validateCPF(req.CPF) {
-        return nil, errors.New("CPF inválido")
-    }
+		return nil, errors.New("CPF inválido")
+	}
 
 	if err := s.repository.CheckConflicts(req.Email, req.Username, req.CPF); err != nil {
 		return nil, err
@@ -157,14 +157,14 @@ func (s *Service) GetUsersByName(name string) ([]models.User, error) {
 }
 
 type UpdateUserRequest struct {
-	Name       string `json:"name"`
-	Username   string `json:"username"`
+	Name           string `json:"name"`
+	Username       string `json:"username"`
 	ProfilePicture string `json:"profile_picture"`
-	Bio        string `json:"bio"`
-	Level      string `json:"level"`
-	City       string `json:"city"`
-	State      string `json:"state"`
-	Country    string `json:"country"`
+	Bio            string `json:"bio"`
+	Level          string `json:"level"`
+	City           string `json:"city"`
+	State          string `json:"state"`
+	Country        string `json:"country"`
 }
 
 func (s *Service) UpdateUserProfile(id uint, req UpdateUserRequest) error {
@@ -211,4 +211,8 @@ func (s *Service) UpdateUserProfile(id uint, req UpdateUserRequest) error {
 }
 func (s *Service) DeleteUserAccount(userID uint) error {
 	return s.repository.DeleteUser(userID)
+}
+
+func (s *Service) GetUserActivity(userID uint) ([]map[string]interface{}, error) {
+	return s.repository.GetUserActivity(userID)
 }
