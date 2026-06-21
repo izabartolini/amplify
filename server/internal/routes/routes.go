@@ -55,7 +55,7 @@ func SetupRoutes(r *gin.Engine) {
 
 			eventsAPI.PUT("/:id/update", controller.UpdateEvent)
         }
-		}
+		
 		//future protected routes
 	}
 }
