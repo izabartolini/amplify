@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"amplify/server/internal/services"
@@ -222,4 +223,19 @@ func (h *Controller) ValidateCod(c *gin.Context) {
 		"message": "password updated successfully",
 		"user":    id,
 	})
+func (h *Controller) GetUserActivity(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	activities, err := h.service.GetUserActivity(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, activities)
 }

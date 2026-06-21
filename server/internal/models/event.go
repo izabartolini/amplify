@@ -29,6 +29,7 @@ type Participate struct {
 	ID        uint      `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
 	UserID    uint      `gorm:"not null"`
 	EventID   uint      `gorm:"not null"`
+	Status	  string	`gorm:"type:varchar(20);not null;default:'accepted'"`
 	Joined    time.Time `gorm:"autoCreateTime"`
 	Left      *time.Time
 }

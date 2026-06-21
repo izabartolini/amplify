@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(135deg, #f5e6c8 0%, #e8d5a3 50%, #d4c17a 100%);
+  background: radial-gradient(ellipse at center, #fdf6e3 0%, #f5e6c8 40%, #e8d5a3 70%, #d4c17a 100%);
   gap: 40px;
 }
 
@@ -15,7 +15,7 @@
 }
 
 .logo-text {
-  font-family: 'Georgia', serif;
+  font-family: 'Molle', cursive;
   font-size: 3rem;
   color: #3d1f00;
   font-style: italic;
@@ -59,7 +59,7 @@
   font-weight: bold;
   border-radius: 30px;
   cursor: pointer;
-  margin-top: 4px;
+  margin-top: 0;
 }
 
 .btn-entrar:hover {

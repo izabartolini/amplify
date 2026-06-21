@@ -2,6 +2,7 @@ package services
 
 import (
 	"crypto/tls"
+	"amplify/server/internal/models"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -12,8 +13,6 @@ import (
 	"strings"
 	"time"
 	"unicode"
-
-	"amplify/server/internal/models"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -409,3 +408,6 @@ func (s *Service) VerifyResetCode(email string, code string) (uint, error) {
 	return data.UserID, nil
 }
 
+func (s *Service) GetUserActivity(userID uint) ([]map[string]interface{}, error) {
+	return s.repository.GetUserActivity(userID)
+}

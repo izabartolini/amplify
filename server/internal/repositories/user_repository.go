@@ -110,3 +110,46 @@ func (r *Repository) DeleteUser(id uint) error {
 	result := r.db.Delete(&models.User{}, id)
 	return result.Error
 }
+
+func (r *Repository) GetUserActivity(userID uint) ([]map[string]interface{}, error) {
+	var activities []map[string]interface{}
+
+	var likes []models.Like
+	if err := r.db.Where("user_id = ?", userID).Order("created_at desc").Find(&likes).Error; err != nil {
+		return nil, err
+	}
+	for _, l := range likes {
+		activities = append(activities, map[string]interface{}{
+			"type":       "like",
+			"post_id":    l.PostID,
+			"created_at": l.CreatedAt,
+		})
+	}
+
+	var comments []models.Comment
+	if err := r.db.Where("user_id = ?", userID).Order("created_at desc").Find(&comments).Error; err != nil {
+		return nil, err
+	}
+	for _, c := range comments {
+		activities = append(activities, map[string]interface{}{
+			"type":       "comment",
+			"post_id":    c.PostID,
+			"text":       c.Text,
+			"created_at": c.CreatedAt,
+		})
+	}
+
+	var follows []models.Follow
+	if err := r.db.Where("follower_id = ?", userID).Order("created_at desc").Find(&follows).Error; err != nil {
+		return nil, err
+	}
+	for _, f := range follows {
+		activities = append(activities, map[string]interface{}{
+			"type":         "follow",
+			"following_id": f.FollowingID,
+			"created_at":   f.CreatedAt,
+		})
+	}
+
+	return activities, nil
+}

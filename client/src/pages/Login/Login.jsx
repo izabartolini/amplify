@@ -12,7 +12,7 @@ function Login() {
       </div>
 
       <div className="login-center">
-        <h1 className="logo-text">Amplify</h1>
+        <h1 className="logo-text amplify-logo">Amplify</h1>
         <div className="login-card">
           <h2>Bem-vindo!</h2>
           <input type="text" placeholder="Usuário ou e-mail" />

@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import speakerImg from '../../assets/speaker.png'
 import './Landing.css'
 
 function Landing() {
@@ -6,22 +7,18 @@ function Landing() {
 
   return (
     <div className="landing-container">
-      <div className="landing-speakers left-speakers">
-        <div className="speaker"></div>
-        <div className="speaker"></div>
+      <div className="landing-speakers">
+        <div className="speaker-connector"></div>
+        <img src={speakerImg} alt="speaker" className="speaker-img speaker-left" />
+        <img src={speakerImg} alt="speaker" className="speaker-img speaker-right" />
       </div>
 
       <div className="landing-center">
-        <h1 className="logo-text">Amplify</h1>
+        <h1 className="logo-text amplify-logo">Amplify</h1>
         <p className="slogan">Amplifique suas conexões.<br />Viva a música ao vivo.</p>
         <button className="btn-entrar" onClick={() => navigate('/login')}>
           Entrar
         </button>
-      </div>
-
-      <div className="landing-speakers right-speakers">
-        <div className="speaker"></div>
-        <div className="speaker"></div>
       </div>
     </div>
   )
