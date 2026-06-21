@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -156,5 +157,69 @@ func (h *Controller) UpdateUserPassword(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"message": "profile updated successfully",
+	})
+}
+
+type ForgotPasswordRequest struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+func (h *Controller) ForgotPassword(c *gin.Context) {
+
+	var req ForgotPasswordRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := h.service.SendResetPasswordEmail(
+		req.Email,
+	)
+
+	if err != nil {
+		fmt.Println("SMTP ERROR:", err)
+		c.JSON(500, gin.H{"error": "failed to send email"})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "email sent",
+	})
+}
+
+func (h *Controller) ValidateCod(c *gin.Context) {
+	var req struct {
+		Email string `json:"email"`
+		Code  string `json:"code"`
+		services.UpdateForgotenPasswordRequest
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	id, err := h.service.VerifyResetCode(req.Email, req.Code)
+
+	if err != nil {
+		c.JSON(401, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	err = h.service.UpdateForgotenPassword(id, req.UpdateForgotenPasswordRequest)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "password updated successfully",
+		"user":    id,
 	})
 }
