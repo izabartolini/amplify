@@ -26,11 +26,11 @@ func SetupRoutes(r *gin.Engine) {
 	}
 
 	protectedAPI := r.Group("/api")
-	protectedAPI.Use(middlewares.AuthRequired()) 
+	protectedAPI.Use(middlewares.AuthRequired())
 	{
 		protectedAPI.GET("/test-auth", func(c *gin.Context) {
-			userID, _ := c.Get("userID") 
-			
+			userID, _ := c.Get("userID")
+
 			c.JSON(http.StatusOK, gin.H{
 				"message":        "Funcionando...",
 				"user_id_logado": userID,
@@ -38,14 +38,16 @@ func SetupRoutes(r *gin.Engine) {
 		})
 
 		protectedAPI.PUT("/users/update", controller.UpdateUser)
+		protectedAPI.GET("/users/:id/activity", controller.GetUserActivity)
 		protectedAPI.DELETE("/me", controller.DeleteMe)
+		protectedAPI.POST("/posts", controller.CreatePost)
 		eventsAPI := protectedAPI.Group("/events")
-        {
-            eventsAPI.POST("", controller.CreateEvent)
-            
-            eventsAPI.POST("/:id/requests", controller.RequestParticipation)
-            
-            eventsAPI.POST("/:id/invites", controller.InviteUser)
+		{
+			eventsAPI.POST("", controller.CreateEvent)
+
+			eventsAPI.POST("/:id/requests", controller.RequestParticipation)
+
+			eventsAPI.POST("/:id/invites", controller.InviteUser)
 
 			eventsAPI.GET("/:id", controller.GetEvent)
 
@@ -53,6 +55,7 @@ func SetupRoutes(r *gin.Engine) {
 
 			eventsAPI.PUT("/:id/update", controller.UpdateEvent)
         }
+		}
 		//future protected routes
 	}
 }
