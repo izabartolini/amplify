@@ -136,7 +136,7 @@ func (s *Service) UpdateEvent(eventID uint, ownerID uint, req UpdateEventRequest
     }
     err = s.repository.UpdateEvent(event)
     if err != nil {
-        return nil, err // Retorna erro caso o banco falhe ao salvar
+        return nil, err 
     }
     return event, nil
 }
