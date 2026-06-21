@@ -30,3 +30,6 @@ func (r *Repository) GetPendingRequests(eventID uint) ([]models.Participate, err
     err := r.db.Where("event_id = ? AND status = ?", eventID, "pending").Find(&participation).Error
     return participation, err 
 }
+func (r *Repository) UpdateEvent(event *models.Event) error {
+    return r.db.Save(event).Error
+}

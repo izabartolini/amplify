@@ -104,3 +104,28 @@ func (c *Controller) GetEventRequests(ctx *gin.Context) {
     }
     ctx.JSON(http.StatusOK, requests)
 }
+func (c *Controller) UpdateEvent(ctx *gin.Context){
+    var req services.UpdateEventRequest
+    eventIDStr := ctx.Param("id")
+    eventID, err := strconv.ParseUint(eventIDStr,10,32)
+    if err != nil{
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "id invalido"})
+        return
+    }
+    if err := ctx.ShouldBindJSON(&req); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos: " + err.Error()})
+        return
+    }
+    userIDInterface, exists := ctx.Get("userID")
+    if !exists {
+        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
+        return
+    }
+    userID := userIDInterface.(uint)
+    updatedEvent, err := c.service.UpdateEvent(uint(eventID), userID, req)
+    if err != nil {
+        ctx.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+        return
+    }
+    ctx.JSON(http.StatusOK, updatedEvent)
+}

@@ -92,3 +92,51 @@ func (s *Service) GetEventRequests(eventID uint, requesterUserID uint) ([]models
     
     return participations, err
 }
+type UpdateEventRequest struct {
+    Name        string    `json:"name"`
+    Description string    `json:"description"`
+    Date        *time.Time `json:"date"` 
+    IsPrivate   *bool      `json:"is_private"` 
+    Place       string    `json:"place"`
+    City        string    `json:"city"`
+    State       string    `json:"state"`
+    Country     string    `json:"country"`
+}
+func (s *Service) UpdateEvent(eventID uint, ownerID uint, req UpdateEventRequest) (*models.Event, error){
+    event, err := s.repository.GetEventByID(eventID)
+    if err != nil{
+        return nil, err
+    }
+    if event.UserID != ownerID{
+        return nil, errors.New("Acesso negado")
+    }
+    if req.Name != "" {
+        event.Name = req.Name
+    }
+    if req.IsPrivate != nil {
+        event.IsPrivate = *req.IsPrivate
+    }
+    if req.Description != ""{
+        event.Description = req.Description
+    }
+    if req.Date != nil {
+        event.Date = *req.Date
+    }
+    if req.Place != "" {
+        event.Place = req.Place
+    }
+    if req.City != "" { 
+        event.City = req.City
+    }
+    if req.State != "" {
+        event.State = req.State
+    }
+    if req.Country != "" {
+        event.Country = req.Country
+    }
+    err = s.repository.UpdateEvent(event)
+    if err != nil {
+        return nil, err 
+    }
+    return event, nil
+}
