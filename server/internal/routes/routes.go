@@ -41,6 +41,7 @@ func SetupRoutes(r *gin.Engine) {
 		protectedAPI.GET("/users/:id/activity", controller.GetUserActivity)
 		protectedAPI.DELETE("/me", controller.DeleteMe)
 		protectedAPI.POST("/posts", controller.CreatePost)
+		protectedAPI.GET("/posts", controller.GetFeed)
 		eventsAPI := protectedAPI.Group("/events")
 		{
 			eventsAPI.POST("", controller.CreateEvent)
