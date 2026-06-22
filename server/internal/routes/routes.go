@@ -19,6 +19,8 @@ func SetupRoutes(r *gin.Engine) {
 	r.GET("/user", controller.GetUsers)
 	r.GET("/userByName", controller.GetUsersByName)
 	r.POST("/login", controller.Login)
+	r.POST("/forgot-password", controller.ForgotPassword)
+	r.POST("/forgot-password/new-password", controller.ValidateCod)
 
 	publicAPI := r.Group("/api/auth")
 	{
@@ -40,6 +42,8 @@ func SetupRoutes(r *gin.Engine) {
 		protectedAPI.PUT("/users/update", controller.UpdateUser)
 		protectedAPI.GET("/users/:id/activity", controller.GetUserActivity)
 		protectedAPI.DELETE("/me", controller.DeleteMe)
+		protectedAPI.PUT("/users/update/security", controller.UpdateUserPassword)
+
 		protectedAPI.POST("/posts", controller.CreatePost)
 		eventsAPI := protectedAPI.Group("/events")
 		{
