@@ -3,6 +3,7 @@ package controllers
 import (
 	"amplify/server/internal/services"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -40,4 +41,21 @@ func (h *Controller) GetFeed(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, posts)
+}
+
+func (h *Controller) GetPostByID(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	post, err := h.service.GetPostByID(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, post)
 }

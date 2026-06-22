@@ -17,3 +17,14 @@ func (r *Repository) GetFeed() ([]models.Post, error) {
 		Find(&posts).Error
 	return posts, err
 }
+
+func (r *Repository) GetPostByID(id uint) (*models.Post, error) {
+	var post models.Post
+	err := r.db.
+		Preload("Medias").
+		Preload("Likes").
+		Preload("Comments").
+		Preload("User").
+		First(&post, id).Error
+	return &post, err
+}
