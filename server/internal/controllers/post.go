@@ -59,3 +59,34 @@ func (h *Controller) GetPostByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, post)
 }
+
+func (h *Controller) LikePost(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "não autenticado"})
+		return
+	}
+
+	idStr := c.Param("id")
+	postID, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	err = h.service.LikePost(userID.(uint), uint(postID))
+	if err != nil {
+		if err.Error() == "post não encontrado" {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		if err.Error() == "usuário já curtiu este post" {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "post curtido com sucesso"})
+}

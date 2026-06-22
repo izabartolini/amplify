@@ -32,35 +32,36 @@ func SetupRoutes(r *gin.Engine) {
 	{
 		protectedAPI.GET("/test-auth", func(c *gin.Context) {
 			userID, _ := c.Get("userID")
-
 			c.JSON(http.StatusOK, gin.H{
 				"message":        "Funcionando...",
 				"user_id_logado": userID,
 			})
 		})
 
-		protectedAPI.PUT("/users/update", controller.UpdateUser)
-		protectedAPI.GET("/users/:id/activity", controller.GetUserActivity)
-		protectedAPI.DELETE("/me", controller.DeleteMe)
-		protectedAPI.PUT("/users/update/security", controller.UpdateUserPassword)
+		usersAPI := protectedAPI.Group("/users")
+		{
+			usersAPI.PUT("/update", controller.UpdateUser)
+			usersAPI.PUT("/update/security", controller.UpdateUserPassword)
+			usersAPI.GET("/:id/activity", controller.GetUserActivity)
+			usersAPI.DELETE("/me", controller.DeleteMe)
+		}
 
-		protectedAPI.POST("/posts", controller.CreatePost)
-		protectedAPI.GET("/posts", controller.GetFeed)
-		protectedAPI.GET("/posts/:id", controller.GetPostByID)
+		postsAPI := protectedAPI.Group("/posts")
+		{
+			postsAPI.POST("", controller.CreatePost)
+			postsAPI.GET("", controller.GetFeed)
+			postsAPI.GET("/:id", controller.GetPostByID)
+			postsAPI.POST("/:id/like", controller.LikePost)
+		}
+
 		eventsAPI := protectedAPI.Group("/events")
 		{
 			eventsAPI.POST("", controller.CreateEvent)
-
-			eventsAPI.POST("/:id/requests", controller.RequestParticipation)
-
-			eventsAPI.POST("/:id/invites", controller.InviteUser)
-
 			eventsAPI.GET("/:id", controller.GetEvent)
-
 			eventsAPI.GET("/:id/requests", controller.GetEventRequests)
-
+			eventsAPI.POST("/:id/requests", controller.RequestParticipation)
+			eventsAPI.POST("/:id/invites", controller.InviteUser)
 			eventsAPI.PUT("/:id/update", controller.UpdateEvent)
-
 			eventsAPI.DELETE("/:id/delete", controller.DeleteEvent)
 		}
 
