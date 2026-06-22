@@ -223,6 +223,8 @@ func (h *Controller) ValidateCod(c *gin.Context) {
 		"message": "password updated successfully",
 		"user":    id,
 	})
+}
+
 func (h *Controller) GetUserActivity(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)

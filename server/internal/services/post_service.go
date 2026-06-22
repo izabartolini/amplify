@@ -97,3 +97,66 @@ func (s *Service) GetFeed() ([]PostResponseDTO, error) {
 
 	return result, nil
 }
+
+type CommentUserDTO struct {
+	ID             uint   `json:"id"`
+	Name           string `json:"name"`
+	Username       string `json:"username"`
+	ProfilePicture string `json:"profile_picture"`
+}
+
+type CommentResponseDTO struct {
+	ID        uint           `json:"id"`
+	Text      string         `json:"text"`
+	CreatedAt string         `json:"created_at"`
+	User      CommentUserDTO `json:"user"`
+}
+
+type PostDetailDTO struct {
+	ID        uint                 `json:"id"`
+	Subtitle  string               `json:"subtitle"`
+	CreatedAt string               `json:"created_at"`
+	User      PostUserDTO          `json:"user"`
+	Medias    []models.Media       `json:"medias"`
+	LikeCount int                  `json:"like_count"`
+	Comments  []CommentResponseDTO `json:"comments"`
+}
+
+func (s *Service) GetPostByID(id uint) (*PostDetailDTO, error) {
+	post, err := s.repository.GetPostByID(id)
+	if err != nil {
+		return nil, errors.New("post não encontrado")
+	}
+
+	var comments []CommentResponseDTO
+	for _, c := range post.Comments {
+		comments = append(comments, CommentResponseDTO{
+			ID:        c.ID,
+			Text:      c.Text,
+			CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			User: CommentUserDTO{
+				ID:             post.User.ID,
+				Name:           post.User.Name,
+				Username:       post.User.Username,
+				ProfilePicture: post.User.ProfilePicture,
+			},
+		})
+	}
+
+	return &PostDetailDTO{
+		ID:        post.ID,
+		Subtitle:  post.Subtitle,
+		CreatedAt: post.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		User: PostUserDTO{
+			ID:             post.User.ID,
+			Name:           post.User.Name,
+			Username:       post.User.Username,
+			ProfilePicture: post.User.ProfilePicture,
+			City:           post.User.City,
+			State:          post.User.State,
+		},
+		Medias:    post.Medias,
+		LikeCount: len(post.Likes),
+		Comments:  comments,
+	}, nil
+}
