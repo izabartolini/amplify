@@ -49,3 +49,51 @@ func (s *Service) CreatePost(userID uint, req CreatePostDTO) (*models.Post, erro
 
 	return post, nil
 }
+
+type PostUserDTO struct {
+	ID             uint   `json:"id"`
+	Name           string `json:"name"`
+	Username       string `json:"username"`
+	ProfilePicture string `json:"profile_picture"`
+	City           string `json:"city"`
+	State          string `json:"state"`
+}
+
+type PostResponseDTO struct {
+	ID        uint             `json:"id"`
+	Subtitle  string           `json:"subtitle"`
+	CreatedAt string           `json:"created_at"`
+	User      PostUserDTO      `json:"user"`
+	Medias    []models.Media   `json:"medias"`
+	Likes     []models.Like    `json:"likes"`
+	Comments  []models.Comment `json:"comments"`
+}
+
+func (s *Service) GetFeed() ([]PostResponseDTO, error) {
+	posts, err := s.repository.GetFeed()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []PostResponseDTO
+	for _, p := range posts {
+		result = append(result, PostResponseDTO{
+			ID:        p.ID,
+			Subtitle:  p.Subtitle,
+			CreatedAt: p.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			User: PostUserDTO{
+				ID:             p.User.ID,
+				Name:           p.User.Name,
+				Username:       p.User.Username,
+				ProfilePicture: p.User.ProfilePicture,
+				City:           p.User.City,
+				State:          p.User.State,
+			},
+			Medias:   p.Medias,
+			Likes:    p.Likes,
+			Comments: p.Comments,
+		})
+	}
+
+	return result, nil
+}

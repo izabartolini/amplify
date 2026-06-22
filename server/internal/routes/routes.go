@@ -45,6 +45,7 @@ func SetupRoutes(r *gin.Engine) {
 		protectedAPI.PUT("/users/update/security", controller.UpdateUserPassword)
 
 		protectedAPI.POST("/posts", controller.CreatePost)
+		protectedAPI.GET("/posts", controller.GetFeed)
 		eventsAPI := protectedAPI.Group("/events")
 		{
 			eventsAPI.POST("", controller.CreateEvent)

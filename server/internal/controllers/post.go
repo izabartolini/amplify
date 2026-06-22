@@ -32,3 +32,12 @@ func (h *Controller) CreatePost(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, post)
 }
+
+func (h *Controller) GetFeed(c *gin.Context) {
+	posts, err := h.service.GetFeed()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, posts)
+}
