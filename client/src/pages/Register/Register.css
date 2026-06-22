@@ -1,0 +1,243 @@
+@import url('https://fonts.googleapis.com/css2?family=Molle:ital@1&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+.main-container {
+    width: 100vw;
+    height: 100vh;
+    background-color: #F6EDE4;
+    font-family: 'Ubuntu';
+    display: flex;
+}
+
+.img-container {
+    overflow: hidden;
+}
+
+.img-container img {
+    width: 40vw;
+    height: 100%;
+    object-fit: cover;
+    object-position: 0px -10vw;
+}
+
+.form-container {
+    margin-right: 3%;
+    margin-left: -3%;
+    margin-bottom: 5%;
+    margin-top: 5%;
+    width: 57%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.form-container header {
+    width: 100%;
+    height: 20%;
+}
+
+.form-container header h1 {
+    width: 100%;
+    font-family: 'Molle';
+    font-style: italic;
+    font-size: 400%;
+    margin: 0;
+    display: inline-block;
+    background: linear-gradient(to right, #452D20, #6B3A2A);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    -webkit-text-stroke: 0;
+    filter: drop-shadow(-3px -3px 0 #ECE3CF) drop-shadow(3px -3px 0 #ECE3CF) drop-shadow(-3px 3px 0 #ECE3CF) drop-shadow(3px 3px 0 #ECE3CF) drop-shadow(3px 4px 6px rgba(0, 0, 0, 0.15));
+    margin-bottom: -1%;
+}
+
+.form-container header h3 {
+    color: #6B3A2A;
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.15);
+    font-size: 150%;
+}
+
+.form-tabs {
+    display: flex;
+    width: 100%;
+    height: 80%;
+    flex-direction: row;
+    justify-self: center;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.div-open {
+    background-color: #FAE4CB;
+    width: 65%;
+    height: 100%;
+    border-radius: 5%;
+    box-shadow: 4px 4px 8px rgba(70, 34, 11, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+}
+
+.div-closed {
+    width: 15%;
+    background-color: #FAE4CB;
+    height: 100%;
+    border-radius: 5%;
+    box-shadow: 4px 4px 8px rgba(70, 34, 11, 0.15);
+}
+
+.div-open h2 {
+    display: flex;
+    background-color: #d0b08e2f;
+    width: 100%;
+    height: 15%;
+    align-items: center;
+    align-content: center;
+    padding-left: 5%;
+    color: #5D3926;
+    font-size: 130%;
+    font-weight: 500;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    width: 88%;
+    height: 50%;
+    justify-content: space-evenly;
+}
+
+.main-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
+    background-color: transparent;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.input-group {
+    position: relative;
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group.empty {
+    pointer-events: none;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 20px;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 110%;
+    color: #452D20;
+    background-color: #f9e7d4;
+    border: 2px solid #BC9A74;
+    border-radius: 50px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.input-group input::placeholder {
+    color: #D5C7B7;
+    opacity: 1;
+    font-size: 85%;
+}
+
+.input-group label {
+    position: absolute;
+    left: 20px;
+    top: -10px;
+    z-index: 2;
+    display: inline-block;
+    width: auto;
+    padding: 0 3px;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 100%;
+    color: #452D20;
+    background-color: #FAE4CB;
+    pointer-events: none;
+}
+
+.btn-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    height: 15%;
+    margin-bottom: 3%;
+    margin-top: -1%;
+    align-items: center;
+}
+
+.interactive-nav {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 10rem;
+    height: 3rem;
+    transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.btn-advance {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    color: #6B3A2A;
+    border: 0.125rem solid #6B3A2A;
+    border-radius: 3.125rem;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.arrow-ball {
+    position: absolute;
+    right: 0;
+    width: 3rem;
+    height: 3rem;
+    background: transparent;
+    color: #452D20;
+    border-radius: 50%;
+    border: 0.125rem solid #452D20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    pointer-events: none;
+    
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.interactive-nav:hover {
+    width: 60%;
+}
+
+.interactive-nav:hover .btn-advance {
+    background: linear-gradient(to right, #452D20, #6B3A2A);
+    border-color: transparent;
+    color: #ECE3CF;
+    width: 11.5rem;
+}
+
+.interactive-nav:hover .arrow-ball {
+    opacity: 1;
+    transform: scale(1);
+}
