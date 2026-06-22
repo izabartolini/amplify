@@ -58,6 +58,8 @@ func SetupRoutes(r *gin.Engine) {
 			eventsAPI.GET("/:id/requests", controller.GetEventRequests)
 
 			eventsAPI.PUT("/:id/update", controller.UpdateEvent)
+
+			eventsAPI.DELETE("/:id/delete", controller.DeleteEvent)
         }
 		
 		//future protected routes

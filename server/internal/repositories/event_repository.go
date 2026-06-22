@@ -3,6 +3,7 @@ package repositories
 import (
     "amplify/server/internal/models"
     "gorm.io/gorm"
+    "gorm.io/gorm/clause"
 )
 
 type EventRepository struct {
@@ -32,4 +33,7 @@ func (r *Repository) GetPendingRequests(eventID uint) ([]models.Participate, err
 }
 func (r *Repository) UpdateEvent(event *models.Event) error {
     return r.db.Save(event).Error
+}
+func (r *Repository) DeleteEvent(event *models.Event) error {
+    return r.db.Select(clause.Associations).Delete(event).Error
 }

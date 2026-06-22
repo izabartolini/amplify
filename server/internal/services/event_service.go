@@ -140,3 +140,17 @@ func (s *Service) UpdateEvent(eventID uint, ownerID uint, req UpdateEventRequest
     }
     return event, nil
 }
+func (s *Service) DeleteEvent(eventID uint, ownerID uint) error{
+    event, err := s.repository.GetEventByID(eventID)
+    if err != nil{
+        return err
+    }
+    if event.UserID != ownerID{
+        return errors.New("Acesso negado")
+    }
+    err = s.repository.DeleteEvent(event)
+    if err != nil {
+        return err 
+    }
+    return nil
+}
