@@ -160,3 +160,11 @@ func (s *Service) GetPostByID(id uint) (*PostDetailDTO, error) {
 		Comments:  comments,
 	}, nil
 }
+
+func (s *Service) LikePost(userID uint, postID uint) error {
+	_, err := s.repository.GetPostByID(postID)
+	if err != nil {
+		return errors.New("post não encontrado")
+	}
+	return s.repository.LikePost(userID, postID)
+}
