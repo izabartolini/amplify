@@ -53,3 +53,7 @@ func (r *Repository) UnlikePost(userID uint, postID uint) error {
 	}
 	return result.Error
 }
+
+func (r *Repository) CreateComment(comment *models.Comment) error {
+	return r.db.Create(comment).Error
+}
