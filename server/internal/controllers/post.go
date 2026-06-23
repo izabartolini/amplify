@@ -121,3 +121,40 @@ func (h *Controller) UnlikePost(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "curtida removida com sucesso"})
 }
+
+func (h *Controller) CreateComment(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "não autenticado"})
+		return
+	}
+
+	idStr := c.Param("id")
+	postID, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	var req services.CreateCommentDTO
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "payload inválido"})
+		return
+	}
+
+	comment, err := h.service.CreateComment(userID.(uint), uint(postID), req)
+	if err != nil {
+		if err.Error() == "post não encontrado" {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		if err.Error() == "comentário não pode ser vazio" || err.Error() == "comentário não pode ter mais de 200 caracteres" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, comment)
+}

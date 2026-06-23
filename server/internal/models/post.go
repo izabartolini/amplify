@@ -28,11 +28,11 @@ type Like struct {
 }
 
 type Comment struct {
-	ID        uint           `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
-	UserID    uint           `gorm:"not null"`
-	PostID    uint           `gorm:"not null"`
-	Text      string         `gorm:"not null"`
-	CreatedAt time.Time      `gorm:"autoCreateTime"`
-	UpdatedAt time.Time      `gorm:"autoUpdateTime"`
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	ID        uint           `gorm:"primaryKey;autoIncrement:true;<-:create(false)" json:"id"`
+	UserID    uint           `gorm:"not null" json:"user_id"`
+	PostID    uint           `gorm:"not null" json:"post_id"`
+	Text      string         `gorm:"not null" json:"text"`
+	CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }

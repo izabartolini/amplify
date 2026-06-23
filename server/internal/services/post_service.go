@@ -176,3 +176,33 @@ func (s *Service) UnlikePost(userID uint, postID uint) error {
 	}
 	return s.repository.UnlikePost(userID, postID)
 }
+
+type CreateCommentDTO struct {
+	Text string `json:"text"`
+}
+
+func (s *Service) CreateComment(userID uint, postID uint, req CreateCommentDTO) (*models.Comment, error) {
+	if req.Text == "" {
+		return nil, errors.New("comentário não pode ser vazio")
+	}
+	if len(req.Text) > 200 {
+		return nil, errors.New("comentário não pode ter mais de 200 caracteres")
+	}
+
+	_, err := s.repository.GetPostByID(postID)
+	if err != nil {
+		return nil, errors.New("post não encontrado")
+	}
+
+	comment := &models.Comment{
+		UserID: userID,
+		PostID: postID,
+		Text:   req.Text,
+	}
+
+	if err := s.repository.CreateComment(comment); err != nil {
+		return nil, errors.New("erro ao criar comentário")
+	}
+
+	return comment, nil
+}
