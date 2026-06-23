@@ -158,3 +158,41 @@ func (h *Controller) CreateComment(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, comment)
 }
+
+func (h *Controller) DeleteComment(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "não autenticado"})
+		return
+	}
+
+	idStr := c.Param("id")
+	postID, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID do post inválido"})
+		return
+	}
+
+	commentIDStr := c.Param("commentId")
+	commentID, err := strconv.ParseUint(commentIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID do comentário inválido"})
+		return
+	}
+
+	err = h.service.DeleteComment(uint(commentID), userID.(uint), uint(postID))
+	if err != nil {
+		if err.Error() == "comentário não encontrado" || err.Error() == "post não encontrado" {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		if err.Error() == "sem permissão para deletar este comentário" {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "comentário deletado com sucesso"})
+}

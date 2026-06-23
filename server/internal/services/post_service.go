@@ -206,3 +206,7 @@ func (s *Service) CreateComment(userID uint, postID uint, req CreateCommentDTO) 
 
 	return comment, nil
 }
+
+func (s *Service) DeleteComment(commentID uint, userID uint, postID uint) error {
+	return s.repository.DeleteComment(commentID, userID, postID)
+}

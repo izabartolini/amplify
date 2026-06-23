@@ -57,3 +57,21 @@ func (r *Repository) UnlikePost(userID uint, postID uint) error {
 func (r *Repository) CreateComment(comment *models.Comment) error {
 	return r.db.Create(comment).Error
 }
+
+func (r *Repository) DeleteComment(commentID uint, userID uint, postID uint) error {
+	var comment models.Comment
+	if err := r.db.First(&comment, commentID).Error; err != nil {
+		return errors.New("comentário não encontrado")
+	}
+
+	var post models.Post
+	if err := r.db.First(&post, postID).Error; err != nil {
+		return errors.New("post não encontrado")
+	}
+
+	if comment.UserID != userID && post.UserID != userID {
+		return errors.New("sem permissão para deletar este comentário")
+	}
+
+	return r.db.Unscoped().Delete(&comment).Error
+}
