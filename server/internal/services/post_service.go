@@ -168,3 +168,11 @@ func (s *Service) LikePost(userID uint, postID uint) error {
 	}
 	return s.repository.LikePost(userID, postID)
 }
+
+func (s *Service) UnlikePost(userID uint, postID uint) error {
+	_, err := s.repository.GetPostByID(postID)
+	if err != nil {
+		return errors.New("post não encontrado")
+	}
+	return s.repository.UnlikePost(userID, postID)
+}
