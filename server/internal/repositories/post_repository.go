@@ -45,3 +45,11 @@ func (r *Repository) LikePost(userID uint, postID uint) error {
 	}
 	return r.db.Create(&like).Error
 }
+
+func (r *Repository) UnlikePost(userID uint, postID uint) error {
+	result := r.db.Where("user_id = ? AND post_id = ?", userID, postID).Delete(&models.Like{})
+	if result.RowsAffected == 0 {
+		return errors.New("curtida não encontrada")
+	}
+	return result.Error
+}

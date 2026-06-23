@@ -52,6 +52,7 @@ func SetupRoutes(r *gin.Engine) {
 			postsAPI.GET("", controller.GetFeed)
 			postsAPI.GET("/:id", controller.GetPostByID)
 			postsAPI.POST("/:id/like", controller.LikePost)
+			postsAPI.DELETE("/:id/like", controller.UnlikePost)
 		}
 
 		eventsAPI := protectedAPI.Group("/events")
