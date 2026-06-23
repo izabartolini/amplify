@@ -54,6 +54,7 @@ func SetupRoutes(r *gin.Engine) {
 			postsAPI.POST("/:id/like", controller.LikePost)
 			postsAPI.DELETE("/:id/like", controller.UnlikePost)
 			postsAPI.POST("/:id/comments", controller.CreateComment)
+			postsAPI.DELETE("/:id/comments/:commentId", controller.DeleteComment)
 		}
 
 		eventsAPI := protectedAPI.Group("/events")
