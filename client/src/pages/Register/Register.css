@@ -4,7 +4,7 @@
     width: 100vw;
     height: 100vh;
     background-color: #F6EDE4;
-    font-family: 'Ubuntu';
+    font-family: 'Ubuntu', sans-serif;
     display: flex;
 }
 
@@ -38,7 +38,7 @@
 
 .form-container header h1 {
     width: 100%;
-    font-family: 'Molle';
+    font-family: 'Molle', cursive;
     font-style: italic;
     font-size: 400%;
     margin: 0;
@@ -80,14 +80,26 @@
     justify-content: space-between;
     align-items: center;
     overflow: hidden;
+    transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .div-closed {
-    width: 15%;
+    width: 12%;
     background-color: #FAE4CB;
     height: 100%;
     border-radius: 5%;
     box-shadow: 4px 4px 8px rgba(70, 34, 11, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.3s ease;
+}
+
+.div-closed:hover {
+    background-color: #f7dac1;
 }
 
 .div-open h2 {
@@ -101,13 +113,25 @@
     color: #5D3926;
     font-size: 130%;
     font-weight: 500;
+    margin: 0;
 }
 
+/* TEXTO VERTICAL (EM PÉ) PARA AS ABAS FECHADAS */
+.vertical-title {
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    color: #452D20;
+    font-size: 1.6rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* --- FORMULÁRIO E INPUTS --- */
 .form {
     display: flex;
     flex-direction: column;
     width: 88%;
-    height: 50%;
+    height: 80%;
     justify-content: space-evenly;
 }
 
@@ -116,7 +140,7 @@
     flex-direction: column;
     width: 100%;
     height: 100%;
-    justify-content: space-between;
+    justify-content: space-evenly;
     background-color: transparent;
 }
 
@@ -175,10 +199,10 @@
 .btn-container {
     width: 100%;
     display: flex;
-    justify-content: space-around;
-    height: 15%;
+    justify-content: center;
+    height: 13%;
     margin-bottom: 3%;
-    margin-top: -1%;
+    margin-top: 1.5rem;
     align-items: center;
 }
 
@@ -211,23 +235,27 @@
     right: 0;
     width: 3rem;
     height: 3rem;
+    
     background: transparent;
+    border: 0.125rem solid #452D20; 
     color: #452D20;
+    
     border-radius: 50%;
-    border: 0.125rem solid #452D20;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.3rem;
-    pointer-events: none;
+    pointer-events: auto;
     
     opacity: 0;
     transform: scale(0.5);
+    box-sizing: border-box;
+    
     transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .interactive-nav:hover {
-    width: 60%;
+    width: 16rem;
 }
 
 .interactive-nav:hover .btn-advance {
@@ -240,4 +268,168 @@
 .interactive-nav:hover .arrow-ball {
     opacity: 1;
     transform: scale(1);
+}
+
+.arrow-ball:hover {
+    border-width: 0.25rem;
+}
+
+.interests-step {
+    height: 75% !important;
+}
+
+.interests-columns {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 80%;
+}
+
+.fieldset-container {
+    position: relative;
+    width: 48%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.fieldset-label {
+    position: absolute;
+    left: 25px;
+    top: -10px;
+    z-index: 2;
+    padding: 0 6px;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 95%;
+    color: #452D20;
+    background-color: #FAE4CB;
+}
+
+.fieldset-content {
+    width: 100%;
+    height: 100%;
+    border: 2px solid #BC9A74;
+    border-radius: 25px;
+    background-color: transparent;
+    padding: 1.5rem 1rem 1rem 1rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.list-rows {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.instrument-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f9e7d4;
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    height: 18%;
+    box-sizing: border-box;
+}
+
+.instrument-row input::placeholder{
+    font-size: 0.8rem;
+}
+
+.instrument-name {
+    color: #452D20;
+    font-weight: 500;
+}
+
+.skill-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    width: 4.5rem;
+    height: 100%;
+    cursor: pointer;
+}
+
+.skill-bars .bar {
+    flex: 1;
+    background-color: #D5C7B7; 
+    border-radius: 2px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.skill-bars .bar:hover {
+    transform: scaleY(1.1);
+}
+
+.skill-bars .bar.active {
+    background-color: var(--bar-color);
+}
+
+.tags-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.tag-input {
+    width: 100%;
+    padding: 10px 15px;
+    font-family: 'Ubuntu', sans-serif;
+    color: #452D20;
+    background-color: #f9e7d4;
+    border: 1px solid #BC9A74;
+    border-radius: 50px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    overflow-y: auto;
+    max-height: 75%;
+}
+
+.tag-item {
+    background-color: #BC9A74;
+    color: #FAE4CB;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    font-size: 85%;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.tag-item:hover {
+    background-color: #a3815c;
+    text-decoration: line-through;
+}
+
+.instrument-input-field {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 100%;
+    color: #452D20;
+    font-weight: 500;
+    width: 60%;
+}
+
+.instrument-input-field::placeholder {
+    color: #BC9A74;
+    opacity: 0.6;
+    font-weight: 400;
+}
+
+.skill-bars.blocked {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.skill-bars.blocked .bar {
+    pointer-events: none;
 }
