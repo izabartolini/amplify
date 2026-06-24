@@ -66,14 +66,14 @@ func (r *Repository) GetUserByEmail(findEmail string) (*models.User, error) {
 
 }
 
-func (r *Repository) GetUserById (id uint) (*models.User, error){
+func (r *Repository) GetUserById(id uint) (*models.User, error) {
 	var user models.User
 	err := r.db.First(&user, id).Error
 	if err != nil {
-        return nil, err
-    }
+		return nil, err
+	}
 
-    return &user, nil
+	return &user, nil
 }
 
 func (r *Repository) UpdateUser(id uint, data map[string]interface{}) error {
@@ -152,4 +152,41 @@ func (r *Repository) GetUserActivity(userID uint) ([]map[string]interface{}, err
 	}
 
 	return activities, nil
+}
+
+type PostAuthor struct {
+	ID             uint   `json:"id"`
+	Name           string `json:"name"`
+	Username       string `json:"username"`
+	ProfilePicture string `json:"profile_picture"`
+	City           string `json:"city"`
+	State          string `json:"state"`
+}
+
+func (r *Repository) GetPostsByUser(userID uint) ([]models.Post, error) {
+	var posts []models.Post
+	err := r.db.
+		Where("user_id = ?", userID).
+		Preload("Medias").
+		Preload("Likes").
+		Preload("Comments").
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("users.id, users.name, users.username, users.profile_picture, users.city, users.state")
+		}).
+		Order("created_at desc").
+		Find(&posts).Error
+	return posts, err
+}
+
+func (r *Repository) GetEventsByUser(userID uint) ([]models.Event, error) {
+	var events []models.Event
+	err := r.db.
+		Where("user_id = ?", userID).
+		Preload("Medias").
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("users.id, users.name, users.username, users.profile_picture, users.city, users.state")
+		}).
+		Order("date asc").
+		Find(&events).Error
+	return events, err
 }

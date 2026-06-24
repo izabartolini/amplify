@@ -43,6 +43,8 @@ func SetupRoutes(r *gin.Engine) {
 			usersAPI.PUT("/update", controller.UpdateUser)
 			usersAPI.PUT("/update/security", controller.UpdateUserPassword)
 			usersAPI.GET("/:id/activity", controller.GetUserActivity)
+			usersAPI.GET("/:id/posts", controller.GetUserPosts)
+			usersAPI.GET("/:id/events", controller.GetUserEvents)
 			usersAPI.DELETE("/me", controller.DeleteMe)
 		}
 
