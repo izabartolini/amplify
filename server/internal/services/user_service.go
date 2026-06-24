@@ -450,3 +450,35 @@ func (s *Service) GetUserByID(userID uint) (*UserProfileResponse, error) {
 		FollowingCount: len(user.Following),
 	}, nil
 }
+
+func (s *Service) FollowUser(followerID uint, followingID uint) error {
+	if followerID == followingID {
+		return errors.New("você não pode seguir a si mesmo")
+	}
+
+	already, err := s.repository.IsFollowing(followerID, followingID)
+	if err != nil {
+		return err
+	}
+	if already {
+		return errors.New("você já segue este usuário")
+	}
+
+	return s.repository.FollowUser(followerID, followingID)
+}
+
+func (s *Service) UnfollowUser(followerID uint, followingID uint) error {
+	following, err := s.repository.IsFollowing(followerID, followingID)
+	if err != nil {
+		return err
+	}
+	if !following {
+		return errors.New("você não segue este usuário")
+	}
+
+	return s.repository.UnfollowUser(followerID, followingID)
+}
+
+func (s *Service) IsFollowing(followerID uint, followingID uint) (bool, error) {
+	return s.repository.IsFollowing(followerID, followingID)
+}

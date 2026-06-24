@@ -213,3 +213,25 @@ func (r *Repository) GetUserByID(userID uint) (*models.User, error) {
 
 	return &user, nil
 }
+
+func (r *Repository) FollowUser(followerID uint, followingID uint) error {
+	follow := models.Follow{
+		FollowerID:  followerID,
+		FollowingID: followingID,
+	}
+	return r.db.Create(&follow).Error
+}
+
+func (r *Repository) UnfollowUser(followerID uint, followingID uint) error {
+	return r.db.
+		Where("follower_id = ? AND following_id = ?", followerID, followingID).
+		Delete(&models.Follow{}).Error
+}
+
+func (r *Repository) IsFollowing(followerID uint, followingID uint) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.Follow{}).
+		Where("follower_id = ? AND following_id = ?", followerID, followingID).
+		Count(&count).Error
+	return count > 0, err
+}
