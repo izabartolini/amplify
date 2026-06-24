@@ -93,3 +93,11 @@
   border-radius: 12px;
   border: 3px solid #333;
 }
+
+.error-message {
+  color: #ff4d4f;
+  font-size: 0.85rem;
+  margin-top: 1px;
+  text-align: left;
+  width: 100%;
+}

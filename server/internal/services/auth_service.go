@@ -26,7 +26,7 @@ func (s *Service) Login(email string, password string) (string, error) {
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return "", errors.New("user not found!")
+			return "", errors.New("user_not_found")
 		}
 		return "", err
 	}
@@ -37,7 +37,7 @@ func (s *Service) Login(email string, password string) (string, error) {
 	)
 
 	if err != nil {
-		return "", errors.New("invalid password")
+		return "", errors.New("invalid_password")
 	}
 
 	token, nil := utils.GenerateToken(user.ID, user.Email)
