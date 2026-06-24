@@ -292,3 +292,70 @@ func (h *Controller) GetUserByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, user)
 }
+
+func (h *Controller) FollowUser(c *gin.Context) {
+	followerID, _ := c.Get("userID")
+
+	idStr := c.Param("id")
+	followingID, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	if err := h.service.FollowUser(followerID.(uint), uint(followingID)); err != nil {
+		if err.Error() == "você não pode seguir a si mesmo" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if err.Error() == "você já segue este usuário" {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "usuário seguido com sucesso"})
+}
+
+func (h *Controller) UnfollowUser(c *gin.Context) {
+	followerID, _ := c.Get("userID")
+
+	idStr := c.Param("id")
+	followingID, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	if err := h.service.UnfollowUser(followerID.(uint), uint(followingID)); err != nil {
+		if err.Error() == "você não segue este usuário" {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}
+
+func (h *Controller) IsFollowing(c *gin.Context) {
+	followerID, _ := c.Get("userID")
+
+	idStr := c.Param("id")
+	followingID, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	following, err := h.service.IsFollowing(followerID.(uint), uint(followingID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"is_following": following})
+}

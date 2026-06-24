@@ -47,6 +47,9 @@ func SetupRoutes(r *gin.Engine) {
 			usersAPI.GET("/:id/posts", controller.GetUserPosts)
 			usersAPI.GET("/:id/events", controller.GetUserEvents)
 			usersAPI.DELETE("/me", controller.DeleteMe)
+			usersAPI.POST("/:id/follow", controller.FollowUser)
+			usersAPI.DELETE("/:id/follow", controller.UnfollowUser)
+			usersAPI.GET("/:id/follow", controller.IsFollowing)
 		}
 
 		postsAPI := protectedAPI.Group("/posts")
