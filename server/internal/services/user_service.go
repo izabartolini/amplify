@@ -417,3 +417,36 @@ func (s *Service) GetPostsByUser(userID uint) ([]models.Post, error) {
 func (s *Service) GetEventsByUser(userID uint) ([]models.Event, error) {
 	return s.repository.GetEventsByUser(userID)
 }
+
+type UserProfileResponse struct {
+	ID             uint   `json:"id"`
+	Name           string `json:"name"`
+	Username       string `json:"username"`
+	ProfilePicture string `json:"profile_picture"`
+	Bio            string `json:"bio"`
+	City           string `json:"city"`
+	State          string `json:"state"`
+	Country        string `json:"country"`
+	FollowersCount int    `json:"followers_count"`
+	FollowingCount int    `json:"following_count"`
+}
+
+func (s *Service) GetUserByID(userID uint) (*UserProfileResponse, error) {
+	user, err := s.repository.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &UserProfileResponse{
+		ID:             user.ID,
+		Name:           user.Name,
+		Username:       user.Username,
+		ProfilePicture: user.ProfilePicture,
+		Bio:            user.Bio,
+		City:           user.City,
+		State:          user.State,
+		Country:        user.Country,
+		FollowersCount: len(user.Followers),
+		FollowingCount: len(user.Following),
+	}, nil
+}

@@ -190,3 +190,26 @@ func (r *Repository) GetEventsByUser(userID uint) ([]models.Event, error) {
 		Find(&events).Error
 	return events, err
 }
+
+func (r *Repository) GetUserByID(userID uint) (*models.User, error) {
+	var user models.User
+	err := r.db.
+		Select("id, name, username, profile_picture, bio, city, state, country").
+		Preload("Tag").
+		Preload("Plays").
+		First(&user, userID).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var followersCount int64
+	r.db.Model(&models.Follow{}).Where("following_id = ?", userID).Count(&followersCount)
+
+	var followingCount int64
+	r.db.Model(&models.Follow{}).Where("follower_id = ?", userID).Count(&followingCount)
+
+	user.Followers = make([]models.Follow, followersCount)
+	user.Following = make([]models.Follow, followingCount)
+
+	return &user, nil
+}
