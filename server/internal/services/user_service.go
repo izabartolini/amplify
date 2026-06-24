@@ -1,8 +1,8 @@
 package services
 
 import (
-	"crypto/tls"
 	"amplify/server/internal/models"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -380,34 +380,40 @@ func (s *Service) UpdateForgotenPassword(id uint, req UpdateForgotenPasswordRequ
 	return s.repository.UpdateUser(id, updates)
 }
 
-
 type ResetCode struct {
 	UserID    uint
 	Code      string
 	ExpiresAt time.Time
 }
+
 var ResetCodes = map[string]ResetCode{}
-
-
 
 func (s *Service) VerifyResetCode(email string, code string) (uint, error) {
 	data, exists := ResetCodes[email]
-	
+
 	if !exists {
 		return 0, errors.New("code not found")
 	}
 	if time.Now().After(data.ExpiresAt) {
 		delete(ResetCodes, email)
-		
+
 		return 0, errors.New("code expired")
 	}
 	if data.Code != code {
 		return 0, errors.New("invalid code")
 	}
-	
+
 	return data.UserID, nil
 }
 
 func (s *Service) GetUserActivity(userID uint) ([]map[string]interface{}, error) {
 	return s.repository.GetUserActivity(userID)
+}
+
+func (s *Service) GetPostsByUser(userID uint) ([]models.Post, error) {
+	return s.repository.GetPostsByUser(userID)
+}
+
+func (s *Service) GetEventsByUser(userID uint) ([]models.Event, error) {
+	return s.repository.GetEventsByUser(userID)
 }
