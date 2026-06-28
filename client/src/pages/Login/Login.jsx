@@ -77,8 +77,8 @@ function Login() {
 
           <button className="btn-entrar" onClick={handleLogin}>Entrar</button>
           <div className="login-links">
-            <a href="#">Esqueci a senha</a>
-            <a href="#" onClick={() => navigate('/cadastro')}>Criar conta</a>
+            <a href="#" onClick={() => navigate('/forgot-password')}>Esqueci a senha</a>
+            <a href="" onClick={() => navigate('/cadastro')}>Criar conta</a>
           </div>
         </div>
       </div>

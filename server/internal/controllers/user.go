@@ -212,15 +212,37 @@ func (h *Controller) ValidateCod(c *gin.Context) {
 		return
 	}
 	err = h.service.UpdateForgotenPassword(id, req.UpdateForgotenPasswordRequest)
+
 	if err != nil {
-		c.JSON(400, gin.H{
-			"error": err.Error(),
-		})
+		switch err.Error() {
+
+		case "password_invalid":
+			c.JSON(400, gin.H{
+				"field": "password",
+				"message": "A nova senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial.",
+			})
+
+		case "A nova senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial":
+			c.JSON(400, gin.H{
+				"field": "password",
+				"message": "A nova senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial.",
+			})
+		case "passwords_do_not_match":
+			c.JSON(400, gin.H{
+				"field": "confirmPassword",
+				"message": "As senhas não são iguais.",
+			})
+
+		default:
+			c.JSON(500, gin.H{
+				"message": "Erro interno do servidor",
+			})
+		}
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"message": "password updated successfully",
+		"message": "password_updated_successfully",
 		"user":    id,
 	})
 }
