@@ -40,10 +40,16 @@ func SetupRoutes(r *gin.Engine) {
 
 		usersAPI := protectedAPI.Group("/users")
 		{
+			usersAPI.GET("/:id", controller.GetUserByID)
 			usersAPI.PUT("/update", controller.UpdateUser)
 			usersAPI.PUT("/update/security", controller.UpdateUserPassword)
 			usersAPI.GET("/:id/activity", controller.GetUserActivity)
+			usersAPI.GET("/:id/posts", controller.GetUserPosts)
+			usersAPI.GET("/:id/events", controller.GetUserEvents)
 			usersAPI.DELETE("/me", controller.DeleteMe)
+			usersAPI.POST("/:id/follow", controller.FollowUser)
+			usersAPI.DELETE("/:id/follow", controller.UnfollowUser)
+			usersAPI.GET("/:id/follow", controller.IsFollowing)
 		}
 
 		postsAPI := protectedAPI.Group("/posts")

@@ -402,34 +402,105 @@ func (s *Service) UpdateForgotenPassword(id uint, req UpdateForgotenPasswordRequ
 	return s.repository.UpdateUser(id, updates)
 }
 
-
 type ResetCode struct {
 	UserID    uint
 	Code      string
 	ExpiresAt time.Time
 }
+
 var ResetCodes = map[string]ResetCode{}
-
-
 
 func (s *Service) VerifyResetCode(email string, code string) (uint, error) {
 	data, exists := ResetCodes[email]
-	
+
 	if !exists {
 		return 0, errors.New("code not found")
 	}
 	if time.Now().After(data.ExpiresAt) {
 		delete(ResetCodes, email)
-		
+
 		return 0, errors.New("code expired")
 	}
 	if data.Code != code {
 		return 0, errors.New("invalid code")
 	}
-	
+
 	return data.UserID, nil
 }
 
 func (s *Service) GetUserActivity(userID uint) ([]map[string]interface{}, error) {
 	return s.repository.GetUserActivity(userID)
+}
+
+func (s *Service) GetPostsByUser(userID uint) ([]models.Post, error) {
+	return s.repository.GetPostsByUser(userID)
+}
+
+func (s *Service) GetEventsByUser(userID uint) ([]models.Event, error) {
+	return s.repository.GetEventsByUser(userID)
+}
+
+type UserProfileResponse struct {
+	ID             uint   `json:"id"`
+	Name           string `json:"name"`
+	Username       string `json:"username"`
+	ProfilePicture string `json:"profile_picture"`
+	Bio            string `json:"bio"`
+	City           string `json:"city"`
+	State          string `json:"state"`
+	Country        string `json:"country"`
+	FollowersCount int    `json:"followers_count"`
+	FollowingCount int    `json:"following_count"`
+}
+
+func (s *Service) GetUserByID(userID uint) (*UserProfileResponse, error) {
+	user, err := s.repository.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &UserProfileResponse{
+		ID:             user.ID,
+		Name:           user.Name,
+		Username:       user.Username,
+		ProfilePicture: user.ProfilePicture,
+		Bio:            user.Bio,
+		City:           user.City,
+		State:          user.State,
+		Country:        user.Country,
+		FollowersCount: len(user.Followers),
+		FollowingCount: len(user.Following),
+	}, nil
+}
+
+func (s *Service) FollowUser(followerID uint, followingID uint) error {
+	if followerID == followingID {
+		return errors.New("você não pode seguir a si mesmo")
+	}
+
+	already, err := s.repository.IsFollowing(followerID, followingID)
+	if err != nil {
+		return err
+	}
+	if already {
+		return errors.New("você já segue este usuário")
+	}
+
+	return s.repository.FollowUser(followerID, followingID)
+}
+
+func (s *Service) UnfollowUser(followerID uint, followingID uint) error {
+	following, err := s.repository.IsFollowing(followerID, followingID)
+	if err != nil {
+		return err
+	}
+	if !following {
+		return errors.New("você não segue este usuário")
+	}
+
+	return s.repository.UnfollowUser(followerID, followingID)
+}
+
+func (s *Service) IsFollowing(followerID uint, followingID uint) (bool, error) {
+	return s.repository.IsFollowing(followerID, followingID)
 }

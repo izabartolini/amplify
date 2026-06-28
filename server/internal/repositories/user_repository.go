@@ -201,3 +201,85 @@ func (r *Repository) GetUserActivity(userID uint) ([]map[string]interface{}, err
 
 	return activities, nil
 }
+
+type PostAuthor struct {
+	ID             uint   `json:"id"`
+	Name           string `json:"name"`
+	Username       string `json:"username"`
+	ProfilePicture string `json:"profile_picture"`
+	City           string `json:"city"`
+	State          string `json:"state"`
+}
+
+func (r *Repository) GetPostsByUser(userID uint) ([]models.Post, error) {
+	var posts []models.Post
+	err := r.db.
+		Where("user_id = ?", userID).
+		Preload("Medias").
+		Preload("Likes").
+		Preload("Comments").
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("users.id, users.name, users.username, users.profile_picture, users.city, users.state")
+		}).
+		Order("created_at desc").
+		Find(&posts).Error
+	return posts, err
+}
+
+func (r *Repository) GetEventsByUser(userID uint) ([]models.Event, error) {
+	var events []models.Event
+	err := r.db.
+		Where("user_id = ?", userID).
+		Preload("Medias").
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("users.id, users.name, users.username, users.profile_picture, users.city, users.state")
+		}).
+		Order("date asc").
+		Find(&events).Error
+	return events, err
+}
+
+func (r *Repository) GetUserByID(userID uint) (*models.User, error) {
+	var user models.User
+	err := r.db.
+		Select("id, name, username, profile_picture, bio, city, state, country").
+		Preload("Tag").
+		Preload("Plays").
+		First(&user, userID).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var followersCount int64
+	r.db.Model(&models.Follow{}).Where("following_id = ?", userID).Count(&followersCount)
+
+	var followingCount int64
+	r.db.Model(&models.Follow{}).Where("follower_id = ?", userID).Count(&followingCount)
+
+	user.Followers = make([]models.Follow, followersCount)
+	user.Following = make([]models.Follow, followingCount)
+
+	return &user, nil
+}
+
+func (r *Repository) FollowUser(followerID uint, followingID uint) error {
+	follow := models.Follow{
+		FollowerID:  followerID,
+		FollowingID: followingID,
+	}
+	return r.db.Create(&follow).Error
+}
+
+func (r *Repository) UnfollowUser(followerID uint, followingID uint) error {
+	return r.db.
+		Where("follower_id = ? AND following_id = ?", followerID, followingID).
+		Delete(&models.Follow{}).Error
+}
+
+func (r *Repository) IsFollowing(followerID uint, followingID uint) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.Follow{}).
+		Where("follower_id = ? AND following_id = ?", followerID, followingID).
+		Count(&count).Error
+	return count > 0, err
+}
