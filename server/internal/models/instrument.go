@@ -14,5 +14,5 @@ type UserInstrument struct{
 	ID             uint          `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
 	InstrumentID   uint          `gorm:"not null"`
 	UserID         uint          `gorm:"not null"`
-	Level		   string   	 `gorm:"not null"`
+	Level		   uint8   	     `gorm:"not null"`
 }
