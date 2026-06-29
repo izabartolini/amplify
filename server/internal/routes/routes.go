@@ -15,6 +15,11 @@ func SetupRoutes(r *gin.Engine) {
 	repository := repositories.NewRepository(config.DB)
 	service := services.NewService(repository)
 	controller := controllers.NewHandler(service)
+	instrumentRepository :=repositories.NewInstrumentRepository(config.DB)
+	instrumentController := controllers.NewInstrumentController(instrumentRepository)
+	tagRepository :=repositories.NewTagRepository(config.DB)
+	tagController := controllers.NewTagController(tagRepository)
+
 
 	r.GET("/user", controller.GetUsers)
 	r.GET("/userByName", controller.GetUsersByName)
@@ -25,6 +30,8 @@ func SetupRoutes(r *gin.Engine) {
 	publicAPI := r.Group("/api/auth")
 	{
 		publicAPI.POST("/register", controller.Register)
+		publicAPI.GET("/instruments", instrumentController.GetInstruments)	
+		publicAPI.GET("/tags", tagController.GetTag)	
 	}
 
 	protectedAPI := r.Group("/api")

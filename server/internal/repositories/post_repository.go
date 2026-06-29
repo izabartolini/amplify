@@ -3,6 +3,8 @@ package repositories
 import (
 	"amplify/server/internal/models"
 	"errors"
+
+	"gorm.io/gorm"
 )
 
 func (r *Repository) CreatePost(post *models.Post) error {
@@ -15,7 +17,12 @@ func (r *Repository) GetFeed() ([]models.Post, error) {
 		Preload("Medias").
 		Preload("Likes").
 		Preload("Comments").
-		Preload("User").
+		Preload("Comments.User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("users.id, users.name, users.username, users.profile_picture")
+		}).
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("users.id, users.name, users.username, users.profile_picture, users.city, users.state")
+		}).
 		Order("created_at desc").
 		Find(&posts).Error
 	return posts, err
@@ -27,7 +34,12 @@ func (r *Repository) GetPostByID(id uint) (*models.Post, error) {
 		Preload("Medias").
 		Preload("Likes").
 		Preload("Comments").
-		Preload("User").
+		Preload("Comments.User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("users.id, users.name, users.username, users.profile_picture")
+		}).
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("users.id, users.name, users.username, users.profile_picture, users.city, users.state")
+		}).
 		First(&post, id).Error
 	return &post, err
 }
