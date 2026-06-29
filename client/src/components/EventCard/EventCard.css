@@ -1,0 +1,63 @@
+.event-card {
+  background: #fffdf5;
+  border: 1px solid #d4c17a;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.event-date-badge {
+  background: #8B1A1A;
+  color: white;
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: center;
+  min-width: 48px;
+  flex-shrink: 0;
+}
+
+.event-day {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.event-month {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.event-info {
+  flex: 1;
+}
+
+.event-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3a1a0a;
+  margin-bottom: 4px;
+}
+
+.event-description {
+  font-size: 0.9rem;
+  color: #6B3A2A;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.event-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.82rem;
+  color: #999;
+}
+
+.event-private {
+  color: #8B1A1A;
+}
