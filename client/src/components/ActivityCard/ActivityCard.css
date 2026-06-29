@@ -1,0 +1,30 @@
+.activity-card {
+  background: #fffdf5;
+  border: 1px solid #d4c17a;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.activity-icon {
+  font-size: 1.4rem;
+}
+
+.activity-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.activity-text {
+  font-size: 0.9rem;
+  color: #3a1a0a;
+}
+
+.activity-date {
+  font-size: 0.78rem;
+  color: #999;
+}

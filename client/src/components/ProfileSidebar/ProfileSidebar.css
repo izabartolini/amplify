@@ -37,7 +37,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .sidebar-name-row h2 {
@@ -59,10 +59,21 @@
   border-radius: 20px;
   cursor: pointer;
   font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .btn-seguir:hover {
   background-color: #6B1010;
+}
+
+.btn-seguindo {
+  background-color: transparent;
+  color: #8B1A1A;
+  border: 1px solid #8B1A1A;
+}
+
+.btn-seguindo:hover {
+  background-color: #fce8e8;
 }
 
 .btn-mensagem {
