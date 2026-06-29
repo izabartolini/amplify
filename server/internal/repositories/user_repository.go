@@ -3,9 +3,6 @@ package repositories
 import (
 	"amplify/server/internal/models"
 	"errors"
-	"regexp"
-	"strings"
-
 	"gorm.io/gorm"
 )
 
@@ -83,35 +80,6 @@ func (r *Repository) GetUserById(id uint) (*models.User, error) {
 func (r *Repository) UpdateUser(id uint, data map[string]interface{}) error {
 
 	return r.db.Model(&models.User{}).Where("id = ?", id).Updates(data).Error
-}
-
-func (r *Repository) SaveUserTags(userID uint, tagNames []string) error {
-	var tagValidationRegex = regexp.MustCompile(`^[A-Z0-9]+$`)
-
-	for _, name := range tagNames {
-		cleanName := strings.ToUpper(strings.TrimSpace(name))
-		if cleanName == "" {
-			continue
-		}
-		if !tagValidationRegex.MatchString(cleanName) {
-			continue
-		}
-
-		var tag models.Tag
-		if err := r.db.FirstOrCreate(&tag, models.Tag{Name: cleanName}).Error; err != nil {
-			continue
-		}
-
-		userTag := models.UserTag{
-			UserID: userID,
-			TagID:  tag.ID,
-		}
-
-		if err := r.db.Create(&userTag).Error; err != nil {
-			continue
-		}
-	}
-	return nil
 }
 
 func (r *Repository) DeleteUser(id uint) error {
