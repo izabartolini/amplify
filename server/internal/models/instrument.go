@@ -5,9 +5,9 @@ import "time"
 type Instrument struct{
 	ID             uint                   `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
 	Name            string                `gorm:"not null;unique"`
-	CreatedAt       time.Time             `gorm:"autoCreateTime"`
+	CreatedAt       time.Time             `gorm:"autoCreateTime" json:"-"`
 
-	PlayedBy       []UserInstrument       `gorm:"foreignKey:InstrumentID"`
+	PlayedBy       []UserInstrument       `gorm:"foreignKey:InstrumentID" json:"-"`
 }
 
 type UserInstrument struct{

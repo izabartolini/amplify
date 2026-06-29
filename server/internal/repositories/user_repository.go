@@ -11,11 +11,11 @@ import (
 
 type Repository struct{ db *gorm.DB }
 
-func (r *Repository) FindUserWithRelations(id uint, user *models.User) error {
-    return r.db.Preload("Tag").Preload("Plays").First(user, id).Error
-}
-
 func NewRepository(db *gorm.DB) *Repository { return &Repository{db: db} }
+
+func (r *Repository) FindUserWithRelations(id uint, user *models.User) error {
+	return r.db.Preload("Tag").Preload("Plays").First(user, id).Error
+}
 
 func (r *Repository) GetUsers() ([]models.User, error) {
 	var users []models.User
@@ -85,7 +85,7 @@ func (r *Repository) UpdateUser(id uint, data map[string]interface{}) error {
 	return r.db.Model(&models.User{}).Where("id = ?", id).Updates(data).Error
 }
 
-func (r *Repository) SaveUserTags(userID uint, tagNames []string) error{
+func (r *Repository) SaveUserTags(userID uint, tagNames []string) error {
 	var tagValidationRegex = regexp.MustCompile(`^[A-Z0-9]+$`)
 
 	for _, name := range tagNames {
@@ -108,49 +108,9 @@ func (r *Repository) SaveUserTags(userID uint, tagNames []string) error{
 		}
 
 		if err := r.db.Create(&userTag).Error; err != nil {
-            continue
-        }
+			continue
+		}
 	}
-	return nil
-}
-
-type InstrumentParams struct {
-	Name  string
-	Level uint8
-}
-
-func (r *Repository) SaveUserInstruments(userId uint, instrument []InstrumentParams) error {
-	var instrumentValidationRegex = regexp.MustCompile(`^[A-Z0-9À-Ú\s-]+$`)
-	for _, inst := range instrument {
-		cleanName := strings.ToUpper(strings.TrimSpace(inst.Name))
-
-		if cleanName == "" {
-			continue
-		}
-		if !instrumentValidationRegex.MatchString(cleanName) {
-			continue
-		}
-
-		if inst.Level > 5 {
-			return errors.New("Nível inválido: deve ser entre 0 e 5")
-		}
-
-		var newInstrument models.Instrument
-		if err := r.db.FirstOrCreate(&newInstrument, models.Instrument{Name: cleanName}).Error; err != nil {
-			continue
-		}
-
-		var userInstrument models.UserInstrument
-		if err := r.db.FirstOrCreate(&userInstrument, models.UserInstrument{
-			UserID:       uint(userId),
-			InstrumentID: newInstrument.ID,
-			Level:        inst.Level,
-		}).Error; err != nil {
-			continue
-		}
-
-	}
-
 	return nil
 }
 
