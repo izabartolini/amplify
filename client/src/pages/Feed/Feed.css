@@ -1,0 +1,41 @@
+.feed-page {
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.feed-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  gap: 32px;
+  padding: 24px 32px;
+}
+
+.feed-tab {
+  padding: 12px 28px;
+  border-radius: 30px;
+  background-color: #f5e6c8;
+  color: #8B1A1A;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
+  flex: 0 0 auto;
+}
+
+.feed-tab-active {
+  background-color: #8B1A1A;
+  color: white;
+}
+
+.tab-active {
+  background-color: #8B1A1A;
+  color: white;
+}
+
+.feed-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 32px 40px;
+}
