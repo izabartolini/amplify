@@ -3,6 +3,8 @@ import Landing from './pages/Landing/Landing'
 import Login from './pages/Login/Login'
 import Profile from './pages/Profile/Profile'
 import Feed from './pages/Feed/Feed'
+import Eventos from './pages/Eventos/Eventos'
+import EventDetails from './pages/EventDetails/EventDetails'
 
 function App() {
   return (
@@ -12,6 +14,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/profile/:id" element={<Profile />} />
         <Route path="/feed" element={<Feed />} />
+        <Route path="/eventos" element={<Eventos />} />
+        <Route path="/eventos/:id" element={<EventDetails />} />
       </Routes>
     </BrowserRouter>
   )
