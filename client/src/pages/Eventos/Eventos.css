@@ -1,0 +1,10 @@
+.eventos-page {
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.eventos-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 32px 40px;
+}
