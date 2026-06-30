@@ -9,22 +9,107 @@
 }
 
 .img-container {
-    overflow: hidden;
+    position: relative;
+    flex: 1;
+    background-image: url('../../assets/guitar.png');
+    background-position: left center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: 5vw;
 }
 
-.img-container img {
-    width: 40vw;
-    height: 100%;
-    object-fit: cover;
-    object-position: 0px -10vw;
+.stepper-sidebar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8rem;
+    z-index: 2;
 }
 
+.stepper-line {
+    position: absolute;
+    left: 0.6875rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 0.125rem;
+    background: rgba(236, 227, 207, 0.2);
+    z-index: 1;
+}
+
+.stepper-item {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.stepper-node-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.stepper-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    background-color: #ECE3CF;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.stepper-ring {
+    position: absolute;
+    width: 1.375rem;
+    height: 1.375rem;
+    border: 0.125rem solid #ECE3CF;
+    border-radius: 50%;
+    background-color: transparent;
+    box-shadow: 0 0 0.9375rem rgba(236, 227, 207, 0.6);
+    animation: scaleUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.stepper-label {
+    font-size: 1.2rem;
+    color: #ECE3CF;
+    opacity: 0.4;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.stepper-item.active .stepper-label {
+    opacity: 1;
+    text-shadow: 0 0 0.5rem rgba(236, 227, 207, 0.3);
+}
+
+.stepper-item.active .stepper-dot {
+    background-color: #ECE3CF;
+}
+
+@keyframes scaleUp {
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
 .form-container {
-    margin-right: 3%;
+    margin-right: 4%;
     margin-left: -3%;
     margin-bottom: 5%;
     margin-top: 5%;
-    width: 57%;
+    width: 60%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -433,3 +518,6 @@
 .skill-bars.blocked .bar {
     pointer-events: none;
 }
+
+
+

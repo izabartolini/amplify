@@ -29,11 +29,11 @@ function Register() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 
-                    currentStep: step, 
+                body: JSON.stringify({
+                    currentStep: step,
                     ...data,
-                    instrumentos: instrumentos.filter(i => i.nome.trim() !== ''), 
-                    tags 
+                    instrumentos: instrumentos.filter(i => i.nome.trim() !== ''),
+                    tags
                 }),
             })
         } catch (error) {
@@ -78,7 +78,26 @@ function Register() {
     return (
         <div className='main-container'>
             <div className='img-container'>
-                <img src={Guitar} alt="big guitar fading" />
+                <div className="stepper-sidebar">
+                    <div className="stepper-line"></div>
+                    {[
+                        { id: 1, label: 'Seu perfil' },
+                        { id: 2, label: 'Seus dados' },
+                        { id: 3, label: 'Seus interesses' }
+                    ].map((s) => {
+                        const isActive = step === s.id;
+                        return (
+                            <div key={s.id} className={`stepper-item ${isActive ? 'active' : ''}`} onClick={() => setStep(s.id)}>
+                                <div className="stepper-node-wrapper">
+                                    {isActive && <div className="stepper-ring"></div>}
+                                    <div className="stepper-dot"></div>
+                                </div>
+                                <span className="stepper-label">{s.label}</span>
+                            </div>
+                        );
+                    })}
+                </div>
+
             </div>
             <div className='form-container'>
                 <header>
@@ -185,7 +204,7 @@ function Register() {
                                 <div className='form interests-step'>
                                     <form className='main-form' onSubmit={(e) => { e.preventDefault(); alert('Cadastro Finalizado!'); }}>
                                         <div className="interests-columns">
-                                            
+
                                             <div className="fieldset-container">
                                                 <span className="fieldset-label">instrumentos</span>
                                                 <div className="fieldset-content list-rows">
@@ -193,9 +212,9 @@ function Register() {
                                                         const isBlocked = inst.nome.trim() === '';
                                                         return (
                                                             <div key={inst.id} className="instrument-row">
-                                                                <input 
-                                                                    type="text" 
-                                                                    className="instrument-input-field" 
+                                                                <input
+                                                                    type="text"
+                                                                    className="instrument-input-field"
                                                                     placeholder="Instrumento..."
                                                                     value={inst.nome}
                                                                     onChange={(e) => handleInstrumentNameChange(inst.id, e.target.value)}

@@ -20,7 +20,7 @@ function Login() {
           <button className="btn-entrar">Entrar</button>
           <div className="login-links">
             <a href="#">Esqueci a senha</a>
-            <a href="#" onClick={() => navigate('/cadastro')}>Criar conta</a>
+            <a href="#" onClick={() => navigate('/register')}>Criar conta</a>
           </div>
         </div>
       </div>
