@@ -1,12 +1,17 @@
 import './ProfileSidebar.css'
+import { useState } from 'react'
 
 function ProfileSidebar({ user, isOwnProfile }) {
+  const [following, setFollowing] = useState(false)
   return (
     <aside className="profile-sidebar">
       <div className="sidebar-avatar">
         {user.profilePicture
           ? <img src={user.profilePicture} alt="avatar" />
-          : <div className="avatar-fallback"></div>
+          : <img
+            src={'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name || 'U') + '&background=8B1A1A&color=fff&size=200'}
+            alt="avatar"
+          />
         }
       </div>
 
@@ -15,7 +20,12 @@ function ProfileSidebar({ user, isOwnProfile }) {
           <h2>{user.name}</h2>
           {!isOwnProfile && (
             <div className="sidebar-actions">
-              <button className="btn-seguir">Seguir</button>
+              <button
+                className={`btn-seguir ${following ? 'btn-seguindo' : ''}`}
+                onClick={() => setFollowing(!following)}
+              >
+                {following ? 'Seguindo' : 'Seguir'}
+              </button>
               <button className="btn-mensagem">✉️</button>
             </div>
           )}

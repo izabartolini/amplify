@@ -1,0 +1,112 @@
+.event-details-page {
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.event-details-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 32px 40px;
+}
+
+.back-link {
+  display: inline-block;
+  color: #8B1A1A;
+  text-decoration: none;
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.event-details-card {
+  background: #fffdf5;
+  border: 1px solid #d4c17a;
+  border-radius: 12px;
+  padding: 40px;
+}
+
+.event-details-header {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.event-date-badge-large {
+  background: #8B1A1A;
+  color: white;
+  border-radius: 12px;
+  padding: 16px 22px;
+  text-align: center;
+  min-width: 76px;
+  flex-shrink: 0;
+}
+
+.event-day-large {
+  display: block;
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.event-month-large {
+  display: block;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.event-details-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #3a1a0a;
+  margin-bottom: 8px;
+}
+
+.event-details-organizer {
+  font-size: 0.95rem;
+  color: #6B3A2A;
+}
+
+.event-details-description {
+  font-size: 1.05rem;
+  color: #3a1a0a;
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.event-details-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-size: 0.95rem;
+  color: #999;
+  margin-bottom: 32px;
+}
+
+.event-details-private {
+  color: #8B1A1A;
+}
+
+.btn-participar {
+  background-color: #8B1A1A;
+  color: white;
+  border: none;
+  padding: 14px 40px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-participar:hover {
+  background-color: #6B1010;
+}
+
+.event-not-found {
+  text-align: center;
+  margin-top: 60px;
+  color: #6B3A2A;
+}

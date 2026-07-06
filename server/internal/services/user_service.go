@@ -251,7 +251,7 @@ func (s *Service) UpdateUserPassword(id uint, req UpdateUserPasswordRequest) err
 
 	user, err := s.repository.GetUserById(id)
 	if err != nil {
-		return errors.New("user not found")
+		return errors.New("user_not_found")
 	}
 
 	err = bcrypt.CompareHashAndPassword(
@@ -260,7 +260,7 @@ func (s *Service) UpdateUserPassword(id uint, req UpdateUserPasswordRequest) err
 	)
 
 	if err != nil {
-		return errors.New("invalid password")
+		return errors.New("invalid_password")
 	}
 
 	if !validatePassword(req.NewPassword) {
@@ -268,7 +268,7 @@ func (s *Service) UpdateUserPassword(id uint, req UpdateUserPasswordRequest) err
 	}
 
 	if req.NewPassword != req.ConfirmPassword {
-		return errors.New("passwords do not match")
+		return errors.New("passwords_do_not_match")
 	}
 
 	hash, err := bcrypt.GenerateFromPassword(
@@ -379,11 +379,11 @@ type UpdateForgotenPasswordRequest struct {
 func (s *Service) UpdateForgotenPassword(id uint, req UpdateForgotenPasswordRequest) error {
 
 	if !validatePassword(req.NewPassword) {
-		return errors.New("A nova senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial")
+		return errors.New("password_invalid")
 	}
 
 	if req.NewPassword != req.ConfirmPassword {
-		return errors.New("passwords do not match")
+		return errors.New("passwords_do_not_match")
 	}
 
 	hash, err := bcrypt.GenerateFromPassword(

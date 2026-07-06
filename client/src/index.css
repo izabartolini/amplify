@@ -1,15 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Molle:ital@1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
 .amplify-logo {
   font-family: 'Molle', cursive;
   font-style: italic;
   font-weight: 400;
+  font-size: 4rem !important;
   background: linear-gradient(90deg, #452D20 0%, #5D3926 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

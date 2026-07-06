@@ -33,3 +33,7 @@
   font-size: 1.4rem;
   cursor: pointer;
 }
+
+.navbar-logo {
+  font-size: 2rem !important;
+}
