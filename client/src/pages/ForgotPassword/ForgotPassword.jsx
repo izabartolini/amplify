@@ -9,7 +9,8 @@ import {
     PasswordInput,
     Group,
     Collapse,
-    Box
+    Box,
+    Modal
 } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react"
@@ -27,7 +28,7 @@ export default function ForgotPassword() {
     const [newPassword, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
-
+    const [successModalOpened, setSuccessModalOpened] = useState(false);
     const [emailError, setEmailError] = useState("");
     const [codeError, setCodeError] = useState("");
     const [passwordError, setPasswordError] = useState("");
@@ -89,13 +90,14 @@ export default function ForgotPassword() {
                 if (data.field === 'password') {
                     setPasswordError(data.message)
                 }
-                
+
                 if (data.field === 'confirmPassword') {
                     setConfirmPasswordError(data.message)
                 }
 
                 return
             }
+            setSuccessModalOpened(true);
 
         } catch (err) {
             console.error(err);
@@ -106,6 +108,28 @@ export default function ForgotPassword() {
     return (
 
         <div className="forgot-container">
+
+            <Modal
+                opened={successModalOpened}
+                onClose={() => setSuccessModalOpened(false)}
+                centered
+                withCloseButton={false}
+                closeOnClickOutside={false}
+                closeOnEscape={false}
+                title="Senha alterada✅"
+            >
+
+                <Group justify="center">
+                    <Text mb="md">
+                        Sua senha foi alterada com sucesso!
+                    </Text>
+                    <Button
+                        onClick={() => navigate("/login")}
+                    >
+                        Voltar para Login
+                    </Button>
+                </Group>
+            </Modal>
 
             <Paper shadow="xl" radius="md" p="xl" className="forgot-card">
                 <Title order={1} className="logo-text amplify-logo">
@@ -138,12 +162,16 @@ export default function ForgotPassword() {
                         </Group>
 
                         <Collapse expanded={codeSent} onTransitionEnd={() => setLoading(false)}>
-                            <Text c="dimmed" mt={8} mb="lg">Coloque o código que chegou em seu E-mail.</Text>
 
+                            <Group justify="center" mb={5}>
+                                <Button className="secondary-Button" onClick={() => setCodeSent(false)}>
+                                    Corrigir e-mail
+                                </Button>
+                            </Group>
+                            <Text c="dimmed" mt={8} mb="lg">Coloque o código que chegou em seu E-mail.</Text>
                             <VerificationCode
                                 onComplete={(code) => {
                                     setCode(code);
-                                    console.log(code);
                                     setCodeConfirmed(true);
                                 }}
                             />
