@@ -1,151 +1,160 @@
 package controllers
 
 import (
-    "net/http"
-    "strconv"
-    "amplify/server/internal/services"
-    "github.com/gin-gonic/gin"
+	"amplify/server/internal/services"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (c *Controller) CreateEvent(ctx *gin.Context) {
-    var req services.CreateEventRequest 
-    
-    if err := ctx.ShouldBindJSON(&req); err != nil {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos: " + err.Error()})
-        return
-    }
+	var req services.CreateEventRequest
 
-    userID := ctx.GetUint("userID") 
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos: " + err.Error()})
+		return
+	}
 
-    event, err := c.service.CreateEvent(req, userID)
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao criar o evento"})
-        return
-    }
+	userID := ctx.GetUint("userID")
 
-    ctx.JSON(http.StatusCreated, event)
+	event, err := c.service.CreateEvent(req, userID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao criar o evento"})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, event)
 }
 
 func (c *Controller) RequestParticipation(ctx *gin.Context) {
-    eventIDStr := ctx.Param("id")
-    eventID, _ := strconv.ParseUint(eventIDStr, 10, 32)
-    userID := ctx.GetUint("userID")
+	eventIDStr := ctx.Param("id")
+	eventID, _ := strconv.ParseUint(eventIDStr, 10, 32)
+	userID := ctx.GetUint("userID")
 
-    err := c.service.RequestParticipation(uint(eventID), userID)
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao processar solicitação"})
-        return
-    }
+	err := c.service.RequestParticipation(uint(eventID), userID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao processar solicitação"})
+		return
+	}
 
-    ctx.JSON(http.StatusCreated, gin.H{"message": "Solicitação enviada com sucesso"})
+	ctx.JSON(http.StatusCreated, gin.H{"message": "Solicitação enviada com sucesso"})
 }
 func (c *Controller) InviteUser(ctx *gin.Context) {
-    eventIDStr := ctx.Param("id")
-    eventID, _ := strconv.ParseUint(eventIDStr, 10, 32)
-    
-    var req struct {
-        UserID uint `json:"user_id"`
-    }
-    if err := ctx.ShouldBindJSON(&req); err != nil {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID do usuário inválido"})
-        return
-    }
+	eventIDStr := ctx.Param("id")
+	eventID, _ := strconv.ParseUint(eventIDStr, 10, 32)
 
-    err := c.service.InviteUser(uint(eventID), req.UserID)
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao enviar convite"})
-        return
-    }
+	var req struct {
+		UserID uint `json:"user_id"`
+	}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID do usuário inválido"})
+		return
+	}
 
-    ctx.JSON(http.StatusCreated, gin.H{"message": "Convite enviado com sucesso"})
+	err := c.service.InviteUser(uint(eventID), req.UserID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao enviar convite"})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{"message": "Convite enviado com sucesso"})
 }
-func (c *Controller) GetEvent(ctx *gin.Context ){
-    eventIDStr := ctx.Param("id")
-    eventID, err := strconv.ParseUint(eventIDStr, 10, 20)
-    if err!= nil {
-    ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID do evento invalido"})
-    return
-    }
+func (c *Controller) GetEvent(ctx *gin.Context) {
+	eventIDStr := ctx.Param("id")
+	eventID, err := strconv.ParseUint(eventIDStr, 10, 20)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID do evento invalido"})
+		return
+	}
 
-    userIDInterface, exists := ctx.Get("userID")
-    if !exists {
-        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
-        return
-    }
-    userID := userIDInterface.(uint)
+	userIDInterface, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
+		return
+	}
+	userID := userIDInterface.(uint)
 
-    event, err := c.service.GetEvent(uint(eventID), userID)
-    if err != nil {
-        ctx.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
-        return
-    }
+	event, err := c.service.GetEvent(uint(eventID), userID)
+	if err != nil {
+		ctx.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		return
+	}
 
-    ctx.JSON(http.StatusOK, event)
+	ctx.JSON(http.StatusOK, event)
 }
 func (c *Controller) GetEventRequests(ctx *gin.Context) {
-    eventIDStr := ctx.Param("id")
-    eventID, err := strconv.ParseUint(eventIDStr,10,32)
-    if err != nil{
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "id invalido"})
-        return
-    }
+	eventIDStr := ctx.Param("id")
+	eventID, err := strconv.ParseUint(eventIDStr, 10, 32)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "id invalido"})
+		return
+	}
 
-    userIDInterface, exists := ctx.Get("userID")
-    if !exists{
-        ctx.JSON(http.StatusUnauthorized, gin.H{"error":"Usuario nao autenticado"})
-        return
-    }
-    userID := userIDInterface.(uint)
+	userIDInterface, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Usuario nao autenticado"})
+		return
+	}
+	userID := userIDInterface.(uint)
 
-    requests, err := c.service.GetEventRequests(uint(eventID), userID)
-    if err != nil {
-        ctx.JSON(http.StatusForbidden, gin.H{"error":"Nao e o dono do evento"})
-        return
-    }
-    ctx.JSON(http.StatusOK, requests)
+	requests, err := c.service.GetEventRequests(uint(eventID), userID)
+	if err != nil {
+		ctx.JSON(http.StatusForbidden, gin.H{"error": "Nao e o dono do evento"})
+		return
+	}
+	ctx.JSON(http.StatusOK, requests)
 }
-func (c *Controller) UpdateEvent(ctx *gin.Context){
-    var req services.UpdateEventRequest
-    eventIDStr := ctx.Param("id")
-    eventID, err := strconv.ParseUint(eventIDStr,10,32)
-    if err != nil{
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "id invalido"})
-        return
-    }
-    if err := ctx.ShouldBindJSON(&req); err != nil {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos: " + err.Error()})
-        return
-    }
-    userIDInterface, exists := ctx.Get("userID")
-    if !exists {
-        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
-        return
-    }
-    userID := userIDInterface.(uint)
-    updatedEvent, err := c.service.UpdateEvent(uint(eventID), userID, req)
-    if err != nil {
-        ctx.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
-        return
-    }
-    ctx.JSON(http.StatusOK, updatedEvent)
+func (c *Controller) UpdateEvent(ctx *gin.Context) {
+	var req services.UpdateEventRequest
+	eventIDStr := ctx.Param("id")
+	eventID, err := strconv.ParseUint(eventIDStr, 10, 32)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "id invalido"})
+		return
+	}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos: " + err.Error()})
+		return
+	}
+	userIDInterface, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
+		return
+	}
+	userID := userIDInterface.(uint)
+	updatedEvent, err := c.service.UpdateEvent(uint(eventID), userID, req)
+	if err != nil {
+		ctx.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, updatedEvent)
 }
-func (c *Controller) DeleteEvent(ctx *gin.Context){
-    eventIDStr := ctx.Param("id")
-    eventID, err := strconv.ParseUint(eventIDStr,10,32)
-    if err != nil{
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "id invalido"})
-        return
-    }
-    userIDInterface, exists := ctx.Get("userID")
-    if !exists {
-        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
-        return
-    }
-    userID := userIDInterface.(uint)
-    err = c.service.DeleteEvent(uint(eventID), userID)  
-     if err != nil {
-        ctx.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
-        return
-    }
-    ctx.Status(http.StatusNoContent)
+func (c *Controller) DeleteEvent(ctx *gin.Context) {
+	eventIDStr := ctx.Param("id")
+	eventID, err := strconv.ParseUint(eventIDStr, 10, 32)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "id invalido"})
+		return
+	}
+	userIDInterface, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
+		return
+	}
+	userID := userIDInterface.(uint)
+	err = c.service.DeleteEvent(uint(eventID), userID)
+	if err != nil {
+		ctx.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.Status(http.StatusNoContent)
+}
+func (c *Controller) GetAllEvents(ctx *gin.Context) {
+	events, err := c.service.GetAllEvents()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, events)
 }
