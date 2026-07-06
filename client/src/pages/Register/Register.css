@@ -519,5 +519,49 @@
     pointer-events: none;
 }
 
+.error-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; 
+}
 
+.error-box {
+    background-color: #2D1B13; 
+    border: 2px solid #FF3D00;
+    padding: 25px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.error-box p {
+    color: #ECE3CF;
+    font-size: 16px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.error-box button {
+    background: linear-gradient(to right, #452D20, #6B3A2A);
+    color: #ECE3CF;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.error-box button:hover {
+    background: #FF3D00;
+}
 

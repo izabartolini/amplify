@@ -1,79 +1,131 @@
 import { useState } from 'react'
 import './Register.css'
 import Guitar from '../../assets/guitar.png'
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
-    const [step, setStep] = useState(1)
+    const navigate = useNavigate();
+    const [step, setStep] = useState(1);
+    const [error, setError] = useState('');
 
-    const [instrumentos, setInstrumentos] = useState([
+    const [formData, setFormData] = useState({
+        name: '',
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        city: '',
+        state: '',
+        country: '',
+        cpf: ''
+    });
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const [instruments, setInstruments] = useState([
         { id: 1, nome: '', nivel: 0 },
         { id: 2, nome: '', nivel: 0 },
         { id: 3, nome: '', nivel: 0 },
         { id: 4, nome: '', nivel: 0 },
-    ])
-    const [tags, setTags] = useState(['Rock', 'Metal', 'Blues'])
-    const [inputValue, setInputValue] = useState('')
+    ]);
+    const [tags, setTags] = useState(['Rock', 'Metal', 'Blues']);
+    const [inputValue, setInputValue] = useState('');
 
-    const handleNextStep = async (event) => {
-        if (event) event.preventDefault()
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
 
-        const formElement = document.querySelector('.main-form')
-        if (!formElement) return
+    const handleNextStep = (event) => {
+        if (event) event.preventDefault();
 
-        const formData = new FormData(formElement)
-        const data = Object.fromEntries(formData.entries())
+        if (step === 1) {
+            const senha = formData.password ? formData.password.trim() : '';
+            const confirmacao = formData.confirmPassword ? formData.confirmPassword.trim() : '';
+
+            if (senha !== confirmacao) {
+                setError('As senhas não coincidem!');
+                return;
+            }
+            setError('');
+        }
+
+        if (step < 3) {
+            setStep(step + 1);
+        }
+    };
+
+    const handleFinalSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        const instrumentsFiltrados = instruments
+            .filter(inst => inst.nome.trim() !== '')
+            .map(inst => ({ instrument_name: inst.nome, instrument_level: inst.nivel }));
+
+        const { confirmPassword, ...dadosEnvio } = formData;
+
+        const payloadCompleto = {
+            ...dadosEnvio,
+            instruments: instrumentsFiltrados,
+            tags: tags
+        };
 
         try {
-            await fetch('https://sua-api.com/api/register-partial', {
+            const response = await fetch('http://localhost:8080/api/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    currentStep: step,
-                    ...data,
-                    instrumentos: instrumentos.filter(i => i.nome.trim() !== ''),
-                    tags
-                }),
-            })
-        } catch (error) {
-            console.error('Erro ao salvar dados parciais:', error)
-        }
+                body: JSON.stringify(payloadCompleto),
+            });
 
-        if (step < 3) {
-            setStep(step + 1)
+            if (response.ok) {
+                alert('Usuário criado com sucesso!');
+                navigate('/login');
+            } else {
+                const errorData = await response.json();
+                setError(errorData.message || 'Erro ao cadastrar usuário.');
+            }
+        } catch (error) {
+            console.error('Erro ao conectar com o servidor:', error);
+            setError('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
         }
-    }
+    };
 
     const handleInstrumentNameChange = (id, value) => {
-        setInstrumentos(prev => prev.map(inst =>
+        setInstruments(prev => prev.map(inst =>
             inst.id === id ? { ...inst, nome: value, nivel: value.trim() === '' ? 0 : inst.nivel } : inst
-        ))
-    }
+        ));
+    };
 
     const handleLevelClick = (id, clickedLevel) => {
-        setInstrumentos(prev => prev.map(inst => {
+        setInstruments(prev => prev.map(inst => {
             if (inst.id === id && inst.nome.trim() !== '') {
-                return { ...inst, nivel: inst.nivel === clickedLevel ? 0 : clickedLevel }
+                return { ...inst, nivel: inst.nivel === clickedLevel ? 0 : clickedLevel };
             }
-            return inst
-        }))
-    }
+            return inst;
+        }));
+    };
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
-            e.preventDefault()
-            const trimmed = inputValue.trim()
+            e.preventDefault();
+            const trimmed = inputValue.trim();
             if (trimmed && !tags.includes(trimmed)) {
-                setTags([...tags, trimmed])
-                setInputValue('')
+                setTags([...tags, trimmed]);
+                setInputValue('');
             }
         }
-    }
+    };
 
     const removeTag = (tagToRemove) => {
-        setTags(tags.filter(tag => tag !== tagToRemove))
-    }
+        setTags(tags.filter(tag => tag !== tagToRemove));
+    };
 
     return (
         <div className='main-container'>
@@ -97,8 +149,8 @@ function Register() {
                         );
                     })}
                 </div>
-
             </div>
+
             <div className='form-container'>
                 <header>
                     <h1 data-text="Amplify">Amplify</h1>
@@ -112,33 +164,89 @@ function Register() {
                                 <h2>Seu perfil</h2>
                                 <div className='form'>
                                     <form className='main-form' onSubmit={handleNextStep}>
+                                        {error && <p className="error-message" style={{ color: '#FF3D00', fontWeight: 'bold', marginBottom: '15px', textAlign: 'center' }}>{error}</p>}
+
                                         <div className='form-row'>
                                             <div className='input-group'>
-                                                <label htmlFor="nome">nome</label>
-                                                <input type="text" id="nome" name="nome" placeholder="nome..." required />
+                                                <label htmlFor="name">nome</label>
+                                                <input
+                                                    type="text"
+                                                    id="name"
+                                                    name="name"
+                                                    placeholder="nome..."
+                                                    value={formData.name}
+                                                    onChange={handleChange}
+                                                    required
+                                                />
                                             </div>
                                             <div className='input-group'>
                                                 <label htmlFor="username">usuário</label>
-                                                <input type="text" id="username" name="username" placeholder="usuário..." required />
+                                                <input
+                                                    type="text"
+                                                    id="username"
+                                                    name="username"
+                                                    placeholder="usuário..."
+                                                    value={formData.username}
+                                                    onChange={handleChange}
+                                                    required
+                                                />
                                             </div>
                                         </div>
                                         <div className='form-row'>
                                             <div className='input-group'>
                                                 <label htmlFor="email">e-mail</label>
-                                                <input type="email" id="email" name="email" placeholder="user@email.com..." required />
+                                                <input
+                                                    type="email"
+                                                    id="email"
+                                                    name="email"
+                                                    placeholder="user@email.com..."
+                                                    value={formData.email}
+                                                    onChange={handleChange}
+                                                    required
+                                                />
                                             </div>
                                             <div className='input-group empty'></div>
                                         </div>
+
                                         <div className='form-row'>
                                             <div className='input-group'>
                                                 <label htmlFor="password">password</label>
-                                                <input type="password" id="password" name="password" placeholder="password..." required />
+                                                <div className="password-wrapper" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                                    <input
+                                                        type={showPassword ? "text" : "password"}
+                                                        id="password"
+                                                        name="password"
+                                                        placeholder="password..."
+                                                        value={formData.password}
+                                                        onChange={handleChange}
+                                                        style={{ width: '100%', paddingRight: '40px' }}
+                                                        required
+                                                    />
+                                                    <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '10px', background: 'none', border: 'none', cursor: 'pointer' }}>
+                                                        {showPassword ? "👁️" : "🙈"}
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div className='input-group'>
                                                 <label htmlFor="confirmPassword">confirm password</label>
-                                                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="confirm password..." required />
+                                                <div className="password-wrapper" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                                    <input
+                                                        type={showConfirmPassword ? "text" : "password"}
+                                                        id="confirmPassword"
+                                                        name="confirmPassword"
+                                                        placeholder="confirm password..."
+                                                        value={formData.confirmPassword}
+                                                        onChange={handleChange}
+                                                        style={{ width: '100%', paddingRight: '40px' }}
+                                                        required
+                                                    />
+                                                    <button type="button" className="toggle-password" onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{ position: 'absolute', right: '10px', background: 'none', border: 'none', cursor: 'pointer' }}>
+                                                        {showConfirmPassword ? "👁️" : "🙈"}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
+
                                         <div className="btn-container">
                                             <div className="interactive-nav">
                                                 <button type="submit" className="btn-advance">Avançar</button>
@@ -161,25 +269,56 @@ function Register() {
                                     <form className='main-form' onSubmit={handleNextStep}>
                                         <div className='form-row'>
                                             <div className='input-group'>
-                                                <label htmlFor="cidade">cidade</label>
-                                                <input type="text" id="cidade" name="cidade" placeholder="cidade..." required />
+                                                <label htmlFor="city">cidade</label>
+                                                <input
+                                                    type="text"
+                                                    id="city"
+                                                    name="city"
+                                                    placeholder="cidade..."
+                                                    value={formData.city}
+                                                    onChange={handleChange}
+                                                    required
+                                                />
                                             </div>
                                             <div className='input-group'>
-                                                <label htmlFor="estado">estado</label>
-                                                <input type="text" id="estado" name="estado" placeholder="estado..." required />
+                                                <label htmlFor="state">estado</label>
+                                                <input
+                                                    type="text"
+                                                    id="state"
+                                                    name="state"
+                                                    placeholder="estado..."
+                                                    value={formData.state}
+                                                    onChange={handleChange}
+                                                    required
+                                                />
                                             </div>
                                         </div>
                                         <div className='form-row'>
                                             <div className='input-group'>
-                                                <label htmlFor="pais">país</label>
-                                                <input type="text" id="pais" name="pais" placeholder="país..." required />
+                                                <label htmlFor="country">país</label>
+                                                <input
+                                                    type="text"
+                                                    id="country"
+                                                    name="country"
+                                                    placeholder="país..."
+                                                    value={formData.country}
+                                                    onChange={handleChange}
+                                                    required
+                                                />
                                             </div>
                                             <div className='input-group empty'></div>
                                         </div>
                                         <div className='form-row'>
                                             <div className='input-group'>
                                                 <label htmlFor="cpf">CPF</label>
-                                                <input type="text" id="cpf" name="cpf" placeholder="CPF..." required />
+                                                <input
+                                                    type="text"
+                                                    id="cpf"
+                                                    name="cpf"
+                                                    placeholder="CPF..."
+                                                    value={formData.cpf}
+                                                    onChange={handleChange}
+                                                />
                                             </div>
                                             <div className='input-group empty'></div>
                                         </div>
@@ -202,13 +341,12 @@ function Register() {
                             <>
                                 <h2>Seus interesses</h2>
                                 <div className='form interests-step'>
-                                    <form className='main-form' onSubmit={(e) => { e.preventDefault(); alert('Cadastro Finalizado!'); }}>
+                                    <form className='main-form' onSubmit={handleFinalSubmit}>
                                         <div className="interests-columns">
-
                                             <div className="fieldset-container">
                                                 <span className="fieldset-label">instrumentos</span>
                                                 <div className="fieldset-content list-rows">
-                                                    {instrumentos.map(inst => {
+                                                    {instruments.map(inst => {
                                                         const isBlocked = inst.nome.trim() === '';
                                                         return (
                                                             <div key={inst.id} className="instrument-row">
@@ -221,8 +359,8 @@ function Register() {
                                                                 />
                                                                 <div className={`skill-bars ${isBlocked ? 'blocked' : ''}`}>
                                                                     {[1, 2, 3, 4, 5].map(bar => {
-                                                                        const colors = ['#FFE600', '#FFA800', '#FF7A00', '#FF3D00', '#FF0000']
-                                                                        const isActive = inst.nivel >= bar
+                                                                        const colors = ['#FFE600', '#FFA800', '#FF7A00', '#FF3D00', '#FF0000'];
+                                                                        const isActive = inst.nivel >= bar;
                                                                         return (
                                                                             <div
                                                                                 key={bar}
@@ -233,11 +371,11 @@ function Register() {
                                                                                 }}
                                                                                 onClick={() => handleLevelClick(inst.id, bar)}
                                                                             />
-                                                                        )
+                                                                        );
                                                                     })}
                                                                 </div>
                                                             </div>
-                                                        )
+                                                        );
                                                     })}
                                                 </div>
                                             </div>
@@ -274,11 +412,10 @@ function Register() {
                             <span className="vertical-title">Seus interesses</span>
                         )}
                     </div>
-
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
-export default Register
+export default Register;
