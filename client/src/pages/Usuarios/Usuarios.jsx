@@ -46,8 +46,12 @@ function Usuarios() {
   return (
     <div className="usuarios-page">
       <Navbar />
+      <div className="feed-tabs">
+        <Link to="/feed" className="feed-tab">feed</Link>
+        <Link to="/eventos" className="feed-tab">eventos</Link>
+        <Link to="/amplifique" className="feed-tab feed-tab-active">amplifique</Link>
+      </div>
       <div className="usuarios-content">
-        <h2 className="usuarios-title">Músicos</h2>
         <input
           type="text"
           placeholder="Buscar por nome..."
