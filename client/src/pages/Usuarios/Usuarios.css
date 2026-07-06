@@ -1,0 +1,94 @@
+.usuarios-page {
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.usuarios-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.usuarios-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #3a1a0a;
+  margin-bottom: 24px;
+}
+
+.usuarios-search {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d4c17a;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 32px;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+.usuarios-search:focus {
+  outline: none;
+  border-color: #8B1A1A;
+}
+
+.usuarios-status {
+  text-align: center;
+  color: #6B3A2A;
+  margin-top: 48px;
+  font-size: 1rem;
+}
+
+.usuarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.usuario-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  border: 1px solid #d4c17a;
+  border-radius: 12px;
+  background: #fffdf5;
+  text-decoration: none;
+  transition: border-color 0.15s;
+  gap: 12px;
+}
+
+.usuario-card:hover {
+  border-color: #8B1A1A;
+}
+
+.usuario-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.usuario-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.usuario-name {
+  font-weight: 600;
+  color: #3a1a0a;
+  font-size: 1rem;
+}
+
+.usuario-username {
+  font-size: 0.85rem;
+  color: #6B3A2A;
+}
+
+.usuario-location {
+  font-size: 0.78rem;
+  color: #999;
+}
