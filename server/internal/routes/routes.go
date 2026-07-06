@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gin-contrib/cors"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,6 +29,13 @@ func SetupRoutes(r *gin.Engine) {
 	instrumentController := controllers.NewInstrumentController(instrumentRepository)
 	tagRepository := repositories.NewTagRepository(config.DB)
 	tagController := controllers.NewTagController(tagRepository)
+
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"http://localhost:5173"},
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
+	}))
 
 	r.GET("/user", controller.GetUsers)
 	r.GET("/userByName", controller.GetUsersByName)
