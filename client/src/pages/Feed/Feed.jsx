@@ -20,7 +20,7 @@ function Feed() {
         })
         if (!response.ok) throw new Error('Erro ao buscar posts')
         const data = await response.json()
-        setPosts(data)
+        setPosts(Array.isArray(data) ? data : [])
       } catch (err) {
         setError('Não foi possível carregar o feed.')
       } finally {
