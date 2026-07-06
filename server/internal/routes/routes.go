@@ -14,12 +14,20 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine) {
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+
 	repository := repositories.NewRepository(config.DB)
 	service := services.NewService(repository)
 	controller := controllers.NewHandler(service)
-	instrumentRepository :=repositories.NewInstrumentRepository(config.DB)
+	instrumentRepository := repositories.NewInstrumentRepository(config.DB)
 	instrumentController := controllers.NewInstrumentController(instrumentRepository)
-	tagRepository :=repositories.NewTagRepository(config.DB)
+	tagRepository := repositories.NewTagRepository(config.DB)
 	tagController := controllers.NewTagController(tagRepository)
 
 
@@ -38,8 +46,8 @@ func SetupRoutes(r *gin.Engine) {
 	publicAPI := r.Group("/api/auth")
 	{
 		publicAPI.POST("/register", controller.Register)
-		publicAPI.GET("/instruments", instrumentController.GetInstruments)	
-		publicAPI.GET("/tags", tagController.GetTag)	
+		publicAPI.GET("/instruments", instrumentController.GetInstruments)  
+		publicAPI.GET("/tags", tagController.GetTag)    
 	}
 
 	protectedAPI := r.Group("/api")

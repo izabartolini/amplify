@@ -77,12 +77,10 @@ function Login() {
           <button className="btn-entrar" onClick={handleLogin}>Entrar</button>
           <div className="login-links">
             <a href="#" onClick={() => navigate('/forgot-password')}>Esqueci a senha</a>
-            <a href="" onClick={() => navigate('/cadastro')}>Criar conta</a>
           </div>
-          <button className="btn-entrar">Entrar</button>
           <p className="register-text">
             Se ainda não possuir uma conta,{' '}
-            <a href="#" onClick={() => navigate('/cadastro')}>clique aqui para se registrar</a>
+            <a href="#" onClick={() => navigate('/register')}>clique aqui para se registrar</a>
           </p>
         </div>
       </div>
