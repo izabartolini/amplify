@@ -7,11 +7,11 @@ import (
 type Tag struct{
 	ID             uint           `gorm:"primaryKey;autoIncrement:true;<-:create(false)"`
 	Name           string		  `gorm:"not null;unique"`
-	CreatedAt      time.Time      `gorm:"autoCreateTime"`
+	CreatedAt      time.Time      `gorm:"autoCreateTime" json:"-"`
 
-	UserTag     []UserTag         `gorm:"foreignKey:TagID;constraint:OnDelete:CASCADE;"`
-	EventTag    []EventTag        `gorm:"foreignKey:TagID;constraint:OnDelete:CASCADE;"`
-	PostTag     []PostTag         `gorm:"foreignKey:TagID;constraint:OnDelete:CASCADE;"`
+	UserTag     []UserTag         `gorm:"foreignKey:TagID;constraint:OnDelete:CASCADE;" json:"-"`
+	EventTag    []EventTag        `gorm:"foreignKey:TagID;constraint:OnDelete:CASCADE;" json:"-"`
+	PostTag     []PostTag         `gorm:"foreignKey:TagID;constraint:OnDelete:CASCADE;" json:"-"`
 }
 
 type UserTag struct{

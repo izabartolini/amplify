@@ -60,13 +60,13 @@ type PostUserDTO struct {
 }
 
 type PostResponseDTO struct {
-	ID        uint             `json:"id"`
-	Subtitle  string           `json:"subtitle"`
-	CreatedAt string           `json:"created_at"`
-	User      PostUserDTO      `json:"user"`
-	Medias    []models.Media   `json:"medias"`
-	Likes     []models.Like    `json:"likes"`
-	Comments  []models.Comment `json:"comments"`
+	ID        uint                 `json:"id"`
+	Subtitle  string               `json:"subtitle"`
+	CreatedAt string               `json:"created_at"`
+	User      PostUserDTO          `json:"user"`
+	Medias    []models.Media       `json:"medias"`
+	Likes     []models.Like        `json:"likes"`
+	Comments  []CommentResponseDTO `json:"comments"`
 }
 
 func (s *Service) GetFeed() ([]PostResponseDTO, error) {
@@ -77,6 +77,21 @@ func (s *Service) GetFeed() ([]PostResponseDTO, error) {
 
 	var result []PostResponseDTO
 	for _, p := range posts {
+		comments := []CommentResponseDTO{}
+		for _, c := range p.Comments {
+			comments = append(comments, CommentResponseDTO{
+				ID:        c.ID,
+				Text:      c.Text,
+				CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+				User: CommentUserDTO{
+					ID:             c.User.ID,
+					Name:           c.User.Name,
+					Username:       c.User.Username,
+					ProfilePicture: c.User.ProfilePicture,
+				},
+			})
+		}
+
 		result = append(result, PostResponseDTO{
 			ID:        p.ID,
 			Subtitle:  p.Subtitle,
@@ -91,7 +106,7 @@ func (s *Service) GetFeed() ([]PostResponseDTO, error) {
 			},
 			Medias:   p.Medias,
 			Likes:    p.Likes,
-			Comments: p.Comments,
+			Comments: comments,
 		})
 	}
 
@@ -128,17 +143,17 @@ func (s *Service) GetPostByID(id uint) (*PostDetailDTO, error) {
 		return nil, errors.New("post não encontrado")
 	}
 
-	var comments []CommentResponseDTO
+	comments := []CommentResponseDTO{}
 	for _, c := range post.Comments {
 		comments = append(comments, CommentResponseDTO{
 			ID:        c.ID,
 			Text:      c.Text,
 			CreatedAt: c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
 			User: CommentUserDTO{
-				ID:             post.User.ID,
-				Name:           post.User.Name,
-				Username:       post.User.Username,
-				ProfilePicture: post.User.ProfilePicture,
+				ID:             c.User.ID,
+				Name:           c.User.Name,
+				Username:       c.User.Username,
+				ProfilePicture: c.User.ProfilePicture,
 			},
 		})
 	}

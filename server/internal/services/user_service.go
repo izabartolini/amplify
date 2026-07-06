@@ -1,8 +1,9 @@
 package services
 
 import (
-	"crypto/tls"
 	"amplify/server/internal/models"
+	"amplify/server/internal/repositories"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -91,20 +92,23 @@ func validateCPF(cpf string) bool {
 	return true
 }
 
+type InstrumentDTO struct{
+	Name           string   `json:"instrument_name"`
+	Level          uint8    `json:"instrument_level"`
+}
 type RegisterDTO struct {
-	Name           string   `json:"name" binding:"required"`
-	Email          string   `json:"email" binding:"required,email"`
-	Username       string   `json:"username" binding:"required"`
-	Password       string   `json:"password" binding:"required"`
-	CPF            string   `json:"cpf" binding:"required"`
-	Instrument     string   `json:"instrument"`
-	Level          string   `json:"level"`
-	City           string   `json:"city"`
-	State          string   `json:"state"`
-	Country        string   `json:"country"`
-	Bio            string   `json:"bio"`
-	ProfilePicture string   `json:"profile_picture"`
-	Tags           []string `json:"tags"`
+	Name           string   		`json:"name" binding:"required"`
+	Email          string   		`json:"email" binding:"required,email"`
+	Username       string   		`json:"username" binding:"required"`
+	Password       string   		`json:"password" binding:"required"`
+	CPF            string   		`json:"cpf" binding:"required"`
+	City           string  		 	`json:"city"`
+	State          string  			`json:"state"`
+	Country        string  			`json:"country"`
+	Bio            string   		`json:"bio"`
+	ProfilePicture string   		`json:"profile_picture"`
+	Tags           []string         `json:"tags"`
+	Instruments    []InstrumentDTO  `json:"instruments"`
 }
 
 func (s *Service) RegisterUser(req RegisterDTO) (*models.User, error) {
@@ -146,13 +150,31 @@ func (s *Service) RegisterUser(req RegisterDTO) (*models.User, error) {
 		return nil, errors.New("Erro ao registrar usuário no banco de dados")
 	}
 
-	if len(req.Tags) > 0 {
-		s.repository.SaveUserTags(user.ID, req.Tags)
-	}
+    if len(req.Tags) > 0 {
+         s.repository.SaveUserTags(user.ID, req.Tags)
+    }
 
-	return &user, nil
+    if len(req.Instruments) > 0 {
+        repoParams := make([]repositories.InstrumentParams, 0, len(req.Instruments))
 
+        for _, inst := range req.Instruments {
+            repoParams = append(repoParams, repositories.InstrumentParams{
+                Name:  inst.Name, 
+                Level: inst.Level,
+            })
+        }
+		
+
+        if err := s.repository.SaveUserInstruments(user.ID, repoParams); err != nil {
+            return nil, errors.New("Usuário criado, mas erro ao salvar os instrumentos")
+        }
+    }
+
+	s.repository.FindUserWithRelations(user.ID, &user)
+
+    return &user, nil
 }
+
 
 func (s *Service) GetUsers() ([]models.User, error) {
 	return s.repository.GetUsers()
@@ -380,34 +402,105 @@ func (s *Service) UpdateForgotenPassword(id uint, req UpdateForgotenPasswordRequ
 	return s.repository.UpdateUser(id, updates)
 }
 
-
 type ResetCode struct {
 	UserID    uint
 	Code      string
 	ExpiresAt time.Time
 }
+
 var ResetCodes = map[string]ResetCode{}
-
-
 
 func (s *Service) VerifyResetCode(email string, code string) (uint, error) {
 	data, exists := ResetCodes[email]
-	
+
 	if !exists {
 		return 0, errors.New("code not found")
 	}
 	if time.Now().After(data.ExpiresAt) {
 		delete(ResetCodes, email)
-		
+
 		return 0, errors.New("code expired")
 	}
 	if data.Code != code {
 		return 0, errors.New("invalid code")
 	}
-	
+
 	return data.UserID, nil
 }
 
 func (s *Service) GetUserActivity(userID uint) ([]map[string]interface{}, error) {
 	return s.repository.GetUserActivity(userID)
+}
+
+func (s *Service) GetPostsByUser(userID uint) ([]models.Post, error) {
+	return s.repository.GetPostsByUser(userID)
+}
+
+func (s *Service) GetEventsByUser(userID uint) ([]models.Event, error) {
+	return s.repository.GetEventsByUser(userID)
+}
+
+type UserProfileResponse struct {
+	ID             uint   `json:"id"`
+	Name           string `json:"name"`
+	Username       string `json:"username"`
+	ProfilePicture string `json:"profile_picture"`
+	Bio            string `json:"bio"`
+	City           string `json:"city"`
+	State          string `json:"state"`
+	Country        string `json:"country"`
+	FollowersCount int    `json:"followers_count"`
+	FollowingCount int    `json:"following_count"`
+}
+
+func (s *Service) GetUserByID(userID uint) (*UserProfileResponse, error) {
+	user, err := s.repository.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &UserProfileResponse{
+		ID:             user.ID,
+		Name:           user.Name,
+		Username:       user.Username,
+		ProfilePicture: user.ProfilePicture,
+		Bio:            user.Bio,
+		City:           user.City,
+		State:          user.State,
+		Country:        user.Country,
+		FollowersCount: len(user.Followers),
+		FollowingCount: len(user.Following),
+	}, nil
+}
+
+func (s *Service) FollowUser(followerID uint, followingID uint) error {
+	if followerID == followingID {
+		return errors.New("você não pode seguir a si mesmo")
+	}
+
+	already, err := s.repository.IsFollowing(followerID, followingID)
+	if err != nil {
+		return err
+	}
+	if already {
+		return errors.New("você já segue este usuário")
+	}
+
+	return s.repository.FollowUser(followerID, followingID)
+}
+
+func (s *Service) UnfollowUser(followerID uint, followingID uint) error {
+	following, err := s.repository.IsFollowing(followerID, followingID)
+	if err != nil {
+		return err
+	}
+	if !following {
+		return errors.New("você não segue este usuário")
+	}
+
+	return s.repository.UnfollowUser(followerID, followingID)
+}
+
+func (s *Service) IsFollowing(followerID uint, followingID uint) (bool, error) {
+	return s.repository.IsFollowing(followerID, followingID)
 }

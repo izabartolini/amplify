@@ -1,0 +1,78 @@
+.post-card {
+  background: #fffdf5;
+  border: 1px solid #d4c17a;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.post-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #d4c17a;
+}
+
+.post-author {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.post-author-name {
+  font-weight: 600;
+  color: #3a1a0a;
+  font-size: 0.95rem;
+}
+
+.post-author-username {
+  font-size: 0.8rem;
+  color: #6B3A2A;
+}
+
+.post-date {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.post-subtitle {
+  color: #3a1a0a;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.post-medias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.post-media-link {
+  font-size: 0.85rem;
+  color: #8B1A1A;
+  text-decoration: none;
+  border: 1px solid #d4c17a;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.post-media-link:hover {
+  background: #f0e6d0;
+}
+
+.post-card-footer {
+  display: flex;
+  gap: 20px;
+  color: #6B3A2A;
+  font-size: 0.85rem;
+}

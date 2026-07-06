@@ -4,80 +4,77 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: radial-gradient(ellipse at center, #fdf6e3 0%, #f5e6c8 40%, #e8d5a3 70%, #d4c17a 100%);
-  gap: 60px;
+  background: linear-gradient(to top right, #840000 0%, #B75F53 20%, #DFA993 38%, #FFE5C7 57%, #FCDAB4 79%, #F8CB98 100%);
+  gap: 100px;
 }
 
 .landing-speakers {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 280px;
-  height: 220px;
-}
-
-.speaker-connector {
-  position: absolute;
-  width: 120px;
-  height: 400px;
-  background-color: #8B1A1A;
-  border-radius: 8px;
-  z-index: 0;
-}
-
-.speaker-img {
-  position: absolute;
-  height: 440px;
-  object-fit: contain;
-  z-index: 1;
-}
-
-.speaker-left {
-  left: -170px;
-}
-
-.speaker-right {
-  right: -170px;
-  transform: scaleX(-1);
+  flex-shrink: 0;
+  margin-left: -60px;
 }
 
 .landing-center {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 20px;
-  text-align: left;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+  flex-shrink: 0;
+  width: 320px;
+  margin-right: 80px;
+}
+
+.speakers-with-star {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 460px;
+  height: 520px;
+}
+
+.star-img {
+  position: absolute;
+  width: 580px;
+  z-index: 0;
+}
+
+.speaker-img {
+  height: 340px;
+  object-fit: contain;
+  z-index: 1;
+  position: relative;
 }
 
 .logo-text {
   font-family: 'Molle', cursive;
-  font-size: 20rem;
-  color: #3d1f00;
   font-style: italic;
   margin: 0;
 }
 
 .slogan {
-  font-size: 1.25rem;
+  font-size: 1.8rem;
   color: #3d1f00;
   font-weight: 500;
   line-height: 1.6;
   margin: 0;
+  text-align: center;
 }
 
-.btn-entrar {
-  background-color: #f5c200;
+.btn-entrar-landing {
+  background-color: white;
   color: #3d1f00;
   border: none;
-  padding: 14px 48px;
+  padding: 14px 100px;
   font-size: 1.1rem;
-  font-weight: bold;
-  border-radius: 30px;
+  font-weight: 900;
+  border-radius: 8px;
   cursor: pointer;
-  margin-top: 0;
 }
 
-.btn-entrar:hover {
-  background-color: #e6b800;
+.btn-entrar-landing:hover {
+  background-color: #f0f0f0;
 }

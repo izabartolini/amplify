@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PasswordInput } from '@mantine/core';
 import { Input } from '@mantine/core';
+import speakerLeftImg from '../../assets/speaker-left.png'
+import speakerRightImg from '../../assets/speaker-right.png'
 import './Login.css'
 
 function Login() {
@@ -61,13 +63,10 @@ function Login() {
 
   return (
     <div className="login-container">
-      <div className="login-speakers left-speakers">
-        <div className="speaker"></div>
-        <div className="speaker"></div>
-      </div>
+      <img src={speakerLeftImg} alt="speaker" className="login-speaker login-speaker-left" />
 
       <div className="login-center">
-        <h1 className="logo-text amplify-logo">Amplify</h1>
+        <h1 className="logo-text amplify-logo login-logo">Amplify</h1>
         <div className="login-card">
           <h2>Bem-vindo!</h2>
           <Input.Wrapper label="E-mail" error={emailError} style={{ width: '100%' }} >
@@ -80,13 +79,15 @@ function Login() {
             <a href="#" onClick={() => navigate('/forgot-password')}>Esqueci a senha</a>
             <a href="" onClick={() => navigate('/cadastro')}>Criar conta</a>
           </div>
+          <button className="btn-entrar">Entrar</button>
+          <p className="register-text">
+            Se ainda não possuir uma conta,{' '}
+            <a href="#" onClick={() => navigate('/cadastro')}>clique aqui para se registrar</a>
+          </p>
         </div>
       </div>
 
-      <div className="login-speakers right-speakers">
-        <div className="speaker"></div>
-        <div className="speaker"></div>
-      </div>
+      <img src={speakerRightImg} alt="speaker" className="login-speaker login-speaker-right" />
     </div>
   )
 }

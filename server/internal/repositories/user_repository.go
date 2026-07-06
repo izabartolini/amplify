@@ -3,15 +3,16 @@ package repositories
 import (
 	"amplify/server/internal/models"
 	"errors"
-	"regexp"
-	"strings"
-
 	"gorm.io/gorm"
 )
 
 type Repository struct{ db *gorm.DB }
 
 func NewRepository(db *gorm.DB) *Repository { return &Repository{db: db} }
+
+func (r *Repository) FindUserWithRelations(id uint, user *models.User) error {
+	return r.db.Preload("Tag").Preload("Plays").First(user, id).Error
+}
 
 func (r *Repository) GetUsers() ([]models.User, error) {
 	var users []models.User
@@ -66,14 +67,14 @@ func (r *Repository) GetUserByEmail(findEmail string) (*models.User, error) {
 
 }
 
-func (r *Repository) GetUserById (id uint) (*models.User, error){
+func (r *Repository) GetUserById(id uint) (*models.User, error) {
 	var user models.User
 	err := r.db.First(&user, id).Error
 	if err != nil {
-        return nil, err
-    }
+		return nil, err
+	}
 
-    return &user, nil
+	return &user, nil
 }
 
 func (r *Repository) UpdateUser(id uint, data map[string]interface{}) error {
@@ -81,31 +82,6 @@ func (r *Repository) UpdateUser(id uint, data map[string]interface{}) error {
 	return r.db.Model(&models.User{}).Where("id = ?", id).Updates(data).Error
 }
 
-func (r *Repository) SaveUserTags(userID uint, tagNames []string) {
-	var tagValidationRegex = regexp.MustCompile(`^[A-Z0-9]+$`)
-
-	for _, name := range tagNames {
-		cleanName := strings.ToUpper(strings.TrimSpace(name))
-		if cleanName == "" {
-			continue
-		}
-		if !tagValidationRegex.MatchString(cleanName) {
-			continue
-		}
-
-		var tag models.Tag
-		if err := r.db.FirstOrCreate(&tag, models.Tag{Name: cleanName}).Error; err != nil {
-			continue
-		}
-
-		userTag := models.UserTag{
-			UserID: userID,
-			TagID:  tag.ID,
-		}
-
-		r.db.Create(&userTag)
-	}
-}
 func (r *Repository) DeleteUser(id uint) error {
 	result := r.db.Delete(&models.User{}, id)
 	return result.Error
@@ -152,4 +128,86 @@ func (r *Repository) GetUserActivity(userID uint) ([]map[string]interface{}, err
 	}
 
 	return activities, nil
+}
+
+type PostAuthor struct {
+	ID             uint   `json:"id"`
+	Name           string `json:"name"`
+	Username       string `json:"username"`
+	ProfilePicture string `json:"profile_picture"`
+	City           string `json:"city"`
+	State          string `json:"state"`
+}
+
+func (r *Repository) GetPostsByUser(userID uint) ([]models.Post, error) {
+	var posts []models.Post
+	err := r.db.
+		Where("user_id = ?", userID).
+		Preload("Medias").
+		Preload("Likes").
+		Preload("Comments").
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("users.id, users.name, users.username, users.profile_picture, users.city, users.state")
+		}).
+		Order("created_at desc").
+		Find(&posts).Error
+	return posts, err
+}
+
+func (r *Repository) GetEventsByUser(userID uint) ([]models.Event, error) {
+	var events []models.Event
+	err := r.db.
+		Where("user_id = ?", userID).
+		Preload("Medias").
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("users.id, users.name, users.username, users.profile_picture, users.city, users.state")
+		}).
+		Order("date asc").
+		Find(&events).Error
+	return events, err
+}
+
+func (r *Repository) GetUserByID(userID uint) (*models.User, error) {
+	var user models.User
+	err := r.db.
+		Select("id, name, username, profile_picture, bio, city, state, country").
+		Preload("Tag").
+		Preload("Plays").
+		First(&user, userID).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var followersCount int64
+	r.db.Model(&models.Follow{}).Where("following_id = ?", userID).Count(&followersCount)
+
+	var followingCount int64
+	r.db.Model(&models.Follow{}).Where("follower_id = ?", userID).Count(&followingCount)
+
+	user.Followers = make([]models.Follow, followersCount)
+	user.Following = make([]models.Follow, followingCount)
+
+	return &user, nil
+}
+
+func (r *Repository) FollowUser(followerID uint, followingID uint) error {
+	follow := models.Follow{
+		FollowerID:  followerID,
+		FollowingID: followingID,
+	}
+	return r.db.Create(&follow).Error
+}
+
+func (r *Repository) UnfollowUser(followerID uint, followingID uint) error {
+	return r.db.
+		Where("follower_id = ? AND following_id = ?", followerID, followingID).
+		Delete(&models.Follow{}).Error
+}
+
+func (r *Repository) IsFollowing(followerID uint, followingID uint) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.Follow{}).
+		Where("follower_id = ? AND following_id = ?", followerID, followingID).
+		Count(&count).Error
+	return count > 0, err
 }
