@@ -72,7 +72,7 @@
   background: transparent;
   color: #8B1A1A;
   border: 1px solid #8B1A1A;
-  padding: 10px; /* Formato redondo perfeito */
+  padding: 10px; 
   border-radius: 50%; 
   cursor: pointer;
   transition: all 0.2s ease;

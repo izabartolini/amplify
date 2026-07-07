@@ -1,21 +1,17 @@
-/* Força o container do calendário a expandir */
+
 .mantine-DatePicker-calendar {
     width: 100% !important;
     max-width: 100% !important;
 }
 
-/* Força a grade de dias a ocupar o espaço */
 .mantine-DatePicker-calendar .mantine-Calendar-calendar {
     width: 100% !important;
 }
-
-/* Garante que as colunas ocupem 1/7 do espaço disponível */
 .mantine-DatePicker-calendar .mantine-Calendar-calendarTable {
     width: 100% !important;
     table-layout: fixed;
 }
 
-/* Ajusta o tamanho dos botões de dia para preencher o espaço */
 .mantine-DatePicker-day {
     width: 100% !important;
     aspect-ratio: 1 / 1;

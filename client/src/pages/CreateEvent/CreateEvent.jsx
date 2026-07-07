@@ -70,7 +70,6 @@ export default function CreateEvent() {
 
     try {
       const token = localStorage.getItem("token");
-      // Recupera o ID do usuário diretamente no momento da ação
       const userID = localStorage.getItem("userID");
 
       const eventData = {
@@ -91,8 +90,6 @@ export default function CreateEvent() {
         const errorData = await response.json();
         throw new Error(errorData.message || "Falha ao criar o evento.");
       }
-
-      // Notificação de sucesso
       notifications.show({
         title: 'Sucesso!',
         message: 'O evento foi criado e já está disponível.',
@@ -101,11 +98,9 @@ export default function CreateEvent() {
         autoClose: 3000,
       });
 
-      // Redirecionamento seguro
       if (userID) {
         navigate(`/profile/${userID}`);
       } else {
-        // Se não tiver userID, cai no feed para não quebrar a navegação
         navigate("/feed");
       }
 
