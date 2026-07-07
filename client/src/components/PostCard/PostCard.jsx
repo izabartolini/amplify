@@ -1,40 +1,43 @@
 import './PostCard.css'
+import { Link } from 'react-router-dom'
 
 function PostCard({ post }) {
+  const avatarUrl = post.user?.profile_picture
+    || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(post.user?.name || 'U') + '&background=8B1A1A&color=fff&size=48'
+
   return (
     <div className="post-card">
-      <div className="post-card-header">
-        <img
-          src={'https://ui-avatars.com/api/?name=' + encodeURIComponent(post.user?.name || 'U') + '&background=8B1A1A&color=fff&size=40'}
-          alt={post.user?.name}
-          className="post-avatar"
-        />
-        <div className="post-author">
-          <span className="post-author-name">{post.user?.name}</span>
-          <span className="post-author-username">@{post.user?.username}</span>
-        </div>
-        <span className="post-date">
-          {new Date(post.created_at).toLocaleDateString('pt-BR')}
-        </span>
+      <div className="post-header">
+        <Link to={`/profile/${post.user?.id}`} className="post-author-link">
+          <img src={avatarUrl} alt={post.user?.name} className="post-avatar" />
+          <div className="post-author">
+            <span className="post-name">{post.user?.username}</span>
+            <span className="post-location">
+              {post.user?.city && post.user?.state
+                ? `${post.user.city}, ${post.user.state}`
+                : 'Localização não informada'}
+            </span>
+          </div>
+        </Link>
       </div>
 
-      {post.subtitle && (
-        <p className="post-subtitle">{post.subtitle}</p>
-      )}
+      <Link to={`/posts/${post.id}`} className="post-body-link">
+        {post.medias && post.medias.length > 0 && (
+          <div className="post-medias">
+            {post.medias.map((media) => (
+              <img key={media.id} src={media.url} alt="post media" className="post-media-img" />
+            ))}
+          </div>
+        )}
 
-      {post.medias && post.medias.length > 0 && (
-        <div className="post-medias">
-          {post.medias.map((media) => (
-            <a key={media.id} href={media.url} target="_blank" rel="noreferrer" className="post-media-link">
-              {media.type === 'photo' ? '🖼 Ver foto' : '🎥 Ver vídeo'}
-            </a>
-          ))}
-        </div>
-      )}
+        {post.subtitle && (
+          <p className="post-subtitle">{post.subtitle}</p>
+        )}
+      </Link>
 
-      <div className="post-card-footer">
-        <span>❤️ {post.likes?.length ?? 0}</span>
-        <span>💬 {post.comments?.length ?? 0}</span>
+      <div className="post-actions">
+        <button className="post-action-btn">❤️</button>
+        <button className="post-action-btn">💬</button>
       </div>
     </div>
   )

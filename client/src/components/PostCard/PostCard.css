@@ -1,78 +1,90 @@
 .post-card {
-  background: #fffdf5;
-  border: 1px solid #d4c17a;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 16px;
+  padding: 24px 0;
+  border-bottom: 1px solid #e8d5a3;
 }
 
-.post-card-header {
+.post-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.post-author-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
 }
 
 .post-avatar {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  background: #d4c17a;
+  background-color: #8B1A1A;
 }
 
 .post-author {
   display: flex;
   flex-direction: column;
-  flex: 1;
 }
 
-.post-author-name {
-  font-weight: 600;
-  color: #3a1a0a;
-  font-size: 0.95rem;
+.post-name {
+  font-weight: 700;
+  color: #1a1a1a;
+  font-size: 1rem;
 }
 
-.post-author-username {
-  font-size: 0.8rem;
-  color: #6B3A2A;
+.post-location {
+  font-size: 0.85rem;
+  color: #555;
 }
 
-.post-date {
-  font-size: 0.8rem;
-  color: #999;
-}
-
-.post-subtitle {
-  color: #3a1a0a;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin-bottom: 12px;
+.post-body-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
 
 .post-medias {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.post-media-img {
+  border-radius: 6px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.post-subtitle {
+  color: #1a1a1a;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.post-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 16px;
 }
 
-.post-media-link {
-  font-size: 0.85rem;
-  color: #8B1A1A;
-  text-decoration: none;
-  border: 1px solid #d4c17a;
-  padding: 4px 10px;
-  border-radius: 8px;
+.post-action-btn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0;
 }
 
-.post-media-link:hover {
-  background: #f0e6d0;
-}
-
-.post-card-footer {
-  display: flex;
-  gap: 20px;
+.post-status {
+  text-align: center;
   color: #6B3A2A;
-  font-size: 0.85rem;
+  margin-top: 48px;
+  font-size: 1rem;
 }
