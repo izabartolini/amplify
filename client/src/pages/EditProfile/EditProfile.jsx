@@ -32,34 +32,61 @@ function EditProfile() {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        
-        if (!token) {
+        const userID = localStorage.getItem('userID');
+
+        if (!token || !userID) {
             alert('Acesso negado. Por favor, faça login novamente.');
             navigate('/login');
             return;
         }
 
-        axios.get('http://localhost:8080/api/profile', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-        .then(res => {
-            const user = res.data;
-            setFormData({
-                name: user.name || '',
-                username: user.username || '',
-                cpf: user.cpf || '',
-                location: user.location || '',
-                bio: user.bio || ''
-            });
-            if (user.tags) setTags(user.tags);
-            if (user.instruments) setInstruments(user.instruments);
-            if (user.profileImageUrl) setProfileImage(user.profileImageUrl);
-        })
-        .catch(err => {
-            console.error(err);
-            alert('Sessão expirada ou inválida.');
-            navigate('/login');
-        });
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/users/${userID}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const user = response.data;
+
+                setFormData({
+                    name: user.name || '',
+                    username: user.username || '',
+                    cpf: user.cpf || '',
+                    location: user.city || '',
+                    bio: user.bio || ''
+                });
+
+                if (user.profile_picture) {
+                    setProfileImage(user.profile_picture);
+                }
+
+                if (user.Tag && Array.isArray(user.Tag)) {
+                    const loadedTags = user.Tag.map(t => t.name);
+                    setTags(loadedTags);
+                } else if (user.tags && Array.isArray(user.tags)) {
+                    setTags(user.tags);
+                }
+
+                if (user.instruments && Array.isArray(user.instruments)) {
+                    const loadedInstruments = user.instruments.map((inst) => ({
+                        id: inst.id,
+                        nome: inst.nome || '',
+                        nivel: inst.nivel || 0
+                    }));
+
+                    const completeInstruments = [...loadedInstruments];
+                    while (completeInstruments.length < 5) {
+                        completeInstruments.push({ id: completeInstruments.length + 1, nome: '', nivel: 0 });
+                    }
+                    setInstruments(completeInstruments);
+                }
+
+            } catch (error) {
+                console.error("Erro ao buscar dados do usuário:", error);
+            }
+        };
+
+        fetchUserData();
     }, [navigate]);
 
     const hasUploadedPhoto = profileImage !== UserPlaceholder;
@@ -120,15 +147,20 @@ function EditProfile() {
         }
 
         const token = localStorage.getItem('token');
-        
+
+        if (!token) {
+            alert('Sessão inválida ou expirada. Por favor, faça login novamente.');
+            navigate('/login');
+            return;
+        }
+
         const payload = new FormData();
-        
         payload.append('name', formData.name);
         payload.append('username', formData.username);
         payload.append('cpf', formData.cpf);
-        payload.append('location', formData.location);
         payload.append('bio', formData.bio);
-        
+        payload.append('city', formData.location);
+
         payload.append('tags', JSON.stringify(tags));
         payload.append('instruments', JSON.stringify(instruments.filter(i => i.nome.trim() !== '')));
 
@@ -137,7 +169,7 @@ function EditProfile() {
         }
 
         try {
-            const response = await axios.put('http://localhost:8080/api/profile/update', payload, {
+            const response = await axios.put('http://localhost:8080/api/users/update', payload, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
@@ -147,10 +179,16 @@ function EditProfile() {
             alert('Alterações salvas com sucesso!');
             if (response.data.profileImageUrl) {
                 setProfileImage(response.data.profileImageUrl);
+                localStorage.setItem('profile_picture', response.data.profileImageUrl)
+                window.location.reload();
             }
         } catch (error) {
-            console.error(error);
-            alert(error.response?.data?.message || 'Erro ao salvar as alterações do perfil.');
+            console.error("Erro detalhado retornado pelo Go no salvamento:", error);
+            if (error.response && error.response.data && error.response.data.error) {
+                alert(`Erro no servidor Go: ${error.response.data.error}`);
+            } else {
+                alert('Erro ao salvar as alterações do perfil.');
+            }
         }
     };
 
@@ -169,13 +207,13 @@ function EditProfile() {
                         <img src={profileImage} alt="Profile" className={hasUploadedPhoto ? "user-photo" : "large-avatar"} />
                         <div className="avatar-overlay"><span>Alterar Foto</span></div>
                     </div>
-                    
-                    <input 
-                        type="file" 
-                        ref={fileInputRef} 
-                        onChange={handleFileChange} 
-                        accept="image/png, image/jpeg" 
-                        style={{ display: 'none' }} 
+
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept="image/png, image/jpeg"
+                        style={{ display: 'none' }}
                     />
 
                     <div className="input-stack">
@@ -195,10 +233,10 @@ function EditProfile() {
                             <textarea name="bio" placeholder="Biografia do usuário" value={formData.bio} onChange={handleChange} />
                         </div>
                         <div className="tags-box">
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 className="tag-input"
-                                placeholder="Digite algo e aperte Enter..." 
+                                placeholder="Digite algo e aperte Enter..."
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
                                 onKeyDown={handleKeyDown}
@@ -216,10 +254,10 @@ function EditProfile() {
                             const isBlocked = inst.nome.trim() === '';
                             return (
                                 <div key={inst.id} className="instrument-edit-row">
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         className="instrument-input-field"
-                                        placeholder="Instrumento..." 
+                                        placeholder="Instrumento..."
                                         value={inst.nome}
                                         onChange={(e) => handleInstrumentNameChange(inst.id, e.target.value)}
                                     />
@@ -228,8 +266,8 @@ function EditProfile() {
                                             const colors = ['#FFE600', '#FFA800', '#FF7A00', '#FF3D00', '#FF0000'];
                                             const isActive = inst.nivel >= bar;
                                             return (
-                                                <div 
-                                                    key={bar} 
+                                                <div
+                                                    key={bar}
                                                     className={`bar ${isActive ? 'active' : ''}`}
                                                     style={{ '--bar-color': colors[bar - 1], height: `${20 + (bar * 15)}%` }}
                                                     onClick={() => handleLevelClick(inst.id, bar)}

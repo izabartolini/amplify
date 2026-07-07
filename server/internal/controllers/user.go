@@ -71,14 +71,12 @@ func (h *Controller) GetUsersByName(c *gin.Context) {
 
 	c.JSON(200, users)
 }
-// UpdateUserForm mapeia os campos vindos do FormData do React
+
 type UpdateUserForm struct {
-	Name           string `form:"name"`
-	Username       string `form:"username"`
+	Name           string `form:"name" binding:"required"`
+	Username       string `form:"username" binding:"required"`
 	Bio            string `form:"bio"`
 	City           string `form:"city"`
-	State          string `form:"state"`
-	Country        string `form:"country"`
 	CPF            string `form:"cpf"`
 	TagsRaw        string `form:"tags"`
 	InstrumentsRaw string `form:"instruments"`
@@ -94,8 +92,6 @@ type UpdateUserDTO struct {
 	Username       string
 	Bio            string
 	City           string
-	State          string
-	Country        string
 	CPF            string
 	ProfilePicture string
 	Tags           []string
@@ -122,10 +118,11 @@ func (h *Controller) UpdateUserProfile(c *gin.Context) {
 
 	var profilePictureURL string
 	file, err := c.FormFile("image")
-	if err == nil && file != nil {
+	
+	if err == nil && file != nil && file.Size > 0 && file.Filename != "" {
 		uploadedURL, uploadErr := utils.UploadToDrive(file)
 		if uploadErr != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "erro ao subir imagem"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "erro ao subir imagem: " + uploadErr.Error()})
 			return
 		}
 		profilePictureURL = uploadedURL
@@ -137,8 +134,6 @@ func (h *Controller) UpdateUserProfile(c *gin.Context) {
 		form.Username, 
 		form.Bio, 
 		form.City, 
-		form.State, 
-		form.Country, 
 		form.CPF, 
 		profilePictureURL, 
 		form.TagsRaw, 

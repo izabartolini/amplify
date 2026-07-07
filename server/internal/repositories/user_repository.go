@@ -15,6 +15,10 @@ func (r *Repository) FindUserWithRelations(id uint, user *models.User) error {
 	return r.db.Preload("Tag").Preload("Plays").First(user, id).Error
 }
 
+func (r *Repository) UpdateUserProfileFields(userID uint, fields map[string]interface{}) error {
+	return r.db.Model(&models.User{}).Where("id = ?", userID).Updates(fields).Error
+}
+
 func (r *Repository) GetUsers() ([]models.User, error) {
 	var users []models.User
 	err1 := r.db.Select("id, email, name, username, password, bio").Find(&users).Error
@@ -235,4 +239,31 @@ func (r *Repository) GetFollowing(userID uint) ([]models.User, error) {
 		AND follows.deleted_at IS NULL
 	`, userID).Scan(&users).Error
 	return users, err
+}
+
+func (r *Repository) GetTagNamesByIDs(tagIDs []uint) ([]string, error) {
+	var names []string
+	if len(tagIDs) == 0 {
+		return names, nil
+	}
+	err := r.db.Table("tags").Where("id IN ?", tagIDs).Pluck("name", &names).Error
+	return names, err
+}
+
+func (r *Repository) GetInstrumentNamesMap(instIDs []uint) (map[uint]string, error) {
+	namesMap := make(map[uint]string)
+	if len(instIDs) == 0 {
+		return namesMap, nil
+	}
+
+	var instruments []models.Instrument
+	err := r.db.Where("id IN ?", instIDs).Find(&instruments).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for _, inst := range instruments {
+		namesMap[inst.ID] = inst.Name
+	}
+	return namesMap, nil
 }
