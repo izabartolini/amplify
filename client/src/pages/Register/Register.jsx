@@ -85,8 +85,15 @@ function Register() {
             });
 
             if (response.ok) {
-                alert('Usuário criado com sucesso!');
-                navigate('/login');
+                const data = await response.json()
+                if (data.token) {
+                    localStorage.setItem('token', data.token)
+                    const payload = JSON.parse(atob(data.token.split('.')[1]))
+                    localStorage.setItem('userID', payload.sub)
+                    navigate('/feed')
+                } else {
+                    navigate('/login')
+                }
             } else {
                 const errorData = await response.json();
                 setError(errorData.message || 'Erro ao cadastrar usuário.');
@@ -102,7 +109,6 @@ function Register() {
             inst.id === id ? { ...inst, nome: value, nivel: value.trim() === '' ? 0 : inst.nivel } : inst
         ));
     };
-
     const handleLevelClick = (id, clickedLevel) => {
         setInstruments(prev => prev.map(inst => {
             if (inst.id === id && inst.nome.trim() !== '') {

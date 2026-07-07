@@ -41,8 +41,18 @@ func (h *Controller) Register(c *gin.Context) {
 
 	user.Password = ""
 
+	token, err := h.service.Login(user.Email, req.Password)
+	if err != nil {
+		c.JSON(http.StatusCreated, gin.H{
+			"message": "Usuário criado com sucesso",
+			"user":    user,
+		})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Usuário criado com sucesso",
+		"token":   token,
 		"user":    user,
 	})
 }
