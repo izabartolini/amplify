@@ -53,7 +53,9 @@ function Login() {
       }
       localStorage.setItem('token', data.token)
 
-      navigate('/profile/1')
+      const payload = JSON.parse(atob(data.token.split('.')[1]))
+      localStorage.setItem('userID', payload.sub)
+      navigate('/feed')
     } catch (error) {
       setError('Não foi possivel conectar ao servidor.')
     } finally {
@@ -80,7 +82,7 @@ function Login() {
           </div>
           <p className="register-text">
             Se ainda não possuir uma conta,{' '}
-            <a href="#" onClick={() => navigate('/cadastro')}>clique aqui para se registrar</a>
+            <a href="#" onClick={() => navigate('/register')}>clique aqui para se registrar</a>
           </p>
         </div>
       </div>

@@ -6,6 +6,8 @@ import (
 	"amplify/server/internal/middlewares"
 	"amplify/server/internal/repositories"
 	"amplify/server/internal/services"
+	"amplify/server/internal/utils"
+	"log"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -14,13 +16,28 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine) {
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+
 	repository := repositories.NewRepository(config.DB)
 	service := services.NewService(repository)
-	controller := controllers.NewHandler(service)
-	instrumentRepository :=repositories.NewInstrumentRepository(config.DB)
+	
+	cloud, err := utils.NewCloudinaryService()
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	controller := controllers.NewHandler(service, cloud)
+	instrumentRepository := repositories.NewInstrumentRepository(config.DB)
 	instrumentController := controllers.NewInstrumentController(instrumentRepository)
-	tagRepository :=repositories.NewTagRepository(config.DB)
+	tagRepository := repositories.NewTagRepository(config.DB)
 	tagController := controllers.NewTagController(tagRepository)
+
 
 
 	r.Use(cors.New(cors.Config{
@@ -38,8 +55,8 @@ func SetupRoutes(r *gin.Engine) {
 	publicAPI := r.Group("/api/auth")
 	{
 		publicAPI.POST("/register", controller.Register)
-		publicAPI.GET("/instruments", instrumentController.GetInstruments)	
-		publicAPI.GET("/tags", tagController.GetTag)	
+		publicAPI.GET("/instruments", instrumentController.GetInstruments)
+		publicAPI.GET("/tags", tagController.GetTag)
 	}
 
 	protectedAPI := r.Group("/api")
@@ -65,6 +82,8 @@ func SetupRoutes(r *gin.Engine) {
 			usersAPI.POST("/:id/follow", controller.FollowUser)
 			usersAPI.DELETE("/:id/follow", controller.UnfollowUser)
 			usersAPI.GET("/:id/follow", controller.IsFollowing)
+			usersAPI.GET("/:id/followers", controller.GetFollowers)
+			usersAPI.GET("/:id/following", controller.GetFollowing)
 		}
 
 		postsAPI := protectedAPI.Group("/posts")
@@ -76,10 +95,13 @@ func SetupRoutes(r *gin.Engine) {
 			postsAPI.DELETE("/:id/like", controller.UnlikePost)
 			postsAPI.POST("/:id/comments", controller.CreateComment)
 			postsAPI.DELETE("/:id/comments/:commentId", controller.DeleteComment)
+			postsAPI.PUT("/:id", controller.UpdatePost)
+			postsAPI.DELETE("/:id", controller.DeletePost)
 		}
 
 		eventsAPI := protectedAPI.Group("/events")
 		{
+			eventsAPI.GET("", controller.GetAllEvents)
 			eventsAPI.POST("", controller.CreateEvent)
 			eventsAPI.GET("/:id", controller.GetEvent)
 			eventsAPI.GET("/:id/requests", controller.GetEventRequests)

@@ -3,6 +3,7 @@ package repositories
 import (
 	"amplify/server/internal/models"
 	"errors"
+
 	"gorm.io/gorm"
 )
 
@@ -90,40 +91,73 @@ func (r *Repository) DeleteUser(id uint) error {
 func (r *Repository) GetUserActivity(userID uint) ([]map[string]interface{}, error) {
 	var activities []map[string]interface{}
 
+	// Likes
 	var likes []models.Like
 	if err := r.db.Where("user_id = ?", userID).Order("created_at desc").Find(&likes).Error; err != nil {
 		return nil, err
 	}
 	for _, l := range likes {
+		var post models.Post
+		var postAuthor models.User
+		r.db.Select("id, subtitle, user_id").First(&post, l.PostID)
+		r.db.Select("id, name, username, profile_picture").First(&postAuthor, post.UserID)
 		activities = append(activities, map[string]interface{}{
-			"type":       "like",
-			"post_id":    l.PostID,
+			"type":          "like",
+			"post_id":       l.PostID,
+			"post_subtitle": post.Subtitle,
+			"post_author": map[string]interface{}{
+				"id":              postAuthor.ID,
+				"name":            postAuthor.Name,
+				"username":        postAuthor.Username,
+				"profile_picture": postAuthor.ProfilePicture,
+			},
 			"created_at": l.CreatedAt,
 		})
 	}
 
+	// Comments
 	var comments []models.Comment
 	if err := r.db.Where("user_id = ?", userID).Order("created_at desc").Find(&comments).Error; err != nil {
 		return nil, err
 	}
 	for _, c := range comments {
+		var post models.Post
+		var postAuthor models.User
+		r.db.Select("id, subtitle, user_id").First(&post, c.PostID)
+		r.db.Select("id, name, username, profile_picture").First(&postAuthor, post.UserID)
 		activities = append(activities, map[string]interface{}{
-			"type":       "comment",
-			"post_id":    c.PostID,
-			"text":       c.Text,
+			"type":          "comment",
+			"post_id":       c.PostID,
+			"post_subtitle": post.Subtitle,
+			"text":          c.Text,
+			"post_author": map[string]interface{}{
+				"id":              postAuthor.ID,
+				"name":            postAuthor.Name,
+				"username":        postAuthor.Username,
+				"profile_picture": postAuthor.ProfilePicture,
+			},
 			"created_at": c.CreatedAt,
 		})
 	}
 
+	// Follows
 	var follows []models.Follow
-	if err := r.db.Where("follower_id = ?", userID).Order("created_at desc").Find(&follows).Error; err != nil {
+	if err := r.db.Where("follower_id = ? AND deleted_at IS NULL", userID).Order("created_at desc").Find(&follows).Error; err != nil {
 		return nil, err
 	}
 	for _, f := range follows {
+		var followedUser models.User
+		r.db.Select("id, name, username, profile_picture").First(&followedUser, f.FollowingID)
 		activities = append(activities, map[string]interface{}{
 			"type":         "follow",
 			"following_id": f.FollowingID,
-			"created_at":   f.CreatedAt,
+			"followed_user": map[string]interface{}{
+				"id":              followedUser.ID,
+				"name":            followedUser.Name,
+				"username":        followedUser.Username,
+				"profile_picture": followedUser.ProfilePicture,
+			},
+			"created_at": f.CreatedAt,
 		})
 	}
 
@@ -210,4 +244,28 @@ func (r *Repository) IsFollowing(followerID uint, followingID uint) (bool, error
 		Where("follower_id = ? AND following_id = ?", followerID, followingID).
 		Count(&count).Error
 	return count > 0, err
+}
+
+func (r *Repository) GetFollowers(userID uint) ([]models.User, error) {
+	var users []models.User
+	err := r.db.Raw(`
+		SELECT users.id, users.name, users.username, users.profile_picture, users.city, users.state
+		FROM users
+		INNER JOIN follows ON follows.follower_id = users.id
+		WHERE follows.following_id = ?
+		AND follows.deleted_at IS NULL
+	`, userID).Scan(&users).Error
+	return users, err
+}
+
+func (r *Repository) GetFollowing(userID uint) ([]models.User, error) {
+	var users []models.User
+	err := r.db.Raw(`
+		SELECT users.id, users.name, users.username, users.profile_picture, users.city, users.state
+		FROM users
+		INNER JOIN follows ON follows.following_id = users.id
+		WHERE follows.follower_id = ?
+		AND follows.deleted_at IS NULL
+	`, userID).Scan(&users).Error
+	return users, err
 }
