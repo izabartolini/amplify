@@ -439,16 +439,18 @@ func (s *Service) GetEventsByUser(userID uint) ([]models.Event, error) {
 }
 
 type UserProfileResponse struct {
-	ID             uint   `json:"id"`
-	Name           string `json:"name"`
-	Username       string `json:"username"`
-	ProfilePicture string `json:"profile_picture"`
-	Bio            string `json:"bio"`
-	City           string `json:"city"`
-	State          string `json:"state"`
-	Country        string `json:"country"`
-	FollowersCount int    `json:"followers_count"`
-	FollowingCount int    `json:"following_count"`
+	ID             uint                    `json:"id"`
+	Name           string                  `json:"name"`
+	Username       string                  `json:"username"`
+	ProfilePicture string                  `json:"profile_picture"`
+	Bio            string                  `json:"bio"`
+	City           string                  `json:"city"`
+	State          string                  `json:"state"`
+	Country        string                  `json:"country"`
+	FollowersCount int                     `json:"followers_count"`
+	FollowingCount int                     `json:"following_count"`
+	Tags           []models.UserTag        `json:"tags"`
+	Instruments    []models.UserInstrument `json:"instruments"`
 }
 
 func (s *Service) GetUserByID(userID uint) (*UserProfileResponse, error) {
@@ -456,7 +458,6 @@ func (s *Service) GetUserByID(userID uint) (*UserProfileResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return &UserProfileResponse{
 		ID:             user.ID,
 		Name:           user.Name,
@@ -468,6 +469,8 @@ func (s *Service) GetUserByID(userID uint) (*UserProfileResponse, error) {
 		Country:        user.Country,
 		FollowersCount: len(user.Followers),
 		FollowingCount: len(user.Following),
+		Tags:           user.Tag,
+		Instruments:    user.Plays,
 	}, nil
 }
 
