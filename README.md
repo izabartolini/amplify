@@ -171,13 +171,17 @@ O frontend estará disponível em `http://localhost:5173`.
 
 ## Testes
 
-Os testes de unidade cobrem as duas operações principais do sistema:
-
-1. **Curtir post** — valida o fluxo de like/unlike
-2. **Seguir usuário** — valida o fluxo de follow/unfollow
+O projeto possui testes de unidade cobrindo as principais validações de negócio.
 
 Para rodar os testes:
+
 ```bash
 cd amplify/server
-go test ./...
+go test -v ./internal/services
+```
+
+### O que é testado
+
+- **Validação de senha** — verifica se a senha atende aos requisitos de segurança (letras maiúsculas, minúsculas e caractere especial)
+- **Validação de CPF** — verifica se o CPF informado é válido
 ```
