@@ -44,8 +44,18 @@ func (h *Controller) Register(c *gin.Context) {
 
 	user.Password = ""
 
+	token, err := h.service.Login(user.Email, req.Password)
+	if err != nil {
+		c.JSON(http.StatusCreated, gin.H{
+			"message": "Usuário criado com sucesso",
+			"user":    user,
+		})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Usuário criado com sucesso",
+		"token":   token,
 		"user":    user,
 	})
 }
@@ -221,18 +231,18 @@ func (h *Controller) ValidateCod(c *gin.Context) {
 
 		case "password_invalid":
 			c.JSON(400, gin.H{
-				"field": "password",
+				"field":   "password",
 				"message": "A nova senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial.",
 			})
 
 		case "A nova senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial":
 			c.JSON(400, gin.H{
-				"field": "password",
+				"field":   "password",
 				"message": "A nova senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial.",
 			})
 		case "passwords_do_not_match":
 			c.JSON(400, gin.H{
-				"field": "confirmPassword",
+				"field":   "confirmPassword",
 				"message": "As senhas não são iguais.",
 			})
 
@@ -383,4 +393,38 @@ func (h *Controller) IsFollowing(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"is_following": following})
+}
+
+func (h *Controller) GetFollowers(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	users, err := h.service.GetFollowers(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
+}
+
+func (h *Controller) GetFollowing(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	users, err := h.service.GetFollowing(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
 }

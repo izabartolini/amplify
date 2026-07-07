@@ -46,15 +46,16 @@ function Eventos() {
           <p className="feed-status">Nenhum evento ainda.</p>
         )}
         {!loading && !error && eventos.map(evento => (
-          <EventCard key={evento.ID} event={{
-            id: evento.ID,
-            name: evento.Name,
-            description: evento.Description,
-            date: evento.Date,
-            place: evento.Place,
-            city: evento.City,
-            state: evento.State,
-            is_private: evento.IsPrivate,
+          <EventCard key={evento.id} event={{ 
+            id: evento.id,
+            name: evento.name,           
+            description: evento.description,
+            date: evento.date,           
+            place: evento.place,
+            city: evento.city,
+            state: evento.state,
+            is_private: evento.is_private, 
+            organizer: evento.organizer   
           }} />
         ))}
       </div>

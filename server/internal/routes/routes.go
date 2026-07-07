@@ -82,6 +82,8 @@ func SetupRoutes(r *gin.Engine) {
 			usersAPI.POST("/:id/follow", controller.FollowUser)
 			usersAPI.DELETE("/:id/follow", controller.UnfollowUser)
 			usersAPI.GET("/:id/follow", controller.IsFollowing)
+			usersAPI.GET("/:id/followers", controller.GetFollowers)
+			usersAPI.GET("/:id/following", controller.GetFollowing)
 		}
 
 		postsAPI := protectedAPI.Group("/posts")
@@ -93,6 +95,8 @@ func SetupRoutes(r *gin.Engine) {
 			postsAPI.DELETE("/:id/like", controller.UnlikePost)
 			postsAPI.POST("/:id/comments", controller.CreateComment)
 			postsAPI.DELETE("/:id/comments/:commentId", controller.DeleteComment)
+			postsAPI.PUT("/:id", controller.UpdatePost)
+			postsAPI.DELETE("/:id", controller.DeletePost)
 		}
 
 		eventsAPI := protectedAPI.Group("/events")

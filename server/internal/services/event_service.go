@@ -40,12 +40,25 @@ func (s *Service) CreateEvent(req CreateEventRequest, authenticatedUserID uint) 
 }
 
 func (s *Service) RequestParticipation(eventID uint, requesterUserID uint) error {
-	participation := &models.Participate{
-		EventID: eventID,
-		UserID:  requesterUserID,
-		Status:  "pending",
-	}
-	return s.repository.CreateParticipation(participation)
+
+    event, err := s.repository.GetEventByID(eventID)
+    if err != nil {
+        return err
+    }
+
+    status := "pending"
+
+    if !event.IsPrivate {
+        status = "accepted"
+    }
+
+    participation := &models.Participate{
+        EventID: eventID,
+        UserID: requesterUserID,
+        Status: status,
+    }
+
+    return s.repository.CreateParticipation(participation)
 }
 
 func (s *Service) InviteUser(eventID uint, invitedUserID uint) error {
@@ -76,8 +89,8 @@ func (s *Service) GetEvent(eventID uint, requesterUserID uint) (*models.Event, e
 	}
 
 	if !temPermissao {
-		return nil, errors.New("este evento é privado e você não tem permissão para visualizá-lo")
-	}
+    return event, nil
+}
 
 	return event, nil
 }
@@ -157,6 +170,36 @@ func (s *Service) DeleteEvent(eventID uint, ownerID uint) error {
 	}
 	return nil
 }
-func (s *Service) GetAllEvents() ([]models.Event, error) {
-	return s.repository.GetAllEvents()
+func (s *Service) GetAllEvents(userID uint) ([]models.Event, error) {
+
+	events, err := s.repository.GetAllEvents()
+	if err != nil {
+		return nil, err
+	}
+
+	var visibleEvents []models.Event
+
+	for _, event := range events {
+
+		if !event.IsPrivate {
+			visibleEvents = append(visibleEvents, event)
+			continue
+		}
+
+		if event.UserID == userID {
+			visibleEvents = append(visibleEvents, event)
+			continue
+		}
+
+		for _, p := range event.Participants {
+			if p.UserID == userID &&
+				(p.Status == "accepted" || p.Status == "invited") {
+
+				visibleEvents = append(visibleEvents, event)
+				break
+			}
+		}
+	}
+
+	return visibleEvents, nil
 }

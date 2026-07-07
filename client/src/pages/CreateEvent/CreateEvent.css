@@ -1,0 +1,163 @@
+
+.mantine-DatePicker-calendar {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.mantine-DatePicker-calendar .mantine-Calendar-calendar {
+    width: 100% !important;
+}
+.mantine-DatePicker-calendar .mantine-Calendar-calendarTable {
+    width: 100% !important;
+    table-layout: fixed;
+}
+
+.mantine-DatePicker-day {
+    width: 100% !important;
+    aspect-ratio: 1 / 1;
+}
+.create-event-page {
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.create-event-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 32px 40px;
+}
+.calendar-day[data-selected] {
+  background-color: #9f0f0f;
+  color: white;
+}
+
+.calendar-day:hover {
+  background-color: #f3d5d5;
+}
+.back-link {
+  display: inline-block;
+  color: #8B1A1A;
+  text-decoration: none;
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.create-event-card {
+  background: #fffdf5;
+  border: 2px solid #8B1A1A;
+  border-radius: 12px;
+  padding: 40px;
+}
+
+.create-event-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #8B1A1A;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.create-event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.form-group-row > * {
+  flex: 1;
+  min-width: 250px;
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #d4c17a;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: #fff;
+  color: #3a1a0a;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: #8B1A1A;
+}
+
+.form-input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.form-input-with-icon .icon {
+  position: absolute;
+  left: 12px;
+  font-size: 1.2rem;
+}
+
+.form-input-with-icon .form-input {
+  padding-left: 44px;
+}
+
+.form-checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #6B3A2A;
+  font-size: 0.95rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.btn-cancelar {
+  background-color: #fdf5f5;
+  color: #8B1A1A;
+  border: 1px solid #8B1A1A;
+  padding: 12px 32px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 24px; 
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancelar:hover {
+  background-color: #fcebeb;
+}
+
+.btn-criar {
+  background-color: #8B1A1A;
+  color: white;
+  border: none;
+  padding: 12px 40px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 24px; 
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-criar:hover {
+  background-color: #6B1010;
+}
