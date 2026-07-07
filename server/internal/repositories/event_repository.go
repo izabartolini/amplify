@@ -20,7 +20,12 @@ func (r *Repository) CreateParticipation(participation *models.Participate) erro
 }
 func (r *Repository) GetEventByID(id uint) (*models.Event, error) {
 	var event models.Event
-	err := r.db.Preload("Medias").
+
+	err := r.db.
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "name", "username", "profile_picture")
+		}).
+		Preload("Medias").
 		Preload("Participants").
 		Preload("Tag").
 		First(&event, id).Error
@@ -41,12 +46,12 @@ func (r *Repository) DeleteEvent(event *models.Event) error {
 func (r *Repository) GetAllEvents() ([]models.Event, error) {
 	var events []models.Event
 	err := r.db.
-		Where("is_private = ?", false).
-		Preload("User", func(db *gorm.DB) *gorm.DB {
-			return db.Select("users.id, users.name, users.username, users.profile_picture")
-		}).
-		Preload("Medias").
-		Order("date asc").
-		Find(&events).Error
+    Preload("User", func(db *gorm.DB) *gorm.DB {
+        return db.Select("id", "name", "username", "profile_picture")
+    }).
+    Preload("Participants").
+    Preload("Medias").
+    Order("date asc").
+    Find(&events).Error
 	return events, err
 }
