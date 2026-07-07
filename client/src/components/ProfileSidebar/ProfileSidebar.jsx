@@ -1,8 +1,27 @@
 import './ProfileSidebar.css'
 import { useState } from 'react'
+import { useParams } from 'react-router-dom'
 
-function ProfileSidebar({ user, isOwnProfile }) {
-  const [following, setFollowing] = useState(false)
+function ProfileSidebar({ user, isOwnProfile, initialFollowing }) {
+  const { id } = useParams()
+  const [following, setFollowing] = useState(initialFollowing || false)
+  const token = localStorage.getItem('token')
+
+  async function handleFollow() {
+    try {
+      const method = following ? 'DELETE' : 'POST'
+      const response = await fetch(`http://localhost:8080/api/users/${id}/follow`, {
+        method,
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (response.ok || response.status === 204) {
+        setFollowing(!following)
+      }
+    } catch (err) {
+      console.error('Erro ao seguir/deixar de seguir:', err)
+    }
+  }
+
   return (
     <aside className="profile-sidebar">
       <div className="sidebar-avatar">
@@ -22,7 +41,7 @@ function ProfileSidebar({ user, isOwnProfile }) {
             <div className="sidebar-actions">
               <button
                 className={`btn-seguir ${following ? 'btn-seguindo' : ''}`}
-                onClick={() => setFollowing(!following)}
+                onClick={handleFollow}
               >
                 {following ? 'Seguindo' : 'Seguir'}
               </button>
