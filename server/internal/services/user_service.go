@@ -4,6 +4,7 @@ import (
 	"amplify/server/internal/models"
 	"amplify/server/internal/repositories"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -185,56 +186,77 @@ func (s *Service) GetUsersByName(name string) ([]models.User, error) {
 type UpdateUserRequest struct {
 	Name           string `json:"name"`
 	Username       string `json:"username"`
-	ProfilePicture string `json:"profile_picture"`
 	Bio            string `json:"bio"`
-	Level          string `json:"level"`
 	City           string `json:"city"`
 	State          string `json:"state"`
 	Country        string `json:"country"`
+	TagsRaw        string `form:"tags"`
+	InstrumentsRaw string `form:"instruments"`
+}
+type InstrumentUpdate struct {
+	Nome  		   string `json:"nome"`
+	Nivel 		   int    `json:"nivel"`
+}
+type InstrumentData struct {
+	Nome  string `json:"nome"`
+	Nivel int    `json:"nivel"`
 }
 
-func (s *Service) UpdateUserProfile(id uint, req UpdateUserRequest) error {
-
-	updates := make(map[string]interface{})
-
-	if req.Name != "" {
-		updates["name"] = req.Name
+func (s *Service) UpdateUserProfile(userID uint, name string, username string, bio string, city string, cpf string, profilePic string, tagsRaw string, instrumentsRaw string) error {
+	updates := map[string]interface{}{
+		"name":       name,
+		"username":   username,
+		"bio":        bio,
+		"city":       city,
+		"cpf":        cpf,
+		"updated_at": time.Now(),
 	}
 
-	if req.Username != "" {
-		updates["username"] = req.Username
+	if profilePic != "" {
+		updates["profile_picture"] = profilePic
 	}
 
-	if req.ProfilePicture != "" {
-		updates["profile_picture"] = req.ProfilePicture
+	err := s.repository.UpdateUserProfileFields(userID, updates)
+	if err != nil {
+		return err
 	}
 
-	if req.Bio != "" {
-		updates["bio"] = req.Bio
+	if tagsRaw != "" && tagsRaw != "[]" {
+		var tags []string
+		if err := json.Unmarshal([]byte(tagsRaw), &tags); err == nil {
+			if tagErr := s.repository.SaveUserTags(userID, tags); tagErr != nil {
+				fmt.Printf("Erro ao salvar tags: %v\n", tagErr)
+			}
+		}
 	}
 
-	if req.Level != "" {
-		updates["level"] = req.Level
+	if instrumentsRaw != "" && instrumentsRaw != "[]" {
+		type InstrumentInput struct {
+			Nome  string `json:"nome"`
+			Nivel int    `json:"nivel"`
+		}
+		var inputInstruments []InstrumentInput
+		if err := json.Unmarshal([]byte(instrumentsRaw), &inputInstruments); err == nil {
+			
+			var params []repositories.InstrumentParams
+			for _, inst := range inputInstruments {
+				if inst.Nome != "" {
+					params = append(params, repositories.InstrumentParams{
+						Name:  inst.Nome,
+						Level: uint8(inst.Nivel),
+					})
+				}
+			}
+
+			if instErr := s.repository.SaveUserInstruments(userID, params); instErr != nil {
+				fmt.Printf("Erro ao salvar instrumentos: %v\n", instErr)
+			}
+		}
 	}
 
-	if req.City != "" {
-		updates["city"] = req.City
-	}
-
-	if req.State != "" {
-		updates["state"] = req.State
-	}
-
-	if req.Country != "" {
-		updates["country"] = req.Country
-	}
-
-	if len(updates) == 0 {
-		return errors.New("no fields to update")
-	}
-
-	return s.repository.UpdateUser(id, updates)
+	return nil
 }
+
 func (s *Service) DeleteUserAccount(userID uint) error {
 	return s.repository.DeleteUser(userID)
 }
@@ -439,25 +461,62 @@ func (s *Service) GetEventsByUser(userID uint) ([]models.Event, error) {
 }
 
 type UserProfileResponse struct {
-	ID             uint                    `json:"id"`
-	Name           string                  `json:"name"`
-	Username       string                  `json:"username"`
-	ProfilePicture string                  `json:"profile_picture"`
-	Bio            string                  `json:"bio"`
-	City           string                  `json:"city"`
-	State          string                  `json:"state"`
-	Country        string                  `json:"country"`
-	FollowersCount int                     `json:"followers_count"`
-	FollowingCount int                     `json:"following_count"`
-	Tags           []models.UserTag        `json:"tags"`
-	Instruments    []models.UserInstrument `json:"instruments"`
+	ID             uint        `json:"id"`
+	Name           string      `json:"name"`
+	Username       string      `json:"username"`
+	ProfilePicture string      `json:"profile_picture"`
+	Bio            string      `json:"bio"`
+	City           string      `json:"city"`
+	CPF            string      `json:"cpf"`
+	Tags           []string    `json:"tags"`
+	Instruments    interface{} `json:"instruments"`
+	FollowersCount int         `json:"followers_count"`
+	FollowingCount int         `json:"following_count"`
 }
 
-func (s *Service) GetUserByID(userID uint) (*UserProfileResponse, error) {
-	user, err := s.repository.GetUserByID(userID)
+func (s *Service) GetUserByID(id uint) (*UserProfileResponse, error) {
+	var user models.User
+	err := s.repository.FindUserWithRelations(id, &user)
 	if err != nil {
 		return nil, err
 	}
+
+	tagNames := []string{}
+	if len(user.Tag) > 0 {
+		var tagIDs []uint
+		for _, ut := range user.Tag {
+			tagIDs = append(tagIDs, ut.TagID)
+		}
+		tagNames, _ = s.repository.GetTagNamesByIDs(tagIDs)
+	}
+
+	type InstrumentFront struct {
+		ID    uint   `json:"id"`
+		Nome  string `json:"nome"`
+		Nivel uint8  `json:"nivel"`
+	}
+
+	var instParams []map[string]interface{} = []map[string]interface{}{}
+	if len(user.Plays) > 0 {
+		var instIDs []uint
+		for _, ui := range user.Plays {
+			instIDs = append(instIDs, ui.InstrumentID)
+		}
+
+		namesMap, err := s.repository.GetInstrumentNamesMap(instIDs)
+		if err == nil {
+			for i, ui := range user.Plays {
+				nomeReal := namesMap[ui.InstrumentID]
+				
+				instParams = append(instParams, map[string]interface{}{
+					"id":    i + 1,
+					"nome":  nomeReal,
+					"nivel": ui.Level,
+				})
+			}
+		}
+	}
+
 	return &UserProfileResponse{
 		ID:             user.ID,
 		Name:           user.Name,
@@ -465,12 +524,11 @@ func (s *Service) GetUserByID(userID uint) (*UserProfileResponse, error) {
 		ProfilePicture: user.ProfilePicture,
 		Bio:            user.Bio,
 		City:           user.City,
-		State:          user.State,
-		Country:        user.Country,
+		CPF:            user.CPF,
+		Tags:           tagNames,
+		Instruments:    instParams, 
 		FollowersCount: len(user.Followers),
 		FollowingCount: len(user.Following),
-		Tags:           user.Tag,
-		Instruments:    user.Plays,
 	}, nil
 }
 

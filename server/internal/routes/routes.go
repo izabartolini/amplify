@@ -73,7 +73,7 @@ func SetupRoutes(r *gin.Engine) {
 		usersAPI := protectedAPI.Group("/users")
 		{
 			usersAPI.GET("/:id", controller.GetUserByID)
-			usersAPI.PUT("/update", controller.UpdateUser)
+			usersAPI.PUT("/update", controller.UpdateUserProfile)
 			usersAPI.PUT("/update/security", controller.UpdateUserPassword)
 			usersAPI.GET("/:id/activity", controller.GetUserActivity)
 			usersAPI.GET("/:id/posts", controller.GetUserPosts)

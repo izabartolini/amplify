@@ -250,3 +250,8 @@
   font-size: 0.8rem;
   color: #6B3A2A;
 }
+
+.instrument-pair {
+  display: flex;
+  gap: 6px;
+}

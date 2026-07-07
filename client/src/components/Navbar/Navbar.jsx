@@ -1,12 +1,70 @@
+import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 import './Navbar.css'
+import User from "../../assets/user.png"
+import Home from "../../assets/home.png"
+import Notification from "../../assets/notification.png"
 
 function Navbar({ onSearch }) {
   const [search, setSearch] = useState('')
   const location = useLocation()
   const navigate = useNavigate()
-  const userID = localStorage.getItem('userID')
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  
+  const [userData, setUserData] = useState({
+    name: "Usuário",
+    profilePicture: User
+  })
+
+  const token = localStorage.getItem('token')
+  const loggedUserID = localStorage.getItem('userID')
+
+  useEffect(() => {
+    if (!loggedUserID || !token) return
+
+    fetch(`http://localhost:8080/api/users/${loggedUserID}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data) {
+          setUserData({
+            name: data.name || "Usuário",
+            profilePicture: data.profile_picture || User
+          })
+        }
+      })
+      .catch(err => console.error("Erro ao carregar dados na Navbar:", err))
+  }, [loggedUserID, token])
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen)
+  }
+
+  const handleLogout = () => {
+    localStorage.clear() 
+    setIsMenuOpen(false)
+    navigate("/login")
+  }
+
+  const handleDeleteProfile = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/users/me`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+
+      if (response.ok || response.status === 204) {
+        setIsDeleteModalOpen(false)
+        handleLogout() 
+      } else {
+        alert("Erro ao deletar o perfil. Tente novamente.")
+      }
+    } catch (err) {
+      console.error("Erro ao deletar perfil:", err)
+    }
+  }
 
   function handleSearch(e) {
     const value = e.target.value
@@ -34,10 +92,62 @@ function Navbar({ onSearch }) {
         onChange={handleSearch}
       />
       <div className="navbar-icons">
-        <span>🔔</span>
-        <span>✉️</span>
-        <Link to={`/profile/${userID}`}>👤</Link>
+        <span onClick={() => navigate("/feed")}>
+          <img src={Home} alt="Home" />
+        </span>
+        
+        <span>
+          <img src={Notification} alt="Notificações" />
+        </span>
+
+        <span onClick={toggleMenu} className="avatar-trigger">
+          <img src={userData.profilePicture} alt="Perfil" className="navbar-avatar rounded-circle" />
+        </span>
+
+        {isMenuOpen && (
+          <menu className="navbar-dropdown">
+            <div className="dropdown-header" onClick={() => { setIsMenuOpen(false); navigate(`/profile/${loggedUserID}`); }} style={{ cursor: 'pointer' }}>
+              <div className="avatar-container">
+                <img src={userData.profilePicture} alt="User Avatar" className="dropdown-avatar-img rounded-circle" />
+              </div>
+              <h1 className="dropdown-username">{userData.name}</h1>
+              {userData.username && <p className="dropdown-user-handle">@{userData.username}</p>}
+            </div>
+            
+            <div className="dropdown-links">
+              <button onClick={() => { navigate("/profile/edit"); setIsMenuOpen(false); }}>
+                Edit profile
+              </button>
+              
+              <button onClick={(e) => { e.preventDefault(); handleLogout(); }} className="logout-btn">
+                Logout
+              </button>
+              
+              <button onClick={() => { setIsDeleteModalOpen(true); setIsMenuOpen(false); }} className="delete-btn">
+                Delete profile
+              </button>
+            </div>
+          </menu>
+        )}
       </div>
+
+      {isDeleteModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsDeleteModalOpen(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Excluir Conta</h3>
+              <button className="modal-close" onClick={() => setIsDeleteModalOpen(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <p>Tem certeza absoluta que deseja deletar seu perfil? Esta ação não pode ser desfeita.</p>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-cancelar" onClick={() => setIsDeleteModalOpen(false)}>Cancelar</button>
+              <button className="btn-confirmar-deletar" onClick={handleDeleteProfile}>Sim, Deletar Conta</button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   )
 }
