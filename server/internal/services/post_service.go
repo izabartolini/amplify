@@ -225,3 +225,25 @@ func (s *Service) CreateComment(userID uint, postID uint, req CreateCommentDTO) 
 func (s *Service) DeleteComment(commentID uint, userID uint, postID uint) error {
 	return s.repository.DeleteComment(commentID, userID, postID)
 }
+
+func (s *Service) UpdatePost(postID uint, userID uint, subtitle string) error {
+	post, err := s.repository.GetPostByID(postID)
+	if err != nil {
+		return errors.New("post não encontrado")
+	}
+	if post.UserID != userID {
+		return errors.New("sem permissão para editar este post")
+	}
+	return s.repository.UpdatePost(postID, subtitle)
+}
+
+func (s *Service) DeletePost(postID uint, userID uint) error {
+	post, err := s.repository.GetPostByID(postID)
+	if err != nil {
+		return errors.New("post não encontrado")
+	}
+	if post.UserID != userID {
+		return errors.New("sem permissão para deletar este post")
+	}
+	return s.repository.DeletePost(postID)
+}

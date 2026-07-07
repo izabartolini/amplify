@@ -30,7 +30,6 @@ func SetupRoutes(r *gin.Engine) {
 	tagRepository := repositories.NewTagRepository(config.DB)
 	tagController := controllers.NewTagController(tagRepository)
 
-
 	r.GET("/user", controller.GetUsers)
 	r.GET("/userByName", controller.GetUsersByName)
 	r.POST("/login", controller.Login)
@@ -80,6 +79,8 @@ func SetupRoutes(r *gin.Engine) {
 			postsAPI.DELETE("/:id/like", controller.UnlikePost)
 			postsAPI.POST("/:id/comments", controller.CreateComment)
 			postsAPI.DELETE("/:id/comments/:commentId", controller.DeleteComment)
+			postsAPI.PUT("/:id", controller.UpdatePost)
+			postsAPI.DELETE("/:id", controller.DeletePost)
 		}
 
 		eventsAPI := protectedAPI.Group("/events")
