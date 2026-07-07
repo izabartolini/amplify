@@ -90,10 +90,16 @@ function ProfileSidebar({ user, isOwnProfile, initialFollowing }) {
 
         {user.bio && <p className="sidebar-bio">{user.bio}</p>}
 
-        <div className="sidebar-badges">
-          {user.instrument && <span className="badge badge-instrument">{user.instrument}</span>}
-          {user.level && <span className="badge badge-level">{user.level}</span>}
-        </div>
+        {user.instruments && user.instruments.length > 0 && (
+          <div className="sidebar-badges">
+            {user.instruments.map((inst, index) => (
+              <span key={index} className="instrument-pair">
+                <span className="badge badge-instrument">{inst.name}</span>
+                {inst.level && <span className="badge badge-level">{inst.level}</span>}
+              </span>
+            ))}
+          </div>
+        )}
 
         {user.tags && user.tags.length > 0 && (
           <div className="sidebar-tags">
