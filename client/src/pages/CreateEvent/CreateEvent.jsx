@@ -13,30 +13,66 @@ import {
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { IconChevronLeft, IconUser } from "@tabler/icons-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { notifications } from '@mantine/notifications';
 import { IconCheck } from '@tabler/icons-react';
+import { Navigate, useParams } from 'react-router-dom'
 
 import Navbar from "../../components/Navbar/Navbar";
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
 
-const loggedUser = {
-  name: "Eduardo da Silva",
-  username: "eduardosilva",
-  profilePicture: null,
-  followers: 123,
-  following: 321,
-  city: "Campo Mourão",
-  state: "PR",
-  bio: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
-  instrument: "Guitarra",
-  level: "Intermediário",
-  tags: ["instrumento", "nivel", "tag"]
-};
-
 
 export default function CreateEvent() {
+
+  const [user, setUser] = useState(null)
+  const { id } = useParams()
+  const [loading, setLoading] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  const token = localStorage.getItem('token')
+  const loggedUserID = localStorage.getItem('userID')
+  const isOwnProfile = String(loggedUserID) === String(id)
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const headers = { 'Authorization': `Bearer ${token}` }
+
+        const userRes = await fetch(
+          `http://localhost:8080/api/users/${id}`,
+          { headers }
+        );
+
+        const userData = await userRes.json()
+
+        setUser({
+          name: userData.name,
+          username: userData.username,
+          profilePicture: userData.profile_picture,
+          bio: userData.bio,
+          city: userData.city,
+          state: userData.state,
+          country: userData.country,
+          followers: userData.followers_count,
+          following: userData.following_count,
+          tags: [],
+        })
+        if (!isOwnProfile) {
+          const followRes = await fetch(`http://localhost:8080/api/users/${id}/follow`, { headers })
+          const followData = await followRes.json()
+          setIsFollowing(followData.is_following)
+        }
+      } catch (err) {
+        console.error('Erro ao carregar perfil:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProfile()
+  }, [id])
+
+
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -118,7 +154,7 @@ export default function CreateEvent() {
 
       <Flex gap={65} mt={0} mr={65}>
 
-        <ProfileSidebar user={loggedUser} isOwnProfile={true} />
+        <ProfileSidebar user={user} isOwnProfile={true} />
 
         <Box flex={1}>
           <Group mb={15} mt={35}>

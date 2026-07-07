@@ -61,7 +61,7 @@ function Profile() {
           subtitle: p.Subtitle,
           created_at: p.CreatedAt,
           user: p.User ? {
-            id: p.User.ID,        // adiciona essa linha
+            id: p.User.ID,
             name: p.User.Name,
             username: p.User.Username,
             profile_picture: p.User.ProfilePicture,
@@ -107,7 +107,7 @@ function Profile() {
 
   const handleNovoClick = () => {
     if (activeTab === 'posts') navigate(`/profile/${id}/createPost`);
-    if (activeTab === 'eventos') navigate('/eventos/criar-evento');
+    if (activeTab === 'eventos') navigate(`/profile/${id}/createEvent`);
     if (activeTab === 'atividade') navigate('/nova-atividade');
   };
 
