@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import Navbar from '../../components/Navbar/Navbar'
 import ProfileSidebar from '../../components/ProfileSidebar/ProfileSidebar'
+import './Profile.css'
 import PostCard from '../../components/PostCard/PostCard'
 import EventCard from '../../components/EventCard/EventCard'
 import ActivityCard from '../../components/ActivityCard/ActivityCard'
 import './Profile.css'
+import { IconHome } from '@tabler/icons-react';
 
 function Profile() {
   const { id } = useParams()
@@ -16,6 +18,7 @@ function Profile() {
   const [activities, setActivities] = useState([])
   const [isFollowing, setIsFollowing] = useState(false)
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   const token = localStorage.getItem('token')
   const loggedUserID = localStorage.getItem('userID')
@@ -99,16 +102,57 @@ function Profile() {
   if (loading) return <div className="profile-page"><Navbar /><p style={{textAlign:'center', marginTop:'48px'}}>Carregando...</p></div>
   if (!user) return <div className="profile-page"><Navbar /><p style={{textAlign:'center', marginTop:'48px'}}>Usuário não encontrado.</p></div>
 
+   const handleNovoClick = () => {
+    if (activeTab === 'posts') navigate('/novo-post');
+    if (activeTab === 'eventos') navigate('/eventos/criar-evento'); 
+    if (activeTab === 'atividade') navigate('/nova-atividade');
+  };
+
+  const getBtnLabel = () => {
+    if (activeTab === 'posts') return 'Novo Post';
+    if (activeTab === 'eventos') return 'Novo Evento';
+    if (activeTab === 'atividade') return 'Nova Atividade';
+    return 'Novo';
+  };
+
+  if (loading) return <div className="profile-page"><Navbar /><p style={{textAlign:'center', marginTop:'48px'}}>Carregando...</p></div>
+  if (!user) return <div className="profile-page"><Navbar /><p style={{textAlign:'center', marginTop:'48px'}}>Usuário não encontrado.</p></div>
+
   return (
     <div className="profile-page">
       <Navbar />
       <div className="profile-body">
         <ProfileSidebar user={user} isOwnProfile={isOwnProfile} initialFollowing={isFollowing} />
+        
         <main className="profile-content">
-          <div className="profile-tabs">
-            <button className={`tab ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => setActiveTab('posts')}>posts</button>
-            <button className={`tab ${activeTab === 'eventos' ? 'active' : ''}`} onClick={() => setActiveTab('eventos')}>eventos</button>
-            <button className={`tab ${activeTab === 'atividade' ? 'active' : ''}`} onClick={() => setActiveTab('atividade')}>atividade</button>
+          
+          <div className="profile-header-actions">
+            
+            <div className="profile-tabs">
+              <button 
+                className="btn-home" 
+                onClick={() => navigate('/feed')} 
+                title="Voltar ao Feed"
+              >
+                <IconHome size={22} stroke={2.5} />
+              </button>
+
+              <button className={`tab ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => setActiveTab('posts')}>
+                Posts
+              </button>
+              <button className={`tab ${activeTab === 'eventos' ? 'active' : ''}`} onClick={() => setActiveTab('eventos')}>
+                Eventos Organizados
+              </button>
+              <button className={`tab ${activeTab === 'atividade' ? 'active' : ''}`} onClick={() => setActiveTab('atividade')}>
+                Atividades
+              </button>
+            </div>
+            {isOwnProfile && token && (
+              <button className="btn-novo-dinamico" onClick={handleNovoClick}>
+                {getBtnLabel()}
+              </button>
+            )}
+
           </div>
 
           <div className="profile-tab-content">
@@ -128,10 +172,11 @@ function Profile() {
                 : activities.map(activity => <ActivityCard key={activity.id} activity={activity} />)
             )}
           </div>
+          
         </main>
       </div>
     </div>
   )
 }
 
-export default Profile
+export default Profile;
