@@ -28,8 +28,8 @@ function Eventos() {
 
         const uniqueRegions = [...new Set(
           events
-            .filter(e => e.City && e.State)
-            .map(e => `${e.City}, ${e.State}`)
+            .filter(e => e.city && e.state)
+            .map(e => `${e.city}, ${e.state}`)
         )].sort()
         setRegions(uniqueRegions)
       } catch (err) {
@@ -45,13 +45,13 @@ function Eventos() {
     let result = eventos
     if (searchValue.trim()) {
       result = result.filter(e =>
-        e.Name?.toLowerCase().includes(searchValue.toLowerCase()) ||
-        e.Description?.toLowerCase().includes(searchValue.toLowerCase())
+        e.name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+        e.description?.toLowerCase().includes(searchValue.toLowerCase())
       )
     }
     if (regionValue) {
       result = result.filter(e =>
-        `${e.City}, ${e.State}` === regionValue
+        `${e.city}, ${e.state}` === regionValue
       )
     }
     setFiltered(result)
@@ -101,15 +101,15 @@ function Eventos() {
           <p className="feed-status">Nenhum evento encontrado.</p>
         )}
         {!loading && !error && filtered.map(evento => (
-          <EventCard key={evento.ID} event={{
-            id: evento.ID,
-            name: evento.Name,
-            description: evento.Description,
-            date: evento.Date,
-            place: evento.Place,
-            city: evento.City,
-            state: evento.State,
-            is_private: evento.IsPrivate,
+          <EventCard key={evento.id} event={{
+            id: evento.id,
+            name: evento.name,
+            description: evento.description,
+            date: evento.date,
+            place: evento.place,
+            city: evento.city,
+            state: evento.state,
+            is_private: evento.is_private,
           }} />
         ))}
       </div>
