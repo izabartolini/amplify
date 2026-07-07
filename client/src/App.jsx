@@ -9,6 +9,7 @@ import Eventos from './pages/Eventos/Eventos'
 import EventDetails from './pages/EventDetails/EventDetails'
 import CreateEvent from './pages/CreateEvent/CreateEvent'
 import Usuarios from './pages/Usuarios/Usuarios'
+import CreatePost from './pages/CreatePost/CreatePost'
 import PostDetails from './pages/PostDetails/PostDetails'
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="/eventos/criar-evento" element={<CreateEvent />} />
         <Route path="/eventos/:id" element={<EventDetails />} />
         <Route path="/amplifique" element={<Usuarios />} />
+        <Route path="/profile/:id/createPost" element={<CreatePost />} />
         <Route path="/posts/:id" element={<PostDetails />} />
       </Routes>
     </BrowserRouter>

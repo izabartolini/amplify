@@ -7,17 +7,20 @@ import (
 	"strings"
 
 	"amplify/server/internal/services"
+	"amplify/server/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Controller struct {
 	service *services.Service
+	cloud   *utils.CloudinaryService
 }
 
-func NewHandler(service *services.Service) *Controller {
+func NewHandler(service *services.Service, cloud *utils.CloudinaryService) *Controller {
 	return &Controller{
 		service: service,
+		cloud: cloud,
 	}
 }
 
