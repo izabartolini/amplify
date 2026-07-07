@@ -50,10 +50,10 @@ function Profile() {
           country: userData.country,
           followers: userData.followers_count,
           following: userData.following_count,
-          tags: userData.tags?.map(t => t.Tag?.Name?.toLowerCase()) || [],
+          tags: userData.tags?.map(t => t.toLowerCase()) || [],
           instruments: userData.instruments?.map(i => ({
-            name: i.Instrument?.Name?.toLowerCase(),
-            level: ['', 'Iniciante', 'Básico', 'Intermediário', 'Avançado', 'Profissional'][i.Level] || i.Level
+            name: i.nome?.toLowerCase(),
+            level: ['', 'Iniciante', 'Básico', 'Intermediário', 'Avançado', 'Profissional'][i.nivel] || i.nivel
           })) || [],
         })
         setPosts(postsData.map(p => ({
