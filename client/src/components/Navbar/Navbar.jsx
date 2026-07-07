@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './Navbar.css'
 import User from "../../assets/user.png"
 import Home from "../../assets/home.png"
 import Notification from "../../assets/notification.png"
 
-function Navbar() {
-  const navigate = useNavigate()
+function Navbar({ onSearch }) {
+  const [search, setSearch] = useState('')
   const location = useLocation()
+  const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   
