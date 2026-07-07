@@ -7,6 +7,7 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import Feed from './pages/Feed/Feed'
 import Eventos from './pages/Eventos/Eventos'
 import EventDetails from './pages/EventDetails/EventDetails'
+import EditProfile from './pages/EditProfile/EditProfile'
 
 function App() {
   return (
@@ -20,6 +21,8 @@ function App() {
         <Route path="/feed" element={<Feed />} />
         <Route path="/eventos" element={<Eventos />} />
         <Route path="/eventos/:id" element={<EventDetails />} />
+        <Route path="/profile/edit" element={<EditProfile />} />
+
       </Routes>
     </BrowserRouter>
   )
