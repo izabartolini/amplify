@@ -30,7 +30,6 @@ func SetupRoutes(r *gin.Engine) {
 	tagRepository := repositories.NewTagRepository(config.DB)
 	tagController := controllers.NewTagController(tagRepository)
 
-
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:5173"},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
@@ -46,8 +45,8 @@ func SetupRoutes(r *gin.Engine) {
 	publicAPI := r.Group("/api/auth")
 	{
 		publicAPI.POST("/register", controller.Register)
-		publicAPI.GET("/instruments", instrumentController.GetInstruments)  
-		publicAPI.GET("/tags", tagController.GetTag)    
+		publicAPI.GET("/instruments", instrumentController.GetInstruments)
+		publicAPI.GET("/tags", tagController.GetTag)
 	}
 
 	protectedAPI := r.Group("/api")
@@ -73,6 +72,8 @@ func SetupRoutes(r *gin.Engine) {
 			usersAPI.POST("/:id/follow", controller.FollowUser)
 			usersAPI.DELETE("/:id/follow", controller.UnfollowUser)
 			usersAPI.GET("/:id/follow", controller.IsFollowing)
+			usersAPI.GET("/:id/followers", controller.GetFollowers)
+			usersAPI.GET("/:id/following", controller.GetFollowing)
 		}
 
 		postsAPI := protectedAPI.Group("/posts")
@@ -88,6 +89,7 @@ func SetupRoutes(r *gin.Engine) {
 
 		eventsAPI := protectedAPI.Group("/events")
 		{
+			eventsAPI.GET("", controller.GetAllEvents)
 			eventsAPI.POST("", controller.CreateEvent)
 			eventsAPI.GET("/:id", controller.GetEvent)
 			eventsAPI.GET("/:id/requests", controller.GetEventRequests)

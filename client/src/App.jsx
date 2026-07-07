@@ -8,6 +8,7 @@ import Feed from './pages/Feed/Feed'
 import Eventos from './pages/Eventos/Eventos'
 import EventDetails from './pages/EventDetails/EventDetails'
 import EditProfile from './pages/EditProfile/EditProfile'
+import Usuarios from './pages/Usuarios/Usuarios'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/eventos/:id" element={<EventDetails />} />
         <Route path="/profile/edit" element={<EditProfile />} />
 
+        <Route path="/amplifique" element={<Usuarios />} />
       </Routes>
     </BrowserRouter>
   )

@@ -67,3 +67,11 @@
   font-size: 0.95rem;
   line-height: 1.6;
 }
+
+.feed-post-author-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}

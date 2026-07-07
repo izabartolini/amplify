@@ -1,42 +1,35 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../../components/Navbar/Navbar'
 import EventCard from '../../components/EventCard/EventCard'
 import './Eventos.css'
 
-const mockEventos = [
-  {
-    id: 1,
-    name: 'Jam Session — Bar do Zé',
-    description: 'Encontro aberto para músicos de todos os níveis. Traga seu instrumento e venha tocar com a gente!',
-    date: '2026-07-10T19:00:00-03:00',
-    place: 'Bar do Zé',
-    city: 'Campo Mourão',
-    state: 'PR',
-    is_private: false,
-  },
-  {
-    id: 2,
-    name: 'Workshop de Técnica Vocal',
-    description: 'Aula aberta com foco em respiração, projeção e afinação para cantores amadores.',
-    date: '2026-07-15T18:00:00-03:00',
-    place: 'Estúdio Harmonia',
-    city: 'Maringá',
-    state: 'PR',
-    is_private: false,
-  },
-  {
-    id: 3,
-    name: 'Ensaio fechado — Banda Resgate',
-    description: 'Ensaio para o show de agosto. Apenas integrantes confirmados.',
-    date: '2026-07-05T15:00:00-03:00',
-    place: 'Estúdio Central',
-    city: 'Campo Mourão',
-    state: 'PR',
-    is_private: true,
-  },
-]
-
 function Eventos() {
+  const [eventos, setEventos] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    async function fetchEventos() {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await fetch('http://localhost:8080/api/events', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        if (!response.ok) throw new Error('Erro ao buscar eventos')
+        const data = await response.json()
+        setEventos(data)
+      } catch (err) {
+        setError('Não foi possível carregar os eventos.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchEventos()
+  }, [])
+
   return (
     <div className="eventos-page">
       <Navbar />
@@ -47,8 +40,22 @@ function Eventos() {
       </div>
 
       <div className="eventos-content">
-        {mockEventos.map(evento => (
-          <EventCard key={evento.id} event={evento} />
+        {loading && <p className="feed-status">Carregando...</p>}
+        {error && <p className="feed-status">{error}</p>}
+        {!loading && !error && eventos.length === 0 && (
+          <p className="feed-status">Nenhum evento ainda.</p>
+        )}
+        {!loading && !error && eventos.map(evento => (
+          <EventCard key={evento.ID} event={{
+            id: evento.ID,
+            name: evento.Name,
+            description: evento.Description,
+            date: evento.Date,
+            place: evento.Place,
+            city: evento.City,
+            state: evento.State,
+            is_private: evento.IsPrivate,
+          }} />
         ))}
       </div>
     </div>

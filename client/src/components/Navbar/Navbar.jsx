@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import './Navbar.css'
 import User from "../../assets/user.png"
 import Home from "../../assets/home.png"
@@ -40,9 +41,7 @@ function Navbar() {
 
   return (
     <header className="navbar">
-      <h1 className="logo-text amplify-logo navbar-logo" onClick={() => navigate("/feed")}>
-        Amplify
-      </h1>
+      <Link to="/feed" className="logo-text amplify-logo navbar-logo" style={{textDecoration: 'none'}}>Amplify</Link>
       <input className="navbar-search" type="text" placeholder="Buscar..." />
       
       <div className="navbar-icons">
