@@ -53,7 +53,7 @@ function Profile() {
           tags: userData.tags?.map(t => t.Tag?.Name?.toLowerCase()) || [],
           instruments: userData.instruments?.map(i => ({
             name: i.Instrument?.Name?.toLowerCase(),
-            level: i.Level
+            level: ['', 'Iniciante', 'Básico', 'Intermediário', 'Avançado', 'Profissional'][i.Level] || i.Level
           })) || [],
         })
         setPosts(postsData.map(p => ({
