@@ -13,9 +13,10 @@
 .navbar-logo {
   font-family: 'Molle', cursive;
   font-style: italic;
-  font-size: 1.8rem;
+  font-size: 2rem !important;
   color: #3d1f00;
   margin: 0;
+  cursor: pointer;
 }
 
 .navbar-search {
@@ -25,15 +26,213 @@
   border: 1px solid #d4c17a;
   background-color: white;
   font-size: 0.95rem;
+  outline: none;
 }
 
 .navbar-icons {
   display: flex;
-  gap: 20px;
-  font-size: 1.4rem;
+  gap: 3vw;
+  position: relative;
+}
+
+.navbar-icons span {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-icons img {
+  width: 1.75vw;
+  min-width: 24px;
+}
+
+.navbar-dropdown {
+  position: absolute;
+  top: 140%; 
+  right: -10px;
+  background-color: #2D1B11;
+  border: 1px solid #4E3425;
+  border-radius: 16px;
+  padding: 20px;
+  width: 240px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0; 
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-container {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #f5e6c8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar-container img {
+  width: 75%;
+  height: auto;
+  min-width: unset; 
+}
+
+.dropdown-username {
+  font-family: sans-serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #ECE3CF; 
+  margin: 0;
+}
+
+.dropdown-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dropdown-links button {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  color: #ECE3CF;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.dropdown-links button:hover {
+  background-color: #4E3425;
+}
+
+.dropdown-links .delete-btn {
+  color: #FF6B6B;
+}
+
+.dropdown-links .delete-btn:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+.navbar-avatar, .avatar-trigger img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50% !important;
+  object-fit: cover;
+  display: block;
+}
+
+.avatar-container img, .dropdown-avatar-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50% !important;
+  object-fit: cover;
+  display: block;
+}
+
+.rounded-circle {
+  border-radius: 50% !important;
+  object-fit: cover;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-box {
+  background: #251616;
+  color: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border: 1px solid #3d2222;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #3d2222;
+  padding-bottom: 8px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #ff4d4d; 
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
   cursor: pointer;
 }
 
-.navbar-logo {
-  font-size: 2rem !important;
+.modal-close:hover {
+  color: #fff;
+}
+
+.modal-body p {
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+  color: #421515;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-cancelar {
+  background: #443333;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-cancelar:hover {
+  background: #554444;
+}
+
+.btn-confirmar-deletar {
+  background: #8B1A1A;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-confirmar-deletar:hover {
+  background: #b32424;
 }

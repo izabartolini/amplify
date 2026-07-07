@@ -7,6 +7,7 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import Feed from './pages/Feed/Feed'
 import Eventos from './pages/Eventos/Eventos'
 import EventDetails from './pages/EventDetails/EventDetails'
+import EditProfile from './pages/EditProfile/EditProfile'
 import CreateEvent from './pages/CreateEvent/CreateEvent'
 import Usuarios from './pages/Usuarios/Usuarios'
 import CreatePost from './pages/CreatePost/CreatePost'
@@ -25,6 +26,8 @@ function App() {
         <Route path="/eventos" element={<Eventos />} />
         <Route path="/profile/:id/createEvent" element={<CreateEvent />} />
         <Route path="/eventos/:id" element={<EventDetails />} />
+        <Route path="/profile/edit" element={<EditProfile />} />
+
         <Route path="/amplifique" element={<Usuarios />} />
         <Route path="/profile/:id/createPost" element={<CreatePost />} />
         <Route path="/posts/:id" element={<PostDetails />} />
