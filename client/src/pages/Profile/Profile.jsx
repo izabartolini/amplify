@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Navbar from '../../components/Navbar/Navbar'
 import ProfileSidebar from '../../components/ProfileSidebar/ProfileSidebar'
-import './Profile.css'
 import PostCard from '../../components/PostCard/PostCard'
 import EventCard from '../../components/EventCard/EventCard'
 import ActivityCard from '../../components/ActivityCard/ActivityCard'
@@ -78,14 +77,14 @@ function Profile() {
           comments: p.Comments || [],
         })))
         setEvents(eventsData.map(e => ({
-          id: e.ID,
-          name: e.Name,
-          description: e.Description,
-          date: e.Date,
-          place: e.Place,
-          city: e.City,
-          state: e.State,
-          is_private: e.IsPrivate,
+          id: e.id,
+          name: e.name,
+          description: e.description,
+          date: e.date,
+          place: e.place,
+          city: e.city,
+          state: e.state,
+          is_private: e.is_private,
         })))
         setActivities(Array.isArray(activityData) ? activityData : [])
 
