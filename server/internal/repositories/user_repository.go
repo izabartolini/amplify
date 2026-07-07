@@ -205,8 +205,8 @@ func (r *Repository) GetUserByID(userID uint) (*models.User, error) {
 	var user models.User
 	err := r.db.
 		Select("id, name, username, profile_picture, bio, city, state, country").
-		Preload("Tag").
-		Preload("Plays").
+		Preload("Tag.Tag").
+		Preload("Plays.Instrument").
 		First(&user, userID).Error
 	if err != nil {
 		return nil, err

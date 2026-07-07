@@ -51,7 +51,11 @@ function Profile() {
           country: userData.country,
           followers: userData.followers_count,
           following: userData.following_count,
-          tags: [],
+          tags: userData.tags?.map(t => t.Tag?.Name?.toLowerCase()) || [],
+          instruments: userData.instruments?.map(i => ({
+            name: i.Instrument?.Name?.toLowerCase(),
+            level: i.Level
+          })) || [],
         })
         setPosts(postsData.map(p => ({
           id: p.ID,
