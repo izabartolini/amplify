@@ -1,6 +1,6 @@
 .profile-page {
   min-height: 100vh;
-  background-color: #f0e6d0;
+  background-color: #f9fafb; 
 }
 
 .profile-body {
@@ -9,38 +9,97 @@
 
 .profile-content {
   flex: 1;
-  padding: 0;
+  padding: 32px;
+}
+
+
+.profile-header-actions {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.btn-novo-dinamico {
+  background-color: #8B1A1A; 
+  color: #ffffff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 24px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-novo-dinamico:hover {
+  background-color: #6B1010; 
 }
 
 .profile-tabs {
   display: flex;
-  border-bottom: 1px solid #d4c17a;
+  gap: 16px; 
+  align-items: center; 
 }
 
 .tab {
-  flex: 1;
-  padding: 16px;
-  background: none;
-  border: none;
-  font-size: 1rem;
-  color: #6B3A2A;
+  background: transparent;
+  color: #8B1A1A; 
+  border: 1px solid #8B1A1A; 
+  padding: 10px 28px; 
+  border-radius: 24px; 
+  font-size: 1.15rem; 
+  font-weight: 600;
   cursor: pointer;
-  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
 }
 
 .tab.active {
-  background-color: #8B1A1A;
-  color: white;
-  font-weight: bold;
-  border-bottom: 3px solid #8B1A1A;
+  background-color: #8B1A1A; 
+  color: #ffffff;
+  border-color: #8B1A1A;
 }
 
 .tab:hover:not(.active) {
-  background-color: #e8d5a3;
+  background-color: #fdf5f5; 
 }
 
+
+.btn-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #8B1A1A;
+  border: 1px solid #8B1A1A;
+  padding: 10px; /* Formato redondo perfeito */
+  border-radius: 50%; 
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-home:hover {
+  background-color: #fdf5f5;
+  transform: scale(1.05);
+}
+
+.btn-novo-dinamico {
+  background-color: #452D20; 
+  color: #ffffff;
+  border: none;
+  padding: 10px 28px; 
+  border-radius: 24px; 
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-novo-dinamico:hover {
+  background-color: #6B1010; 
+}
 .profile-tab-content {
-  padding: 32px;
+  padding: 0;
 }
 
 .empty-state {
