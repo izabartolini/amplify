@@ -48,7 +48,7 @@ function Navbar() {
 
   const handleDeleteProfile = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/users/${loggedUserID}`, {
+      const response = await fetch(`http://localhost:8080/api/users/me`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       })
