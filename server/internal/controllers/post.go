@@ -11,23 +11,77 @@ import (
 func (h *Controller) CreatePost(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "não autenticado"})
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "não autenticado",
+		})
 		return
 	}
 
-	var req services.CreatePostDTO
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "payload inválido"})
+	subtitle := c.PostForm("subtitle")
+
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "multipart/form-data inválido",
+		})
 		return
+	}
+
+	files := form.File["medias"]
+
+	if len(files) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "nenhuma mídia enviada",
+		})
+		return
+	}
+
+	if len(files) > 5 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "máximo de 5 mídias",
+		})
+		return
+	}
+
+	req := services.CreatePostDTO{
+		Subtitle: subtitle,
+		Medias:   []services.MediaDTO{},
+	}
+
+	for i, fileHeader := range files {
+
+		file, err := fileHeader.Open()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		url, mediaType, err := h.cloud.Upload(file, userID.(uint))
+
+		file.Close()
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		req.Medias = append(req.Medias, services.MediaDTO{
+			URL:   url,
+			Type:  mediaType,
+			Order: i + 1,
+		})
 	}
 
 	post, err := h.service.CreatePost(userID.(uint), req)
+
 	if err != nil {
-		if err.Error() == "máximo de 5 mídias por post" || err.Error() == "tipo de mídia inválido, use 'photo' ou 'video'" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 

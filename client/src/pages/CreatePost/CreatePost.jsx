@@ -52,6 +52,9 @@ export default function CreatePost() {
     const loggedUserID = localStorage.getItem('userID')
     const isOwnProfile = String(loggedUserID) === String(id)
 
+    const [subtitle, setSubtitle] = useState("");
+    const [publishing, setPublishing] = useState(false);
+
     useEffect(() => {
         async function fetchProfile() {
             try {
@@ -126,6 +129,52 @@ export default function CreatePost() {
                 return "repeat(3, 1fr)";
             default:
                 return "repeat(3, 1fr)";
+        }
+    }
+
+    async function handlePublish() {
+        if (files.length === 0) {
+            alert("Selecione pelo menos uma mídia.");
+            return;
+        }
+
+        try {
+            setPublishing(true);
+
+            const formData = new FormData();
+
+            formData.append("subtitle", subtitle);
+
+            files.forEach((file) => {
+                formData.append("medias", file);
+            });
+
+            const response = await fetch(
+                "http://localhost:8080/api/posts",
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: formData,
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Erro ao publicar.");
+            }
+
+            alert("Post publicado com sucesso!");
+
+            navigate(`/profile/${id}`);
+
+        } catch (err) {
+            console.error(err);
+            alert(err.message);
+        } finally {
+            setPublishing(false);
         }
     }
 
@@ -262,19 +311,24 @@ export default function CreatePost() {
                                 placeholder="Write a caption..."
                                 radius="md"
                                 flex={1}
+                                value={subtitle}
+                                onChange={(e) => setSubtitle(e.currentTarget.value)}
                             />
 
                             <Button
                                 radius="xl"
                                 color="gray"
                                 variant="filled"
+                                onClick={() => navigate(`/profile/${id}`)}
                             >
-                                Save draft
+                                Cancel
                             </Button>
 
                             <Button
                                 radius="xl"
                                 color="red"
+                                onClick={handlePublish}
+                                loading={publishing}
                             >
                                 Publish
                             </Button>
