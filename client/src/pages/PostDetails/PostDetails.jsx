@@ -1,16 +1,22 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import Navbar from '../../components/Navbar/Navbar'
 import './PostDetails.css'
 
 function PostDetails() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [commentText, setCommentText] = useState('')
   const [comments, setComments] = useState([])
+  const [showMenu, setShowMenu] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [editText, setEditText] = useState('')
+  const [subtitle, setSubtitle] = useState('')
   const token = localStorage.getItem('token')
+  const loggedUserID = parseInt(localStorage.getItem('userID'))
 
   useEffect(() => {
     async function fetchPost() {
@@ -21,6 +27,8 @@ function PostDetails() {
         if (!response.ok) throw new Error('Erro ao buscar post')
         const data = await response.json()
         setPost(data)
+        setSubtitle(data.subtitle || '')
+        setEditText(data.subtitle || '')
         setComments(data.comments || [])
       } catch (err) {
         setError('Não foi possível carregar o post.')
@@ -52,10 +60,45 @@ function PostDetails() {
     }
   }
 
+  async function handleEdit() {
+    try {
+      const response = await fetch(`http://localhost:8080/api/posts/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ subtitle: editText })
+      })
+      if (response.ok) {
+        setSubtitle(editText)
+        setEditing(false)
+        setShowMenu(false)
+      }
+    } catch (err) {
+      console.error('Erro ao editar:', err)
+    }
+  }
+
+  async function handleDelete() {
+    try {
+      const response = await fetch(`http://localhost:8080/api/posts/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (response.ok || response.status === 204) {
+        navigate('/feed')
+      }
+    } catch (err) {
+      console.error('Erro ao deletar:', err)
+    }
+  }
+
   if (loading) return <div className="post-details-page"><Navbar /><p className="post-details-status">Carregando...</p></div>
   if (error) return <div className="post-details-page"><Navbar /><p className="post-details-status">{error}</p></div>
   if (!post) return null
 
+  const isOwner = post.user?.id === loggedUserID
   const avatarUrl = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(post.user?.name || 'U') + '&background=8B1A1A&color=fff&size=48'
 
   return (
@@ -73,12 +116,37 @@ function PostDetails() {
                 <span className="post-details-username">@{post.user?.username}</span>
               </div>
             </Link>
-            <span className="post-details-date">
-              {new Date(post.created_at).toLocaleDateString('pt-BR')}
-            </span>
+            <div className="post-details-header-right">
+              <span className="post-details-date">
+                {new Date(post.created_at).toLocaleDateString('pt-BR')}
+              </span>
+              {isOwner && (
+                <div className="post-menu-wrapper">
+                  <button className="post-menu-btn" onClick={() => setShowMenu(!showMenu)}>⋮</button>
+                  {showMenu && (
+                    <div className="post-menu">
+                      <button onClick={() => { setEditing(true); setShowMenu(false) }}>Editar</button>
+                      <button onClick={handleDelete} className="post-menu-delete">Excluir</button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
-          {post.subtitle && <p className="post-details-subtitle">{post.subtitle}</p>}
+          {editing ? (
+            <div className="post-edit-input">
+              <input
+                type="text"
+                value={editText}
+                onChange={e => setEditText(e.target.value)}
+              />
+              <button onClick={handleEdit}>Salvar</button>
+              <button onClick={() => setEditing(false)} className="post-edit-cancel">Cancelar</button>
+            </div>
+          ) : (
+            subtitle && <p className="post-details-subtitle">{subtitle}</p>
+          )}
 
           {post.medias && post.medias.length > 0 && (
             <div className="post-details-medias">
@@ -97,7 +165,6 @@ function PostDetails() {
 
           <div className="post-details-comments">
             <h3>Comentários</h3>
-
             <div className="post-comment-input">
               <input
                 type="text"

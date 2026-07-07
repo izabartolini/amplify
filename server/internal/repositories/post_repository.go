@@ -87,3 +87,11 @@ func (r *Repository) DeleteComment(commentID uint, userID uint, postID uint) err
 
 	return r.db.Unscoped().Delete(&comment).Error
 }
+
+func (r *Repository) UpdatePost(postID uint, subtitle string) error {
+	return r.db.Model(&models.Post{}).Where("id = ?", postID).Update("subtitle", subtitle).Error
+}
+
+func (r *Repository) DeletePost(postID uint) error {
+	return r.db.Delete(&models.Post{}, postID).Error
+}

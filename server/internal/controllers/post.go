@@ -196,3 +196,55 @@ func (h *Controller) DeleteComment(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "comentário deletado com sucesso"})
 }
+
+func (h *Controller) UpdatePost(c *gin.Context) {
+	userID, _ := c.Get("userID")
+
+	idStr := c.Param("id")
+	postID, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	var req struct {
+		Subtitle string `json:"subtitle"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Payload inválido"})
+		return
+	}
+
+	if err := h.service.UpdatePost(uint(postID), userID.(uint), req.Subtitle); err != nil {
+		if err.Error() == "sem permissão para editar este post" {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Post atualizado com sucesso"})
+}
+
+func (h *Controller) DeletePost(c *gin.Context) {
+	userID, _ := c.Get("userID")
+
+	idStr := c.Param("id")
+	postID, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	if err := h.service.DeletePost(uint(postID), userID.(uint)); err != nil {
+		if err.Error() == "sem permissão para deletar este post" {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}
