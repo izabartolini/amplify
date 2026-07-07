@@ -1,57 +1,115 @@
-import { useParams, Link } from 'react-router-dom'
-import Navbar from '../../components/Navbar/Navbar'
-import './EventDetails.css'
-
-const mockEventos = [
-  {
-    id: '1',
-    name: 'Jam Session — Bar do Zé',
-    description: 'Encontro aberto para músicos de todos os níveis. Traga seu instrumento e venha tocar com a gente! Vamos formar grupos espontâneos e revezar entre estilos, do rock ao MPB. Bebidas e petiscos disponíveis no local.',
-    date: '2026-07-10T19:00:00-03:00',
-    place: 'Bar do Zé',
-    city: 'Campo Mourão',
-    state: 'PR',
-    is_private: false,
-    organizer: { name: 'João Silva', username: 'joaosilva' },
-  },
-  {
-    id: '2',
-    name: 'Workshop de Técnica Vocal',
-    description: 'Aula aberta com foco em respiração, projeção e afinação para cantores amadores. Ideal para quem está começando ou quer destravar a técnica.',
-    date: '2026-07-15T18:00:00-03:00',
-    place: 'Estúdio Harmonia',
-    city: 'Maringá',
-    state: 'PR',
-    is_private: false,
-    organizer: { name: 'Marina Castello', username: 'marinacastello' },
-  },
-  {
-    id: '3',
-    name: 'Ensaio fechado — Banda Resgate',
-    description: 'Ensaio para o show de agosto. Apenas integrantes confirmados.',
-    date: '2026-07-05T15:00:00-03:00',
-    place: 'Estúdio Central',
-    city: 'Campo Mourão',
-    state: 'PR',
-    is_private: true,
-    organizer: { name: 'Eduardo da Silva', username: 'genioedu' },
-  },
-]
+import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Button, Loader, Center, Text } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import Navbar from '../../components/Navbar/Navbar';
+import './EventDetails.css';
 
 function EventDetails() {
-  const { id } = useParams()
-  const event = mockEventos.find(e => e.id === id)
+  const { id } = useParams();
+  const [event, setEvent] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [hasRequested, setHasRequested] = useState(false);
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/events/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setEvent(data);
+        } else {
+          console.error("Erro ao buscar o evento.");
+        }
+      } catch (error) {
+        console.error("Erro de conexão:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [id]);
+  const handleRequestJoin = async () => {
+    setIsRequesting(true);
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(`/api/events/${id}/requests`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok || response.status === 201) {
+        setHasRequested(true);
+
+        if (event.is_private) {
+          notifications.show({
+            title: "Sucesso!",
+            message: "Sua solicitação foi enviada ao organizador.",
+            color: "green",
+          });
+        } else {
+          notifications.show({
+            title: "Sucesso!",
+            message: "Você entrou no evento.",
+            color: "green",
+          });
+        }
+      } else {
+        const errorData = await response.json();
+
+        notifications.show({
+          title: "Erro",
+          message: errorData.error || "Não foi possível processar a solicitação.",
+          color: "red",
+        });
+      }
+    } catch (error) {
+      notifications.show({
+        title: "Erro de conexão",
+        message: "Verifique sua internet e tente novamente.",
+        color: "red",
+      });
+    } finally {
+      setIsRequesting(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="event-details-page">
+        <Navbar />
+        <Center style={{ height: '70vh' }}>
+          <Loader color="blue" size="xl" />
+        </Center>
+      </div>
+    );
+  }
 
   if (!event) {
     return (
       <div className="event-details-page">
         <Navbar />
-        <p className="event-not-found">Evento não encontrado.</p>
+        <Center style={{ height: '70vh' }}>
+          <Text size="xl" color="dimmed">Evento não encontrado.</Text>
+        </Center>
       </div>
-    )
+    );
   }
 
-  const date = new Date(event.date)
+  const date = new Date(event.date);
 
   return (
     <div className="event-details-page">
@@ -68,7 +126,8 @@ function EventDetails() {
             <div>
               <h1 className="event-details-name">{event.name}</h1>
               <p className="event-details-organizer">
-                Organizado por <strong>{event.organizer.name}</strong> (@{event.organizer.username})
+                Organizado por <strong>{event.organizer?.name || "Usuário"}</strong>
+                {event.organizer?.username && ` (@${event.organizer.username})`}
               </p>
             </div>
           </div>
@@ -81,13 +140,42 @@ function EventDetails() {
             {event.is_private && <span className="event-details-private">🔒 Evento privado</span>}
           </div>
 
-          <button className="btn-participar">
-            {event.is_private ? 'Solicitar participação' : 'Participar'}
-          </button>
+          {event.is_private ? (
+            <Button
+              className="btn-participar"
+              color={hasRequested ? "gray" : "blue"}
+              size="md"
+              mt="xl"
+              loading={isRequesting}
+              disabled={hasRequested}
+              onClick={handleRequestJoin}
+              fullWidth
+            >
+              {hasRequested
+                ? "Solicitação Pendente"
+                : "Solicitar participação"}
+            </Button>
+          ) : (
+            <Button
+              className="btn-participar"
+              color={hasRequested ? "gray" : "green"}
+              size="md"
+              mt="xl"
+              loading={isRequesting}
+              disabled={hasRequested}
+              onClick={handleRequestJoin}
+              fullWidth
+            >
+              {hasRequested
+                ? "✓ Você já participa deste evento"
+                : "Participar"}
+            </Button>
+          )}
+
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default EventDetails
+export default EventDetails;
