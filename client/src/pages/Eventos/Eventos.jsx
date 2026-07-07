@@ -9,6 +9,9 @@ function Eventos() {
   const [filtered, setFiltered] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [region, setRegion] = useState('')
+  const [regions, setRegions] = useState([])
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     async function fetchEventos() {
@@ -22,6 +25,13 @@ function Eventos() {
         const events = Array.isArray(data) ? data : []
         setEventos(events)
         setFiltered(events)
+
+        const uniqueRegions = [...new Set(
+          events
+            .filter(e => e.City && e.State)
+            .map(e => `${e.City}, ${e.State}`)
+        )].sort()
+        setRegions(uniqueRegions)
       } catch (err) {
         setError('Não foi possível carregar os eventos.')
       } finally {
@@ -31,15 +41,30 @@ function Eventos() {
     fetchEventos()
   }, [])
 
-  function handleSearch(value) {
-    if (!value.trim()) {
-      setFiltered(eventos)
-    } else {
-      setFiltered(eventos.filter(e =>
-        e.Name?.toLowerCase().includes(value.toLowerCase()) ||
-        e.Description?.toLowerCase().includes(value.toLowerCase())
-      ))
+  function applyFilters(searchValue, regionValue) {
+    let result = eventos
+    if (searchValue.trim()) {
+      result = result.filter(e =>
+        e.Name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+        e.Description?.toLowerCase().includes(searchValue.toLowerCase())
+      )
     }
+    if (regionValue) {
+      result = result.filter(e =>
+        `${e.City}, ${e.State}` === regionValue
+      )
+    }
+    setFiltered(result)
+  }
+
+  function handleSearch(value) {
+    setSearch(value)
+    applyFilters(value, region)
+  }
+
+  function handleRegion(value) {
+    setRegion(value)
+    applyFilters(search, value)
   }
 
   return (
@@ -49,6 +74,24 @@ function Eventos() {
         <Link to="/feed" className="feed-tab">feed</Link>
         <Link to="/eventos" className="feed-tab feed-tab-active">eventos</Link>
         <Link to="/amplifique" className="feed-tab">amplifique</Link>
+      </div>
+
+      <div className="feed-filter">
+        <select
+          className="feed-region-select"
+          value={region}
+          onChange={e => handleRegion(e.target.value)}
+        >
+          <option value="">Todas as regiões</option>
+          {regions.map(r => (
+            <option key={r} value={r}>{r}</option>
+          ))}
+        </select>
+        {region && (
+          <button className="feed-clear-filter" onClick={() => handleRegion('')}>
+            ✕ Limpar filtro
+          </button>
+        )}
       </div>
 
       <div className="eventos-content">
