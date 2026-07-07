@@ -4,6 +4,7 @@ import (
 	"amplify/server/internal/models"
 	"amplify/server/internal/repositories"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -187,56 +188,59 @@ func (s *Service) GetUsersByName(name string) ([]models.User, error) {
 type UpdateUserRequest struct {
 	Name           string `json:"name"`
 	Username       string `json:"username"`
-	ProfilePicture string `json:"profile_picture"`
 	Bio            string `json:"bio"`
-	Level          string `json:"level"`
 	City           string `json:"city"`
 	State          string `json:"state"`
 	Country        string `json:"country"`
+	TagsRaw        string `form:"tags"`
+	InstrumentsRaw string `form:"instruments"`
+}
+type InstrumentUpdate struct {
+	Nome  		   string `json:"nome"`
+	Nivel 		   int    `json:"nivel"`
+}
+type InstrumentData struct {
+	Nome  string `json:"nome"`
+	Nivel int    `json:"nivel"`
 }
 
-func (s *Service) UpdateUserProfile(id uint, req UpdateUserRequest) error {
+func (s *Service) UpdateUserProfile(
+	id uint, 
+	name, username, bio, city, state, country, cpf, profilePic, tagsRaw, instrumentsRaw string,
+) error {
 
 	updates := make(map[string]interface{})
 
-	if req.Name != "" {
-		updates["name"] = req.Name
+	if name != ""         { updates["name"] = name }
+	if username != ""     { updates["username"] = username }
+	if bio != ""          { updates["bio"] = bio }
+	if city != ""         { updates["city"] = city }
+	if state != ""        { updates["state"] = state }
+	if country != ""      { updates["country"] = country }
+	if cpf != ""          { updates["cpf"] = cpf }
+	if profilePic != ""   { updates["profile_picture"] = profilePic }
+
+	if tagsRaw != "" {
+		var tags []string
+		if err := json.Unmarshal([]byte(tagsRaw), &tags); err == nil {
+			updates["tags"] = tags
+		}
 	}
 
-	if req.Username != "" {
-		updates["username"] = req.Username
-	}
-
-	if req.ProfilePicture != "" {
-		updates["profile_picture"] = req.ProfilePicture
-	}
-
-	if req.Bio != "" {
-		updates["bio"] = req.Bio
-	}
-
-	if req.Level != "" {
-		updates["level"] = req.Level
-	}
-
-	if req.City != "" {
-		updates["city"] = req.City
-	}
-
-	if req.State != "" {
-		updates["state"] = req.State
-	}
-
-	if req.Country != "" {
-		updates["country"] = req.Country
+	if instrumentsRaw != "" {
+		var instruments []InstrumentData
+		if err := json.Unmarshal([]byte(instrumentsRaw), &instruments); err == nil {
+			updates["instruments"] = instruments
+		}
 	}
 
 	if len(updates) == 0 {
-		return errors.New("no fields to update")
+		return errors.New("nenhum campo para atualizar")
 	}
 
 	return s.repository.UpdateUser(id, updates)
 }
+
 func (s *Service) DeleteUserAccount(userID uint) error {
 	return s.repository.DeleteUser(userID)
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"amplify/server/internal/services"
+	"amplify/server/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -70,43 +71,91 @@ func (h *Controller) GetUsersByName(c *gin.Context) {
 
 	c.JSON(200, users)
 }
+// UpdateUserForm mapeia os campos vindos do FormData do React
+type UpdateUserForm struct {
+	Name           string `form:"name"`
+	Username       string `form:"username"`
+	Bio            string `form:"bio"`
+	City           string `form:"city"`
+	State          string `form:"state"`
+	Country        string `form:"country"`
+	CPF            string `form:"cpf"`
+	TagsRaw        string `form:"tags"`
+	InstrumentsRaw string `form:"instruments"`
+}
 
-func (h *Controller) UpdateUser(c *gin.Context) {
+type InstrumentData struct {
+	Nome  string `json:"nome"`
+	Nivel int    `json:"nivel"`
+}
 
-	var req services.UpdateUserRequest
+type UpdateUserDTO struct {
+	Name           string
+	Username       string
+	Bio            string
+	City           string
+	State          string
+	Country        string
+	CPF            string
+	ProfilePicture string
+	Tags           []string
+	Instruments    []InstrumentData
+}
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
+func (h *Controller) UpdateUserProfile(c *gin.Context) {
 	userID, exists := c.Get("userID")
-
 	if !exists {
-		c.JSON(401, gin.H{
-			"error": "unauthorized",
-		})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "usuário não autenticado"})
 		return
 	}
 
-	err := h.service.UpdateUserProfile(
-		userID.(uint),
-		req,
+	var form UpdateUserForm
+	if err := c.ShouldBind(&form); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Campos inválidos"})
+		return
+	}
+
+	if form.Name == "" || form.Username == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Nome e Username são obrigatórios"})
+		return
+	}
+
+	var profilePictureURL string
+	file, err := c.FormFile("image")
+	if err == nil && file != nil {
+		uploadedURL, uploadErr := utils.UploadToDrive(file)
+		if uploadErr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "erro ao subir imagem"})
+			return
+		}
+		profilePictureURL = uploadedURL
+	}
+
+	err = h.service.UpdateUserProfile(
+		userID.(uint), 
+		form.Name, 
+		form.Username, 
+		form.Bio, 
+		form.City, 
+		form.State, 
+		form.Country, 
+		form.CPF, 
+		profilePictureURL, 
+		form.TagsRaw, 
+		form.InstrumentsRaw,
 	)
 
 	if err != nil {
-		c.JSON(400, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"message": "profile updated successfully",
+	c.JSON(http.StatusOK, gin.H{
+		"message":         "perfil atualizado com sucesso",
+		"profileImageUrl": profilePictureURL,
 	})
 }
+
 func (h *Controller) DeleteMe(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {

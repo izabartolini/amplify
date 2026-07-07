@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Certifique-se de ter o axios instalado: npm install axios
+import axios from 'axios';
 import './EditProfile.css';
 import HomeIcon from '../../assets/home.png';
-import UserPlaceholder = '../../assets/user.png';
+import UserPlaceholder from '../../assets/user.png';
 
 function EditProfile() {
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
 
-    // Estado para guardar o arquivo binário real da foto para o upload
     const [selectedFile, setSelectedFile] = useState(null);
     const [profileImage, setProfileImage] = useState(UserPlaceholder);
 
@@ -31,9 +30,8 @@ function EditProfile() {
         { id: 5, nome: '', nivel: 0 },
     ]);
 
-    // 1. CONFERIR SE O TOKEN É VÁLIDO E CARREGAR DADOS DO PERFIL
     useEffect(() => {
-        const token = localStorage.getItem('token'); // Altere para onde você guarda o JWT
+        const token = localStorage.getItem('token');
         
         if (!token) {
             alert('Acesso negado. Por favor, faça login novamente.');
@@ -41,8 +39,7 @@ function EditProfile() {
             return;
         }
 
-        // Busca os dados atuais do usuário logado no back-end para preencher os campos
-        axios.get('http://localhost:5000/api/profile', {
+        axios.get('http://localhost:8080/api/profile', {
             headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(res => {
@@ -56,7 +53,7 @@ function EditProfile() {
             });
             if (user.tags) setTags(user.tags);
             if (user.instruments) setInstruments(user.instruments);
-            if (user.profileImageUrl) setProfileImage(user.profileImageUrl); // Link vindo do drive
+            if (user.profileImageUrl) setProfileImage(user.profileImageUrl);
         })
         .catch(err => {
             console.error(err);
@@ -79,12 +76,11 @@ function EditProfile() {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setSelectedFile(file); // Guarda o arquivo bruto para mandar pro Back-end
-            setProfileImage(URL.createObjectURL(file)); // Altera o preview visual do gato
+            setSelectedFile(file);
+            setProfileImage(URL.createObjectURL(file));
         }
     };
 
-    // Lógica das tags
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -115,11 +111,9 @@ function EditProfile() {
         }));
     };
 
-    // 2. CONFERIR SE OS CAMPOS SÃO VÁLIDOS E ENVIAR ATUALIZAÇÃO
     const handleSaveProfile = async (e) => {
         e.preventDefault();
 
-        // Validações básicas no front-end antes do envio
         if (!formData.name.trim() || !formData.username.trim()) {
             alert('Os campos Nome e Username são obrigatórios.');
             return;
@@ -127,36 +121,30 @@ function EditProfile() {
 
         const token = localStorage.getItem('token');
         
-        // CONSTRUÇÃO DO PAYLOAD CORRETO (FormData)
         const payload = new FormData();
         
-        // Injeta os dados textuais do formulário
         payload.append('name', formData.name);
         payload.append('username', formData.username);
         payload.append('cpf', formData.cpf);
         payload.append('location', formData.location);
         payload.append('bio', formData.bio);
         
-        // Arrays precisam ser stringificados como JSON para passar no FormData de forma limpa
         payload.append('tags', JSON.stringify(tags));
         payload.append('instruments', JSON.stringify(instruments.filter(i => i.nome.trim() !== '')));
 
-        // Se houver uma nova foto selecionada, anexa o binário no campo 'image'
         if (selectedFile) {
             payload.append('image', selectedFile);
         }
 
         try {
-            // Envia o update pro back-end
-            const response = await axios.put('http://localhost:5000/api/profile/update', payload, {
+            const response = await axios.put('http://localhost:8080/api/profile/update', payload, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data' // Avisa o axios que vai um arquivo binário junto
+                    'Content-Type': 'multipart/form-data'
                 }
             });
 
             alert('Alterações salvas com sucesso!');
-            // Se o back-end retornar o link final que ele salvou do Drive, atualiza a tela
             if (response.data.profileImageUrl) {
                 setProfileImage(response.data.profileImageUrl);
             }
