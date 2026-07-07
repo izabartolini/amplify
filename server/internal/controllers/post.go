@@ -19,65 +19,57 @@ func (h *Controller) CreatePost(c *gin.Context) {
 
 	subtitle := c.PostForm("subtitle")
 
-	form, err := c.MultipartForm()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "multipart/form-data inválido",
-		})
-		return
-	}
-
-	files := form.File["medias"]
-
-	if len(files) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "nenhuma mídia enviada",
-		})
-		return
-	}
-
-	if len(files) > 5 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "máximo de 5 mídias",
-		})
-		return
-	}
-
 	req := services.CreatePostDTO{
 		Subtitle: subtitle,
 		Medias:   []services.MediaDTO{},
 	}
 
-	for i, fileHeader := range files {
+	form, err := c.MultipartForm()
+	if err == nil {
+		files := form.File["medias"]
 
-		file, err := fileHeader.Open()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
+		if len(files) > 5 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "máximo de 5 mídias",
 			})
 			return
 		}
 
-		url, mediaType, err := h.cloud.Upload(file, userID.(uint))
+		for i, fileHeader := range files {
+			file, err := fileHeader.Open()
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
 
-		file.Close()
+			url, mediaType, err := h.cloud.Upload(file, userID.(uint))
+			file.Close()
 
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+
+			req.Medias = append(req.Medias, services.MediaDTO{
+				URL:   url,
+				Type:  mediaType,
+				Order: i + 1,
 			})
-			return
 		}
+	}
 
-		req.Medias = append(req.Medias, services.MediaDTO{
-			URL:   url,
-			Type:  mediaType,
-			Order: i + 1,
+	if subtitle == "" && len(req.Medias) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "o post deve ter texto ou mídia",
 		})
+		return
 	}
 
 	post, err := h.service.CreatePost(userID.(uint), req)
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -87,7 +79,6 @@ func (h *Controller) CreatePost(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, post)
 }
-
 func (h *Controller) GetFeed(c *gin.Context) {
 	posts, err := h.service.GetFeed()
 	if err != nil {
