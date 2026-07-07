@@ -15,6 +15,8 @@ import { DatePicker } from "@mantine/dates";
 import { IconChevronLeft, IconUser } from "@tabler/icons-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { notifications } from '@mantine/notifications';
+import { IconCheck } from '@tabler/icons-react';
 
 import Navbar from "../../components/Navbar/Navbar";
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
@@ -59,9 +61,7 @@ export default function CreateEvent() {
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.date || !formData.description) {
-      setErrorMessage(
-        "Por favor, preencha o nome, a descrição e selecione uma data."
-      );
+      setErrorMessage("Por favor, preencha o nome, a descrição e selecione uma data.");
       return;
     }
 
@@ -70,6 +70,8 @@ export default function CreateEvent() {
 
     try {
       const token = localStorage.getItem("token");
+      // Recupera o ID do usuário diretamente no momento da ação
+      const userID = localStorage.getItem("userID");
 
       const eventData = {
         ...formData,
@@ -90,9 +92,25 @@ export default function CreateEvent() {
         throw new Error(errorData.message || "Falha ao criar o evento.");
       }
 
-      navigate("/eventos");
+      // Notificação de sucesso
+      notifications.show({
+        title: 'Sucesso!',
+        message: 'O evento foi criado e já está disponível.',
+        color: 'green',
+        icon: <IconCheck size={18} />,
+        autoClose: 3000,
+      });
+
+      // Redirecionamento seguro
+      if (userID) {
+        navigate(`/profile/${userID}`);
+      } else {
+        // Se não tiver userID, cai no feed para não quebrar a navegação
+        navigate("/feed");
+      }
+
     } catch (error) {
-      console.error(error);
+      console.error("Erro na criação:", error);
       setErrorMessage(error.message);
     } finally {
       setIsLoading(false);
@@ -131,7 +149,7 @@ export default function CreateEvent() {
               <Flex gap={40} direction={{ base: "column", md: "row" }} align="flex-start" justify="flex-start">
 
                 {/* LADO ESQUERDO */}
-                <Box style={{ width: 450 }}> 
+                <Box style={{ width: 450 }}>
                   <Text fw={700} size="xl" mb={15} c="#5d2b16">
                     Data do Evento
                   </Text>
@@ -144,7 +162,7 @@ export default function CreateEvent() {
                 </Box>
 
                 {/* LADO DIREITO */}
-                <Stack flex={1} w="100%" gap={20}> 
+                <Stack flex={1} w="100%" gap={20}>
                   <TextInput
                     label="Nome do Evento"
                     size="lg"
