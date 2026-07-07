@@ -46,3 +46,41 @@
   margin-top: 48px;
   font-size: 1rem;
 }
+
+.feed-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 32px 16px;
+}
+
+.feed-region-select {
+  padding: 8px 12px;
+  border: 1px solid #d4c17a;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: 'Poppins', sans-serif;
+  color: #3a1a0a;
+  background: white;
+  cursor: pointer;
+}
+
+.feed-region-select:focus {
+  outline: none;
+  border-color: #8B1A1A;
+}
+
+.feed-clear-filter {
+  background: none;
+  border: 1px solid #8B1A1A;
+  color: #8B1A1A;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+}
+
+.feed-clear-filter:hover {
+  background: #fce8e8;
+}

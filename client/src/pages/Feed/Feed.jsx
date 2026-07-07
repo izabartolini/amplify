@@ -9,6 +9,9 @@ function Feed() {
   const [filtered, setFiltered] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [region, setRegion] = useState('')
+  const [regions, setRegions] = useState([])
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     async function fetchPosts() {
@@ -22,6 +25,13 @@ function Feed() {
         const posts = Array.isArray(data) ? data : []
         setPosts(posts)
         setFiltered(posts)
+
+        const uniqueRegions = [...new Set(
+          posts
+            .filter(p => p.user?.city && p.user?.state)
+            .map(p => `${p.user.city}, ${p.user.state}`)
+        )].sort()
+        setRegions(uniqueRegions)
       } catch (err) {
         setError('Não foi possível carregar o feed.')
       } finally {
@@ -31,14 +41,29 @@ function Feed() {
     fetchPosts()
   }, [])
 
-  function handleSearch(value) {
-    if (!value.trim()) {
-      setFiltered(posts)
-    } else {
-      setFiltered(posts.filter(p =>
-        p.subtitle?.toLowerCase().includes(value.toLowerCase())
-      ))
+  function applyFilters(searchValue, regionValue) {
+    let result = posts
+    if (searchValue.trim()) {
+      result = result.filter(p =>
+        p.subtitle?.toLowerCase().includes(searchValue.toLowerCase())
+      )
     }
+    if (regionValue) {
+      result = result.filter(p =>
+        `${p.user?.city}, ${p.user?.state}` === regionValue
+      )
+    }
+    setFiltered(result)
+  }
+
+  function handleSearch(value) {
+    setSearch(value)
+    applyFilters(value, region)
+  }
+
+  function handleRegion(value) {
+    setRegion(value)
+    applyFilters(search, value)
   }
 
   return (
@@ -48,6 +73,24 @@ function Feed() {
         <Link to="/feed" className="feed-tab feed-tab-active">feed</Link>
         <Link to="/eventos" className="feed-tab">eventos</Link>
         <Link to="/amplifique" className="feed-tab">amplifique</Link>
+      </div>
+
+      <div className="feed-filter">
+        <select
+          className="feed-region-select"
+          value={region}
+          onChange={e => handleRegion(e.target.value)}
+        >
+          <option value="">Todas as regiões</option>
+          {regions.map(r => (
+            <option key={r} value={r}>{r}</option>
+          ))}
+        </select>
+        {region && (
+          <button className="feed-clear-filter" onClick={() => handleRegion('')}>
+            ✕ Limpar filtro
+          </button>
+        )}
       </div>
 
       <div className="feed-content">
