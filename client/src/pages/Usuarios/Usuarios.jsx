@@ -5,10 +5,9 @@ import './Usuarios.css'
 
 function Usuarios() {
   const [usuarios, setUsuarios] = useState([])
+  const [filtered, setFiltered] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [search, setSearch] = useState('')
-
   const token = localStorage.getItem('token')
 
   useEffect(() => {
@@ -27,7 +26,9 @@ function Usuarios() {
       })
       if (!response.ok) throw new Error('Erro ao buscar usuários')
       const data = await response.json()
-      setUsuarios(data)
+      const users = Array.isArray(data) ? data : []
+      setUsuarios(users)
+      setFiltered(users)
     } catch (err) {
       setError('Não foi possível carregar os usuários.')
     } finally {
@@ -35,40 +36,27 @@ function Usuarios() {
     }
   }
 
-  function handleSearch(e) {
-    const value = e.target.value
-    setSearch(value)
-    if (value.length === 0 || value.length >= 2) {
-      fetchUsuarios(value)
-    }
+  function handleSearch(value) {
+    fetchUsuarios(value)
   }
 
   return (
     <div className="usuarios-page">
-      <Navbar />
+      <Navbar onSearch={handleSearch} />
       <div className="feed-tabs">
         <Link to="/feed" className="feed-tab">feed</Link>
         <Link to="/eventos" className="feed-tab">eventos</Link>
         <Link to="/amplifique" className="feed-tab feed-tab-active">amplifique</Link>
       </div>
       <div className="usuarios-content">
-        <input
-          type="text"
-          placeholder="Buscar por nome..."
-          value={search}
-          onChange={handleSearch}
-          className="usuarios-search"
-        />
-
         {loading && <p className="usuarios-status">Carregando...</p>}
         {error && <p className="usuarios-status">{error}</p>}
-        {!loading && !error && usuarios.length === 0 && (
+        {!loading && !error && filtered.length === 0 && (
           <p className="usuarios-status">Nenhum músico encontrado.</p>
         )}
-
         {!loading && !error && (
           <div className="usuarios-grid">
-            {usuarios.map(user => (
+            {filtered.map(user => (
               <Link to={`/profile/${user.ID}`} key={user.ID} className="usuario-card">
                 <img
                   src={'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.Name || 'U') + '&background=8B1A1A&color=fff&size=80'}
