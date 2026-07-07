@@ -3,6 +3,7 @@ package repositories
 import (
 	"amplify/server/internal/models"
 	"errors"
+
 	"gorm.io/gorm"
 )
 
@@ -210,4 +211,28 @@ func (r *Repository) IsFollowing(followerID uint, followingID uint) (bool, error
 		Where("follower_id = ? AND following_id = ?", followerID, followingID).
 		Count(&count).Error
 	return count > 0, err
+}
+
+func (r *Repository) GetFollowers(userID uint) ([]models.User, error) {
+	var users []models.User
+	err := r.db.Raw(`
+		SELECT users.id, users.name, users.username, users.profile_picture, users.city, users.state
+		FROM users
+		INNER JOIN follows ON follows.follower_id = users.id
+		WHERE follows.following_id = ?
+		AND follows.deleted_at IS NULL
+	`, userID).Scan(&users).Error
+	return users, err
+}
+
+func (r *Repository) GetFollowing(userID uint) ([]models.User, error) {
+	var users []models.User
+	err := r.db.Raw(`
+		SELECT users.id, users.name, users.username, users.profile_picture, users.city, users.state
+		FROM users
+		INNER JOIN follows ON follows.following_id = users.id
+		WHERE follows.follower_id = ?
+		AND follows.deleted_at IS NULL
+	`, userID).Scan(&users).Error
+	return users, err
 }

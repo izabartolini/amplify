@@ -92,23 +92,23 @@ func validateCPF(cpf string) bool {
 	return true
 }
 
-type InstrumentDTO struct{
-	Name           string   `json:"instrument_name"`
-	Level          uint8    `json:"instrument_level"`
+type InstrumentDTO struct {
+	Name  string `json:"instrument_name"`
+	Level uint8  `json:"instrument_level"`
 }
 type RegisterDTO struct {
-	Name           string   		`json:"name" binding:"required"`
-	Email          string   		`json:"email" binding:"required,email"`
-	Username       string   		`json:"username" binding:"required"`
-	Password       string   		`json:"password" binding:"required"`
-	CPF            string   		`json:"cpf" binding:"required"`
-	City           string  		 	`json:"city"`
-	State          string  			`json:"state"`
-	Country        string  			`json:"country"`
-	Bio            string   		`json:"bio"`
-	ProfilePicture string   		`json:"profile_picture"`
-	Tags           []string         `json:"tags"`
-	Instruments    []InstrumentDTO  `json:"instruments"`
+	Name           string          `json:"name" binding:"required"`
+	Email          string          `json:"email" binding:"required,email"`
+	Username       string          `json:"username" binding:"required"`
+	Password       string          `json:"password" binding:"required"`
+	CPF            string          `json:"cpf" binding:"required"`
+	City           string          `json:"city"`
+	State          string          `json:"state"`
+	Country        string          `json:"country"`
+	Bio            string          `json:"bio"`
+	ProfilePicture string          `json:"profile_picture"`
+	Tags           []string        `json:"tags"`
+	Instruments    []InstrumentDTO `json:"instruments"`
 }
 
 func (s *Service) RegisterUser(req RegisterDTO) (*models.User, error) {
@@ -150,31 +150,29 @@ func (s *Service) RegisterUser(req RegisterDTO) (*models.User, error) {
 		return nil, errors.New("Erro ao registrar usuário no banco de dados")
 	}
 
-    if len(req.Tags) > 0 {
-         s.repository.SaveUserTags(user.ID, req.Tags)
-    }
+	if len(req.Tags) > 0 {
+		s.repository.SaveUserTags(user.ID, req.Tags)
+	}
 
-    if len(req.Instruments) > 0 {
-        repoParams := make([]repositories.InstrumentParams, 0, len(req.Instruments))
+	if len(req.Instruments) > 0 {
+		repoParams := make([]repositories.InstrumentParams, 0, len(req.Instruments))
 
-        for _, inst := range req.Instruments {
-            repoParams = append(repoParams, repositories.InstrumentParams{
-                Name:  inst.Name, 
-                Level: inst.Level,
-            })
-        }
-		
+		for _, inst := range req.Instruments {
+			repoParams = append(repoParams, repositories.InstrumentParams{
+				Name:  inst.Name,
+				Level: inst.Level,
+			})
+		}
 
-        if err := s.repository.SaveUserInstruments(user.ID, repoParams); err != nil {
-            return nil, errors.New("Usuário criado, mas erro ao salvar os instrumentos")
-        }
-    }
+		if err := s.repository.SaveUserInstruments(user.ID, repoParams); err != nil {
+			return nil, errors.New("Usuário criado, mas erro ao salvar os instrumentos")
+		}
+	}
 
 	s.repository.FindUserWithRelations(user.ID, &user)
 
-    return &user, nil
+	return &user, nil
 }
-
 
 func (s *Service) GetUsers() ([]models.User, error) {
 	return s.repository.GetUsers()
@@ -503,4 +501,12 @@ func (s *Service) UnfollowUser(followerID uint, followingID uint) error {
 
 func (s *Service) IsFollowing(followerID uint, followingID uint) (bool, error) {
 	return s.repository.IsFollowing(followerID, followingID)
+}
+
+func (s *Service) GetFollowers(userID uint) ([]models.User, error) {
+	return s.repository.GetFollowers(userID)
+}
+
+func (s *Service) GetFollowing(userID uint) ([]models.User, error) {
+	return s.repository.GetFollowing(userID)
 }
