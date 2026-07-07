@@ -55,9 +55,12 @@ function Profile() {
           subtitle: p.Subtitle,
           created_at: p.CreatedAt,
           user: p.User ? {
+            id: p.User.ID,        // adiciona essa linha
             name: p.User.Name,
             username: p.User.Username,
             profile_picture: p.User.ProfilePicture,
+            city: p.User.City,
+            state: p.User.State,
           } : null,
           medias: (p.Medias || []).map(m => ({
             id: m.ID,

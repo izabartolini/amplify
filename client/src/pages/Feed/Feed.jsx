@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../../components/Navbar/Navbar'
-import FeedPostCard from '../../components/FeedPostCard/FeedPostCard'
+import PostCard from '../../components/PostCard/PostCard'
 import './Feed.css'
 
 function Feed() {
@@ -46,7 +46,7 @@ function Feed() {
           <p className="feed-status">Nenhum post ainda.</p>
         )}
         {!loading && !error && posts.map(post => (
-          <FeedPostCard key={post.id} post={post} />
+          <PostCard key={post.id} post={post} />
         ))}
       </div>
     </div>
