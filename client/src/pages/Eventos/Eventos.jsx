@@ -20,7 +20,7 @@ function Eventos() {
         })
         if (!response.ok) throw new Error('Erro ao buscar eventos')
         const data = await response.json()
-        setEventos(data)
+        setEventos(Array.isArray(data) ? data : [])
       } catch (err) {
         setError('Não foi possível carregar os eventos.')
       } finally {
