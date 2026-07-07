@@ -6,6 +6,8 @@ import (
 	"amplify/server/internal/middlewares"
 	"amplify/server/internal/repositories"
 	"amplify/server/internal/services"
+	"amplify/server/internal/utils"
+	"log"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -24,11 +26,19 @@ func SetupRoutes(r *gin.Engine) {
 
 	repository := repositories.NewRepository(config.DB)
 	service := services.NewService(repository)
-	controller := controllers.NewHandler(service)
+	
+	cloud, err := utils.NewCloudinaryService()
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	controller := controllers.NewHandler(service, cloud)
 	instrumentRepository := repositories.NewInstrumentRepository(config.DB)
 	instrumentController := controllers.NewInstrumentController(instrumentRepository)
 	tagRepository := repositories.NewTagRepository(config.DB)
 	tagController := controllers.NewTagController(tagRepository)
+
+
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:5173"},
@@ -85,6 +95,8 @@ func SetupRoutes(r *gin.Engine) {
 			postsAPI.DELETE("/:id/like", controller.UnlikePost)
 			postsAPI.POST("/:id/comments", controller.CreateComment)
 			postsAPI.DELETE("/:id/comments/:commentId", controller.DeleteComment)
+			postsAPI.PUT("/:id", controller.UpdatePost)
+			postsAPI.DELETE("/:id", controller.DeletePost)
 		}
 
 		eventsAPI := protectedAPI.Group("/events")

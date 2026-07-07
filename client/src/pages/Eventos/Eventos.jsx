@@ -6,21 +6,32 @@ import './Eventos.css'
 
 function Eventos() {
   const [eventos, setEventos] = useState([])
+  const [filtered, setFiltered] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [region, setRegion] = useState('')
+  const [regions, setRegions] = useState([])
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     async function fetchEventos() {
       try {
         const token = localStorage.getItem('token')
         const response = await fetch('http://localhost:8080/api/events', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          headers: { 'Authorization': `Bearer ${token}` }
         })
         if (!response.ok) throw new Error('Erro ao buscar eventos')
         const data = await response.json()
-        setEventos(data)
+        const events = Array.isArray(data) ? data : []
+        setEventos(events)
+        setFiltered(events)
+
+        const uniqueRegions = [...new Set(
+          events
+            .filter(e => e.City && e.State)
+            .map(e => `${e.City}, ${e.State}`)
+        )].sort()
+        setRegions(uniqueRegions)
       } catch (err) {
         setError('Não foi possível carregar os eventos.')
       } finally {
@@ -30,22 +41,66 @@ function Eventos() {
     fetchEventos()
   }, [])
 
+  function applyFilters(searchValue, regionValue) {
+    let result = eventos
+    if (searchValue.trim()) {
+      result = result.filter(e =>
+        e.Name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+        e.Description?.toLowerCase().includes(searchValue.toLowerCase())
+      )
+    }
+    if (regionValue) {
+      result = result.filter(e =>
+        `${e.City}, ${e.State}` === regionValue
+      )
+    }
+    setFiltered(result)
+  }
+
+  function handleSearch(value) {
+    setSearch(value)
+    applyFilters(value, region)
+  }
+
+  function handleRegion(value) {
+    setRegion(value)
+    applyFilters(search, value)
+  }
+
   return (
     <div className="eventos-page">
-      <Navbar />
+      <Navbar onSearch={handleSearch} />
       <div className="feed-tabs">
         <Link to="/feed" className="feed-tab">feed</Link>
         <Link to="/eventos" className="feed-tab feed-tab-active">eventos</Link>
         <Link to="/amplifique" className="feed-tab">amplifique</Link>
       </div>
 
+      <div className="feed-filter">
+        <select
+          className="feed-region-select"
+          value={region}
+          onChange={e => handleRegion(e.target.value)}
+        >
+          <option value="">Todas as regiões</option>
+          {regions.map(r => (
+            <option key={r} value={r}>{r}</option>
+          ))}
+        </select>
+        {region && (
+          <button className="feed-clear-filter" onClick={() => handleRegion('')}>
+            ✕ Limpar filtro
+          </button>
+        )}
+      </div>
+
       <div className="eventos-content">
         {loading && <p className="feed-status">Carregando...</p>}
         {error && <p className="feed-status">{error}</p>}
-        {!loading && !error && eventos.length === 0 && (
-          <p className="feed-status">Nenhum evento ainda.</p>
+        {!loading && !error && filtered.length === 0 && (
+          <p className="feed-status">Nenhum evento encontrado.</p>
         )}
-        {!loading && !error && eventos.map(evento => (
+        {!loading && !error && filtered.map(evento => (
           <EventCard key={evento.ID} event={{
             id: evento.ID,
             name: evento.Name,

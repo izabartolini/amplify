@@ -496,7 +496,6 @@ func (s *Service) GetUserByID(id uint) (*UserProfileResponse, error) {
 		Nivel uint8  `json:"nivel"`
 	}
 
-	// 2. RESOLVER INSTRUMENTOS (Mapeamento direto e simples)
 	var instParams []map[string]interface{} = []map[string]interface{}{}
 	if len(user.Plays) > 0 {
 		var instIDs []uint

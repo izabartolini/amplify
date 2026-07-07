@@ -1,16 +1,24 @@
 .activity-card {
-  background: #fffdf5;
-  border: 1px solid #d4c17a;
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 12px;
   display: flex;
   align-items: center;
   gap: 14px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 1px solid #d4c17a;
+  background: #fffdf5;
+  margin-bottom: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s;
+}
+
+.activity-card:hover {
+  border-color: #8B1A1A;
 }
 
 .activity-icon {
   font-size: 1.4rem;
+  flex-shrink: 0;
 }
 
 .activity-info {
@@ -22,6 +30,7 @@
 .activity-text {
   font-size: 0.9rem;
   color: #3a1a0a;
+  line-height: 1.4;
 }
 
 .activity-date {

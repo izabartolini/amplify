@@ -14,11 +14,13 @@ import (
 
 type Controller struct {
 	service *services.Service
+	cloud   *utils.CloudinaryService
 }
 
-func NewHandler(service *services.Service) *Controller {
+func NewHandler(service *services.Service, cloud *utils.CloudinaryService) *Controller {
 	return &Controller{
 		service: service,
+		cloud: cloud,
 	}
 }
 
@@ -42,8 +44,18 @@ func (h *Controller) Register(c *gin.Context) {
 
 	user.Password = ""
 
+	token, err := h.service.Login(user.Email, req.Password)
+	if err != nil {
+		c.JSON(http.StatusCreated, gin.H{
+			"message": "Usuário criado com sucesso",
+			"user":    user,
+		})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Usuário criado com sucesso",
+		"token":   token,
 		"user":    user,
 	})
 }

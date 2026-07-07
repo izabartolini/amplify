@@ -7,6 +7,7 @@ import Notification from "../../assets/notification.png"
 
 function Navbar() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   
@@ -64,11 +65,31 @@ function Navbar() {
     }
   }
 
+  function handleSearch(e) {
+    const value = e.target.value
+    setSearch(value)
+    if (onSearch) {
+      onSearch(value)
+    }
+  }
+
+  function getPlaceholder() {
+    if (location.pathname === '/feed') return 'Buscar posts...'
+    if (location.pathname === '/eventos') return 'Buscar eventos...'
+    if (location.pathname === '/amplifique') return 'Buscar músicos...'
+    return 'Buscar...'
+  }
+
   return (
     <header className="navbar">
       <Link to="/feed" className="logo-text amplify-logo navbar-logo" style={{textDecoration: 'none'}}>Amplify</Link>
-      <input className="navbar-search" type="text" placeholder="Buscar..." />
-      
+      <input
+        className="navbar-search"
+        type="text"
+        placeholder={getPlaceholder()}
+        value={search}
+        onChange={handleSearch}
+      />
       <div className="navbar-icons">
         <span onClick={() => navigate("/feed")}>
           <img src={Home} alt="Home" />

@@ -78,7 +78,7 @@ function Login() {
 
           <button className="btn-entrar" onClick={handleLogin}>Entrar</button>
           <div className="login-links">
-            <a href="#" onClick={() => navigate('/forgot-password')}>Esqueci a senha</a>
+            <a href="#" onClick={() => navigate('/forgot-password')}>Esqueci minha senha</a>
           </div>
           <p className="register-text">
             Se ainda não possuir uma conta,{' '}

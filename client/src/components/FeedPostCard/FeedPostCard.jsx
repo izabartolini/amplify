@@ -21,23 +21,24 @@ function FeedPostCard({ post }) {
         </Link>
       </div>
 
-      {post.medias && post.medias.length > 0 && (
-        <div className="feed-post-medias">
-          {post.medias.map((media) => (
-            <img key={media.id} src={media.url} alt="post media" className="feed-post-media-img" />
-          ))}
-        </div>
-      )}
+      <Link to={`/posts/${post.id}`} className="feed-post-body-link">
+        {post.medias && post.medias.length > 0 && (
+          <div className="feed-post-medias">
+            {post.medias.map((media) => (
+              <img key={media.id} src={media.url} alt="post media" className="feed-post-media-img" />
+            ))}
+          </div>
+        )}
+
+        {post.subtitle && (
+          <p className="feed-post-subtitle">{post.subtitle}</p>
+        )}
+      </Link>
 
       <div className="feed-post-actions">
         <button className="feed-action-btn">❤️</button>
         <button className="feed-action-btn">💬</button>
-        <button className="feed-action-btn">↗️</button>
       </div>
-
-      {post.subtitle && (
-        <p className="feed-post-subtitle">{post.subtitle}</p>
-      )}
     </div>
   )
 }

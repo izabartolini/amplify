@@ -5,7 +5,7 @@ import { useParams, Link } from 'react-router-dom'
 function ProfileSidebar({ user, isOwnProfile, initialFollowing }) {
   const { id } = useParams()
   const [following, setFollowing] = useState(initialFollowing || false)
-  const [modal, setModal] = useState(null) // 'followers' | 'following' | null
+  const [modal, setModal] = useState(null)
   const [modalUsers, setModalUsers] = useState([])
   const [modalLoading, setModalLoading] = useState(false)
   const token = localStorage.getItem('token')
@@ -39,6 +39,11 @@ function ProfileSidebar({ user, isOwnProfile, initialFollowing }) {
     } finally {
       setModalLoading(false)
     }
+  }
+
+
+  if (!user) {
+    return null;
   }
 
   return (
@@ -134,5 +139,6 @@ function ProfileSidebar({ user, isOwnProfile, initialFollowing }) {
     </aside>
   )
 }
+
 
 export default ProfileSidebar
