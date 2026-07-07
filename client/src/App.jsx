@@ -23,7 +23,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/feed" element={<Feed />} />
         <Route path="/eventos" element={<Eventos />} />
-        <Route path="/eventos/criar-evento" element={<CreateEvent />} />
+        <Route path="/profile/:id/createEvent" element={<CreateEvent />} />
         <Route path="/eventos/:id" element={<EventDetails />} />
         <Route path="/amplifique" element={<Usuarios />} />
         <Route path="/profile/:id/createPost" element={<CreatePost />} />
