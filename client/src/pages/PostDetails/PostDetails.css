@@ -161,3 +161,38 @@
   font-size: 0.75rem;
   color: #999;
 }
+
+.post-comment-input {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.post-comment-input input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #d4c17a;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.post-comment-input input:focus {
+  outline: none;
+  border-color: #8B1A1A;
+}
+
+.post-comment-input button {
+  background-color: #8B1A1A;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+}
+
+.post-comment-input button:hover {
+  background-color: #6B1010;
+}
