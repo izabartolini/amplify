@@ -41,13 +41,11 @@ function ProfileSidebar({ user, isOwnProfile, initialFollowing }) {
     }
   }
 
-function ProfileSidebar({ user, isOwnProfile }) {
-  const [following, setFollowing] = useState(false)
 
   if (!user) {
-        return null;
-    }
-    
+    return null;
+  }
+
   return (
     <aside className="profile-sidebar">
       <div className="sidebar-avatar">
@@ -141,5 +139,6 @@ function ProfileSidebar({ user, isOwnProfile }) {
     </aside>
   )
 }
+
 
 export default ProfileSidebar

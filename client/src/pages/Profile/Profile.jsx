@@ -99,12 +99,12 @@ function Profile() {
     fetchProfile()
   }, [id])
 
-  if (loading) return <div className="profile-page"><Navbar /><p style={{textAlign:'center', marginTop:'48px'}}>Carregando...</p></div>
-  if (!user) return <div className="profile-page"><Navbar /><p style={{textAlign:'center', marginTop:'48px'}}>Usuário não encontrado.</p></div>
+  if (loading) return <div className="profile-page"><Navbar /><p style={{ textAlign: 'center', marginTop: '48px' }}>Carregando...</p></div>
+  if (!user) return <div className="profile-page"><Navbar /><p style={{ textAlign: 'center', marginTop: '48px' }}>Usuário não encontrado.</p></div>
 
-   const handleNovoClick = () => {
-    if (activeTab === 'posts') navigate('/novo-post');
-    if (activeTab === 'eventos') navigate('/eventos/criar-evento'); 
+  const handleNovoClick = () => {
+    if (activeTab === 'posts') navigate(`/profile/${id}/createPost`);
+    if (activeTab === 'eventos') navigate('/eventos/criar-evento');
     if (activeTab === 'atividade') navigate('/nova-atividade');
   };
 
@@ -115,23 +115,23 @@ function Profile() {
     return 'Novo';
   };
 
-  if (loading) return <div className="profile-page"><Navbar /><p style={{textAlign:'center', marginTop:'48px'}}>Carregando...</p></div>
-  if (!user) return <div className="profile-page"><Navbar /><p style={{textAlign:'center', marginTop:'48px'}}>Usuário não encontrado.</p></div>
-
+  if (loading) return <div className="profile-page"><Navbar /><p style={{ textAlign: 'center', marginTop: '48px' }}>Carregando...</p></div>
+  if (!user) return <div className="profile-page"><Navbar /><p style={{ textAlign: 'center', marginTop: '48px' }}>Usuário não encontrado.</p></div>
+  console.log(user);
   return (
     <div className="profile-page">
       <Navbar />
       <div className="profile-body">
         <ProfileSidebar user={user} isOwnProfile={isOwnProfile} initialFollowing={isFollowing} />
-        
+
         <main className="profile-content">
-          
+
           <div className="profile-header-actions">
-            
+
             <div className="profile-tabs">
-              <button 
-                className="btn-home" 
-                onClick={() => navigate('/feed')} 
+              <button
+                className="btn-home"
+                onClick={() => navigate('/feed')}
                 title="Voltar ao Feed"
               >
                 <IconHome size={22} stroke={2.5} />
@@ -172,7 +172,7 @@ function Profile() {
                 : activities.map(activity => <ActivityCard key={activity.id} activity={activity} />)
             )}
           </div>
-          
+
         </main>
       </div>
     </div>
