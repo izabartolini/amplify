@@ -3,6 +3,11 @@ import { useState } from 'react'
 
 function ProfileSidebar({ user, isOwnProfile }) {
   const [following, setFollowing] = useState(false)
+
+  if (!user) {
+        return null; // ou um Skeleton/Loader
+    }
+    
   return (
     <aside className="profile-sidebar">
       <div className="sidebar-avatar">
