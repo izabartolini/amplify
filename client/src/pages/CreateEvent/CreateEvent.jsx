@@ -101,6 +101,17 @@ export default function CreateEvent() {
       return;
     }
 
+    const selectedDate = new Date(formData.date);
+    const justTheDate = selectedDate.toISOString().split('T')[0];
+
+    const today = new Date();
+    const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    if (justTheDate < todayString) {
+      setErrorMessage("Não é possível criar um evento em uma data que já passou.");
+      return;
+    }
+
     setIsLoading(true);
     setErrorMessage("");
 
@@ -108,9 +119,11 @@ export default function CreateEvent() {
       const token = localStorage.getItem("token");
       const userID = localStorage.getItem("userID");
 
+      const safeDateString = `${justTheDate}T12:00:00.000Z`;
+
       const eventData = {
         ...formData,
-        date: new Date(formData.date).toISOString(),
+        date: safeDateString,
       };
 
       const response = await fetch("http://localhost:8080/api/events", {
@@ -187,6 +200,7 @@ export default function CreateEvent() {
                   <DatePicker
                     value={formData.date}
                     onChange={(value) => handleChange("date", value)}
+                    minDate={new Date()}
                     size="xl"
                     className="mantine-DatePicker-calendar"
                   />

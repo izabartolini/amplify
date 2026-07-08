@@ -120,7 +120,6 @@ function Profile() {
 
   if (loading) return <div className="profile-page"><Navbar /><p style={{ textAlign: 'center', marginTop: '48px' }}>Carregando...</p></div>
   if (!user) return <div className="profile-page"><Navbar /><p style={{ textAlign: 'center', marginTop: '48px' }}>Usuário não encontrado.</p></div>
-  console.log(user);
   return (
     <div className="profile-page">
       <Navbar />
