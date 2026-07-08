@@ -51,8 +51,19 @@ function PostDetails() {
         body: JSON.stringify({ text: commentText })
       })
       if (response.ok) {
-        const data = await response.json()
-        setComments(prev => [...prev, data])
+          const data = await response.json()
+          const newComment = {
+            id: data.id,
+            text: data.text,
+            created_at: data.created_at,
+            user: {
+                id: data.user?.ID,
+                name: data.user?.Name,
+                username: data.user?.Username,
+                profile_picture: data.user?.ProfilePicture,
+            }
+        }
+        setComments(prev => [...prev, newComment])
         setCommentText('')
       }
     } catch (err) {
