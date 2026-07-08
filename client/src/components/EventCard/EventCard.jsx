@@ -8,8 +8,11 @@ function EventCard({ event }) {
     <Link to={`/eventos/${event.id}`} className="event-card-link">
       <div className="event-card">
         <div className="event-date-badge">
-          <span className="event-day">{date.getDate()}</span>
-          <span className="event-month">{date.toLocaleDateString('pt-BR', { month: 'short' })}</span>
+          <span className="event-day">{date.getUTCDate()}</span>
+          
+          <span className="event-month">
+            {date.toLocaleDateString('pt-BR', { month: 'short', timeZone: 'UTC' })}
+          </span>
         </div>
         <div className="event-info">
           <h3 className="event-name">{event.name}</h3>
