@@ -7,6 +7,7 @@ import EventCard from '../../components/EventCard/EventCard'
 import ActivityCard from '../../components/ActivityCard/ActivityCard'
 import './Profile.css'
 import { IconHome } from '@tabler/icons-react';
+import ParticipationsCalendar from '../../components/ParticipationsCalendar/ParticipationsCalendar';
 
 function Profile() {
   const { id } = useParams()
@@ -17,6 +18,7 @@ function Profile() {
   const [activities, setActivities] = useState([])
   const [isFollowing, setIsFollowing] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [participatingEvents, setParticipatingEvents] = useState([]);
   const navigate = useNavigate()
 
   const token = localStorage.getItem('token')
@@ -34,6 +36,13 @@ function Profile() {
           fetch(`http://localhost:8080/api/users/${id}/events`, { headers }),
           fetch(`http://localhost:8080/api/users/${id}/activity`, { headers }),
         ])
+        if (isOwnProfile) {
+          const partRes = await fetch(`http://localhost:8080/api/users/${id}/participating-events`, { headers });
+          if (partRes.ok) {
+            const partData = await partRes.json();
+            setParticipatingEvents(partData); // Atualiza o state do calendário
+          }
+        }
 
         const userData = await userRes.json()
         const postsData = await postsRes.json()
@@ -115,6 +124,7 @@ function Profile() {
     if (activeTab === 'posts') return 'Novo Post';
     if (activeTab === 'eventos') return 'Novo Evento';
     if (activeTab === 'atividade') return 'Nova Atividade';
+    if (activeTab === 'meu-calendario') return '';
     return 'Novo';
   };
 
@@ -131,25 +141,29 @@ function Profile() {
           <div className="profile-header-actions">
 
             <div className="profile-tabs">
-              <button
-                className="btn-home"
-                onClick={() => navigate('/feed')}
-                title="Voltar ao Feed"
-              >
+              <button className="btn-home" onClick={() => navigate('/feed')} title="Voltar ao Feed">
                 <IconHome size={22} stroke={2.5} />
               </button>
 
               <button className={`tab ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => setActiveTab('posts')}>
                 Posts
               </button>
+
               <button className={`tab ${activeTab === 'eventos' ? 'active' : ''}`} onClick={() => setActiveTab('eventos')}>
                 Eventos Organizados
               </button>
-              <button className={`tab ${activeTab === 'atividade' ? 'active' : ''}`} onClick={() => setActiveTab('atividade')}>
-                Atividades
-              </button>
+
+              {isOwnProfile ? (
+                <button className={`tab ${activeTab === 'meu-calendario' ? 'active' : ''}`} onClick={() => setActiveTab('meu-calendario')}>
+                  Meu Calendário
+                </button>
+              ) : (
+                <button className={`tab ${activeTab === 'atividade' ? 'active' : ''}`} onClick={() => setActiveTab('atividade')}>
+                  Atividades
+                </button>
+              )}
             </div>
-            {isOwnProfile && token && (
+            {isOwnProfile && token && activeTab !== 'meu-calendario' && (
               <button className="btn-novo-dinamico" onClick={handleNovoClick}>
                 {getBtnLabel()}
               </button>
@@ -173,6 +187,10 @@ function Profile() {
                 ? <p className="empty-state">Nenhuma atividade ainda.</p>
                 : activities.map(activity => <ActivityCard key={activity.id} activity={activity} />)
             )}
+            {activeTab === 'meu-calendario' && (
+              <ParticipationsCalendar events={participatingEvents} />
+            )}
+
           </div>
 
         </main>

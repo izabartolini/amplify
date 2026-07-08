@@ -203,3 +203,6 @@ func (s *Service) GetAllEvents(userID uint) ([]models.Event, error) {
 
 	return visibleEvents, nil
 }
+func (s *Service) GetParticipatingEvents(userID uint) ([]models.Event, error) {
+	return s.repository.GetParticipatingEvents(userID)
+}
