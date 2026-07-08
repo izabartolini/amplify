@@ -82,6 +82,7 @@ func SetupRoutes(r *gin.Engine) {
 			usersAPI.GET("/:id/follow", controller.IsFollowing)
 			usersAPI.GET("/:id/followers", controller.GetFollowers)
 			usersAPI.GET("/:id/following", controller.GetFollowing)
+			usersAPI.GET("/:id/participating-events", controller.GetParticipatingEvents)
 		}
 
 		postsAPI := protectedAPI.Group("/posts")

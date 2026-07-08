@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { notifications } from '@mantine/notifications';
 import { IconCheck } from '@tabler/icons-react';
 import { Navigate, useParams } from 'react-router-dom'
+import 'dayjs/locale/pt-br';
 
 import Navbar from "../../components/Navbar/Navbar";
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
@@ -201,6 +202,7 @@ export default function CreateEvent() {
                     value={formData.date}
                     onChange={(value) => handleChange("date", value)}
                     minDate={new Date()}
+                    locale="pt-br"
                     size="xl"
                     className="mantine-DatePicker-calendar"
                   />

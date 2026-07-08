@@ -55,3 +55,16 @@ func (r *Repository) GetAllEvents() ([]models.Event, error) {
     Find(&events).Error
 	return events, err
 }
+func (r *Repository) GetParticipatingEvents(userID uint) ([]models.Event, error) {
+	var events []models.Event
+
+	err := r.db.
+		Joins("JOIN participates ON participates.event_id = events.id").
+		Where("participates.user_id = ? AND participates.status = ?", userID, "accepted").
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "name", "username", "profile_picture")
+		}).
+		Find(&events).Error
+
+	return events, err
+}
