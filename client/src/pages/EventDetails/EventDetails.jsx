@@ -163,8 +163,8 @@ function EventDetails() {
 
       if (response.ok) {
         const updatedEvent = await response.json();
-        setEvent(updatedEvent); // Atualiza a tela com os novos dados
-        setIsEditing(false); // Fecha o modo de edição
+        setEvent(updatedEvent); 
+        setIsEditing(false);
         notifications.show({
           title: "Sucesso",
           message: "Evento atualizado com sucesso!",

@@ -128,7 +128,6 @@ function PostCard({ post, onDelete }) {
       <Link to={`/posts/${post.id}`} className="post-body-link">
         {post.medias && post.medias.length > 0 && (
           <div className="post-medias">
-            {/* AQUI ESTÁ A CORREÇÃO DO AVISO DA KEY */}
             {post.medias.map((media, index) => (
               <img key={media.id || index} src={media.url} alt="post media" className="post-media-img" />
             ))}
