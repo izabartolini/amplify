@@ -173,13 +173,15 @@ function PostDetails() {
           ) : (
             subtitle && <p className="post-details-subtitle">{subtitle}</p>
           )}
-
+          
           {post.medias && post.medias.length > 0 && (
             <div className="post-details-medias">
               {post.medias.map(media => (
-                <a key={media.id} href={media.url} target="_blank" rel="noreferrer" className="post-details-media-link">
-                  {media.type === 'photo' ? '🖼 Ver foto' : '🎥 Ver vídeo'}
-                </a>
+                media.type === 'photo' ? (
+                  <img key={media.id} src={media.url} alt="post media" className="post-details-media-img" />
+                ) : (
+                  <video key={media.id} src={media.url} controls className="post-details-media-video" />
+                )
               ))}
             </div>
           )}
