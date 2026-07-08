@@ -42,22 +42,23 @@ func ConnectDatabase() {
 	log.Println("Connection with database successful!")
 
 	log.Println("Migrating...")
-	
+
 	err = database.AutoMigrate(
 		&models.User{},
-    &models.Follow{},
-    &models.Post{},
-    &models.Media{},
-    &models.Like{},
-    &models.Comment{},
-    &models.Event{},
-    &models.Participate{},
-    &models.Tag{},     
-    &models.UserTag{}, 
-    &models.EventTag{},
-    &models.PostTag{},
-    &models.Instrument{},
-    &models.UserInstrument{},
+		&models.Follow{},
+		&models.Post{},
+		&models.Media{},
+		&models.Like{},
+		&models.Comment{},
+		&models.Event{},
+		&models.Participate{},
+		&models.Tag{},
+		&models.UserTag{},
+		&models.EventTag{},
+		&models.PostTag{},
+		&models.Instrument{},
+		&models.UserInstrument{},
+		&models.Notification{},
 	)
 
 	if err != nil {

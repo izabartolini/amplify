@@ -194,8 +194,8 @@ type UpdateUserRequest struct {
 	InstrumentsRaw string `form:"instruments"`
 }
 type InstrumentUpdate struct {
-	Nome  		   string `json:"nome"`
-	Nivel 		   int    `json:"nivel"`
+	Nome  string `json:"nome"`
+	Nivel int    `json:"nivel"`
 }
 type InstrumentData struct {
 	Nome  string `json:"nome"`
@@ -237,7 +237,7 @@ func (s *Service) UpdateUserProfile(userID uint, name string, username string, b
 		}
 		var inputInstruments []InstrumentInput
 		if err := json.Unmarshal([]byte(instrumentsRaw), &inputInstruments); err == nil {
-			
+
 			var params []repositories.InstrumentParams
 			for _, inst := range inputInstruments {
 				if inst.Nome != "" {
@@ -507,7 +507,7 @@ func (s *Service) GetUserByID(id uint) (*UserProfileResponse, error) {
 		if err == nil {
 			for i, ui := range user.Plays {
 				nomeReal := namesMap[ui.InstrumentID]
-				
+
 				instParams = append(instParams, map[string]interface{}{
 					"id":    i + 1,
 					"nome":  nomeReal,
@@ -526,7 +526,7 @@ func (s *Service) GetUserByID(id uint) (*UserProfileResponse, error) {
 		City:           user.City,
 		CPF:            user.CPF,
 		Tags:           tagNames,
-		Instruments:    instParams, 
+		Instruments:    instParams,
 		FollowersCount: len(user.Followers),
 		FollowingCount: len(user.Following),
 	}, nil
@@ -545,7 +545,12 @@ func (s *Service) FollowUser(followerID uint, followingID uint) error {
 		return errors.New("você já segue este usuário")
 	}
 
-	return s.repository.FollowUser(followerID, followingID)
+	if err := s.repository.FollowUser(followerID, followingID); err != nil {
+		return err
+	}
+
+	s.CreateNotification(followingID, followerID, "follow", nil)
+	return nil
 }
 
 func (s *Service) UnfollowUser(followerID uint, followingID uint) error {
