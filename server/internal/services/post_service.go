@@ -219,6 +219,11 @@ func (s *Service) CreateComment(userID uint, postID uint, req CreateCommentDTO) 
 		return nil, errors.New("erro ao criar comentário")
 	}
 
+	comment, err = s.repository.GetCommentByID(comment.ID)
+	if err != nil {
+		return comment, nil
+	}
+
 	return comment, nil
 }
 

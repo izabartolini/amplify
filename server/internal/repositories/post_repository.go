@@ -95,3 +95,12 @@ func (r *Repository) UpdatePost(postID uint, subtitle string) error {
 func (r *Repository) DeletePost(postID uint) error {
 	return r.db.Delete(&models.Post{}, postID).Error
 }
+func (r *Repository) GetCommentByID(commentID uint) (*models.Comment, error) {
+	var comment models.Comment
+	err := r.db.
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("users.id, users.name, users.username, users.profile_picture")
+		}).
+		First(&comment, commentID).Error
+	return &comment, err
+}
