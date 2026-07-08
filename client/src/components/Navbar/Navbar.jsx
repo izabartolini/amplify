@@ -11,6 +11,8 @@ function Navbar({ onSearch }) {
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isNotifOpen, setIsNotifOpen] = useState(false)
+  const [notifications, setNotifications] = useState([])
   
   const [userData, setUserData] = useState({
     name: "Usuário",
@@ -38,9 +40,54 @@ function Navbar({ onSearch }) {
       .catch(err => console.error("Erro ao carregar dados na Navbar:", err))
   }, [loggedUserID, token])
 
+  const fetchNotifications = () => {
+    if (!token) return
+    fetch(`http://localhost:8080/api/notifications`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => setNotifications(Array.isArray(data) ? data : []))
+      .catch(err => console.error("Erro ao carregar notificações:", err))
+  }
+
+  useEffect(() => {
+    fetchNotifications()
+  }, [token])
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
+
+  const toggleNotifications = () => {
+    setIsNotifOpen(!isNotifOpen)
+    setIsMenuOpen(false)
+  }
+
+  const handleNotificationClick = (notif) => {
+    if (!notif.read) {
+      fetch(`http://localhost:8080/api/notifications/${notif.id}/read`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(() => fetchNotifications())
+        .catch(err => console.error("Erro ao marcar notificação como lida:", err))
+    }
+    if (notif.post_id) {
+      navigate(`/posts/${notif.post_id}`)
+    } else {
+      navigate(`/profile/${notif.actor.id}`)
+    }
+    setIsNotifOpen(false)
+  }
+
+  const notifText = (notif) => {
+    if (notif.type === 'like') return `curtiu seu post`
+    if (notif.type === 'comment') return `comentou no seu post`
+    if (notif.type === 'follow') return `começou a seguir você`
+    return ''
+  }
+
+  const unreadCount = notifications.filter(n => !n.read).length
 
   const handleLogout = () => {
     localStorage.clear() 
@@ -96,9 +143,31 @@ function Navbar({ onSearch }) {
           <img src={Home} alt="Home" />
         </span>
         
-        <span>
+        <span onClick={toggleNotifications} className="notification-trigger" style={{ position: 'relative' }}>
           <img src={Notification} alt="Notificações" />
+          {unreadCount > 0 && (
+            <span className="notification-badge">{unreadCount}</span>
+          )}
         </span>
+
+        {isNotifOpen && (
+          <menu className="navbar-notifications-dropdown">
+            <h1 className="dropdown-notif-title">Notificações</h1>
+            {notifications.length === 0 && (
+              <p className="dropdown-notif-empty">Nenhuma notificação ainda.</p>
+            )}
+            {notifications.map(notif => (
+              <div
+                key={notif.id}
+                className={`notification-item ${notif.read ? '' : 'notification-unread'}`}
+                onClick={() => handleNotificationClick(notif)}
+              >
+                <img src={notif.actor.profile_picture || User} alt={notif.actor.name} className="notification-avatar rounded-circle" />
+                <p><strong>{notif.actor.name}</strong> {notifText(notif)}</p>
+              </div>
+            ))}
+          </menu>
+        )}
 
         <span onClick={toggleMenu} className="avatar-trigger">
           <img src={userData.profilePicture} alt="Perfil" className="navbar-avatar rounded-circle" />

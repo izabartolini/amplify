@@ -26,19 +26,17 @@ func SetupRoutes(r *gin.Engine) {
 
 	repository := repositories.NewRepository(config.DB)
 	service := services.NewService(repository)
-	
+
 	cloud, err := utils.NewCloudinaryService()
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	controller := controllers.NewHandler(service, cloud)
 	instrumentRepository := repositories.NewInstrumentRepository(config.DB)
 	instrumentController := controllers.NewInstrumentController(instrumentRepository)
 	tagRepository := repositories.NewTagRepository(config.DB)
 	tagController := controllers.NewTagController(tagRepository)
-
-
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:5173"},
@@ -111,6 +109,10 @@ func SetupRoutes(r *gin.Engine) {
 			eventsAPI.DELETE("/:id/delete", controller.DeleteEvent)
 		}
 
-		//future protected routes
+		notificationsAPI := protectedAPI.Group("/notifications")
+		{
+			notificationsAPI.GET("", controller.GetNotifications)
+			notificationsAPI.PUT("/:id/read", controller.MarkNotificationAsRead)
+		}
 	}
 }

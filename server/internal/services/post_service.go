@@ -177,11 +177,15 @@ func (s *Service) GetPostByID(id uint) (*PostDetailDTO, error) {
 }
 
 func (s *Service) LikePost(userID uint, postID uint) error {
-	_, err := s.repository.GetPostByID(postID)
+	post, err := s.repository.GetPostByID(postID)
 	if err != nil {
 		return errors.New("post não encontrado")
 	}
-	return s.repository.LikePost(userID, postID)
+	if err := s.repository.LikePost(userID, postID); err != nil {
+		return err
+	}
+	s.CreateNotification(post.UserID, userID, "like", &postID)
+	return nil
 }
 
 func (s *Service) UnlikePost(userID uint, postID uint) error {
@@ -204,7 +208,7 @@ func (s *Service) CreateComment(userID uint, postID uint, req CreateCommentDTO) 
 		return nil, errors.New("comentário não pode ter mais de 200 caracteres")
 	}
 
-	_, err := s.repository.GetPostByID(postID)
+	post, err := s.repository.GetPostByID(postID)
 	if err != nil {
 		return nil, errors.New("post não encontrado")
 	}
@@ -218,6 +222,8 @@ func (s *Service) CreateComment(userID uint, postID uint, req CreateCommentDTO) 
 	if err := s.repository.CreateComment(comment); err != nil {
 		return nil, errors.New("erro ao criar comentário")
 	}
+
+	s.CreateNotification(post.UserID, userID, "comment", &postID)
 
 	comment, err = s.repository.GetCommentByID(comment.ID)
 	if err != nil {
