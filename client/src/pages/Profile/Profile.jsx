@@ -69,9 +69,9 @@ function Profile() {
             state: p.User.State,
           } : null,
           medias: (p.Medias || []).map(m => ({
-            id: m.ID,
-            url: m.Url,
-            type: m.Type,
+            id: m.id || m.ID,
+            url: m.url || m.Url,
+            type: m.type || m.Type,
           })),
           likes: p.Likes || [],
           comments: p.Comments || [],

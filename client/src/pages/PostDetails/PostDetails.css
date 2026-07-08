@@ -282,3 +282,9 @@
 .post-edit-cancel {
   background-color: #999 !important;
 }
+
+.post-details-media-img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 12px;
+}
