@@ -213,6 +213,10 @@ function EventDetails() {
 
   const date = new Date(event.date);
   const isOwner = Number(currentUserId) === Number(event.user_id || event.UserID);
+  
+  const eventOrganizer = event.organizer || {};
+  const organizerName = eventOrganizer.Name || "Usuário";
+  const organizerUsername = eventOrganizer.Username || "";
 
   return (
     <div className="event-details-page">
@@ -236,18 +240,17 @@ function EventDetails() {
               <h1 className="event-details-name">{event.name}</h1>
               <p className="event-details-organizer">
                 Organizado por{" "}
-                <strong>{event.organizer?.name || event.User?.name || "Usuário"}</strong>
-                {(event.organizer?.username || event.User?.username) &&
-                  ` (@${event.organizer?.username || event.User?.username})`}
+                <strong>{organizerName}</strong>
+                {organizerUsername && ` (@${organizerUsername})`}
               </p>
             </div>
 
             {isOwner && !isEditing && (
               <Group>
-                <Button color="blue" variant="light" onClick={startEditing}>
+                <Button color="white" variant="light" onClick={startEditing}>
                   Editar
                 </Button>
-                <Button color="red" variant="light" onClick={handleDelete}>
+                <Button color="white" variant="light" onClick={handleDelete}>
                   Excluir
                 </Button>
               </Group>
