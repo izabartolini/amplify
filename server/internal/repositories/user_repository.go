@@ -12,7 +12,7 @@ type Repository struct{ db *gorm.DB }
 func NewRepository(db *gorm.DB) *Repository { return &Repository{db: db} }
 
 func (r *Repository) FindUserWithRelations(id uint, user *models.User) error {
-	return r.db.Preload("Tag").Preload("Plays").First(user, id).Error
+	return r.db.Preload("Tag").Preload("Plays").Preload("Following").Preload("Followers").First(user, id).Error
 }
 
 func (r *Repository) UpdateUserProfileFields(userID uint, fields map[string]interface{}) error {
