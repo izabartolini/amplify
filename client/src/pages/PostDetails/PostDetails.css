@@ -129,13 +129,19 @@
   border-bottom: 1px solid #f0e6d0;
 }
 
+.comment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
 .comment-author-link {
   display: flex;
   align-items: center;
   gap: 8px;
   text-decoration: none;
   color: inherit;
-  margin-bottom: 6px;
 }
 
 .comment-avatar {
@@ -160,6 +166,51 @@
 .comment-date {
   font-size: 0.75rem;
   color: #999;
+}
+
+.comment-menu-wrapper {
+  position: relative;
+}
+
+.comment-menu-btn {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 4px;
+}
+
+.comment-menu {
+  position: absolute;
+  right: 0;
+  top: 20px;
+  background: white;
+  border: 1px solid #d4c17a;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.comment-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-align: left;
+  font-family: 'Poppins', sans-serif;
+}
+
+.comment-menu-delete {
+  color: #A32D2D !important;
+}
+
+.comment-menu-delete:hover {
+  background: #fce8e8 !important;
 }
 
 .post-comment-input {

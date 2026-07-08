@@ -15,6 +15,7 @@ function PostDetails() {
   const [editing, setEditing] = useState(false)
   const [editText, setEditText] = useState('')
   const [subtitle, setSubtitle] = useState('')
+  const [commentMenu, setCommentMenu] = useState(null)
   const token = localStorage.getItem('token')
   const loggedUserID = parseInt(localStorage.getItem('userID'))
 
@@ -68,6 +69,20 @@ function PostDetails() {
       }
     } catch (err) {
       console.error('Erro ao comentar:', err)
+    }
+  }
+
+  async function handleDeleteComment(commentId) {
+    try {
+      const response = await fetch(`http://localhost:8080/api/posts/${id}/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (response.ok || response.status === 204) {
+        setComments(prev => prev.filter(c => c.id !== commentId))
+      }
+    } catch (err) {
+      console.error('Erro ao deletar comentário:', err)
     }
   }
 
@@ -192,14 +207,26 @@ function PostDetails() {
             )}
             {comments.map((comment, index) => (
               <div key={comment.id || index} className="post-details-comment">
-                <Link to={`/profile/${comment.user?.id}`} className="comment-author-link">
-                  <img
-                    src={'https://ui-avatars.com/api/?name=' + encodeURIComponent(comment.user?.name || 'U') + '&background=8B1A1A&color=fff&size=32'}
-                    alt={comment.user?.name}
-                    className="comment-avatar"
-                  />
-                  <span className="comment-username">@{comment.user?.username || 'usuário'}</span>
-                </Link>
+                <div className="comment-header">
+                  <Link to={`/profile/${comment.user?.id}`} className="comment-author-link">
+                    <img
+                      src={'https://ui-avatars.com/api/?name=' + encodeURIComponent(comment.user?.name || 'U') + '&background=8B1A1A&color=fff&size=32'}
+                      alt={comment.user?.name}
+                      className="comment-avatar"
+                    />
+                    <span className="comment-username">@{comment.user?.username || 'usuário'}</span>
+                  </Link>
+                  {comment.user?.id === loggedUserID && (
+                    <div className="comment-menu-wrapper">
+                      <button className="comment-menu-btn" onClick={() => setCommentMenu(commentMenu === comment.id ? null : comment.id)}>⋮</button>
+                      {commentMenu === comment.id && (
+                        <div className="comment-menu">
+                          <button onClick={() => { handleDeleteComment(comment.id); setCommentMenu(null) }} className="comment-menu-delete">Excluir</button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
                 <p className="comment-text">{comment.text || comment.Text}</p>
                 <span className="comment-date">
                   {comment.created_at ? new Date(comment.created_at).toLocaleDateString('pt-BR') : ''}
