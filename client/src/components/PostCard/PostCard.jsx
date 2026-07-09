@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './PostCard.css'
+import { notifications } from '@mantine/notifications'
+import { IconX, IconCheck } from '@tabler/icons-react'
 
 function PostCard({ post, onDelete }) {
   const token = localStorage.getItem('token')
@@ -56,8 +58,22 @@ function PostCard({ post, onDelete }) {
         setCommentText('')
         setShowComment(false)
       }
+      notifications.show({
+        title: 'Sucesso!',
+        message: 'Comentário enviado!.',
+        color: 'green',
+        icon: <IconCheck size={18} />,
+        autoClose: 3000,
+      });
     } catch (err) {
       console.error('Erro ao comentar:', err)
+      notifications.show({
+        title: 'Falha!',
+        message: 'Erro ao comentar!',
+        color: 'red',
+        icon: <IconX size={18} />,
+        autoClose: 3000,
+      })
     }
   }
 
@@ -76,8 +92,22 @@ function PostCard({ post, onDelete }) {
         setEditing(false)
         setShowMenu(false)
       }
+      notifications.show({
+        title: 'Sucesso!',
+        message: 'Post editado!.',
+        color: 'green',
+        icon: <IconCheck size={18} />,
+        autoClose: 3000,
+      });
     } catch (err) {
       console.error('Erro ao editar:', err)
+      notifications.show({
+        title: 'Falha!',
+        message: 'Erro ao editar!',
+        color: 'red',
+        icon: <IconX size={18} />,
+        autoClose: 3000,
+      })
     }
   }
 
@@ -91,8 +121,22 @@ function PostCard({ post, onDelete }) {
         setDeleted(true)
         if (onDelete) onDelete(post.id)
       }
+      notifications.show({
+        title: 'Sucesso!',
+        message: 'Post excluido!.',
+        color: 'green',
+        icon: <IconCheck size={18} />,
+        autoClose: 3000,
+      });
     } catch (err) {
       console.error('Erro ao deletar:', err)
+      notifications.show({
+        title: 'Falha!',
+        message: 'Erro ao exluir post!',
+        color: 'red',
+        icon: <IconX size={18} />,
+        autoClose: 3000,
+      })
     }
   }
 

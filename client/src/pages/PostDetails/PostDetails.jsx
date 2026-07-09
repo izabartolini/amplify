@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import Navbar from '../../components/Navbar/Navbar'
 import './PostDetails.css'
+import { notifications } from '@mantine/notifications'
+import { IconX, IconCheck } from '@tabler/icons-react'
 
 function PostDetails() {
   const { id } = useParams()
@@ -52,23 +54,37 @@ function PostDetails() {
         body: JSON.stringify({ text: commentText })
       })
       if (response.ok) {
-          const data = await response.json()
-          const newComment = {
-            id: data.id,
-            text: data.text,
-            created_at: data.created_at,
-            user: {
-                id: data.user?.ID,
-                name: data.user?.Name,
-                username: data.user?.Username,
-                profile_picture: data.user?.ProfilePicture,
-            }
+        const data = await response.json()
+        const newComment = {
+          id: data.id,
+          text: data.text,
+          created_at: data.created_at,
+          user: {
+            id: data.user?.ID,
+            name: data.user?.Name,
+            username: data.user?.Username,
+            profile_picture: data.user?.ProfilePicture,
+          }
         }
         setComments(prev => [...prev, newComment])
         setCommentText('')
       }
+      notifications.show({
+        title: 'Sucesso!',
+        message: 'Comentário enviado!.',
+        color: 'green',
+        icon: <IconCheck size={18} />,
+        autoClose: 3000,
+      });
     } catch (err) {
       console.error('Erro ao comentar:', err)
+      notifications.show({
+        title: 'Falha!',
+        message: 'Erro ao comentar!',
+        color: 'red',
+        icon: <IconX size={18} />,
+        autoClose: 3000,
+      })
     }
   }
 
@@ -81,8 +97,22 @@ function PostDetails() {
       if (response.ok || response.status === 204) {
         setComments(prev => prev.filter(c => c.id !== commentId))
       }
+      notifications.show({
+        title: 'Sucesso!',
+        message: 'Comentário excluido!.',
+        color: 'green',
+        icon: <IconCheck size={18} />,
+        autoClose: 3000,
+      });
     } catch (err) {
       console.error('Erro ao deletar comentário:', err)
+      notifications.show({
+        title: 'Falha!',
+        message: 'Erro ao excluir comentario!',
+        color: 'red',
+        icon: <IconX size={18} />,
+        autoClose: 3000,
+      })
     }
   }
 
@@ -101,8 +131,22 @@ function PostDetails() {
         setEditing(false)
         setShowMenu(false)
       }
+      notifications.show({
+        title: 'Sucesso!',
+        message: 'Comentário editado!.',
+        color: 'green',
+        icon: <IconCheck size={18} />,
+        autoClose: 3000,
+      });
     } catch (err) {
       console.error('Erro ao editar:', err)
+      notifications.show({
+        title: 'Falha!',
+        message: 'Erro ao editar!',
+        color: 'red',
+        icon: <IconX size={18} />,
+        autoClose: 3000,
+      })
     }
   }
 
@@ -115,8 +159,22 @@ function PostDetails() {
       if (response.ok || response.status === 204) {
         navigate('/feed')
       }
+      notifications.show({
+        title: 'Sucesso!',
+        message: 'Post excluido!.',
+        color: 'green',
+        icon: <IconCheck size={18} />,
+        autoClose: 3000,
+      });
     } catch (err) {
       console.error('Erro ao deletar:', err)
+      notifications.show({
+        title: 'Falha!',
+        message: 'Erro ao exluir post!',
+        color: 'red',
+        icon: <IconX size={18} />,
+        autoClose: 3000,
+      })
     }
   }
 
@@ -173,7 +231,7 @@ function PostDetails() {
           ) : (
             subtitle && <p className="post-details-subtitle">{subtitle}</p>
           )}
-          
+
           {post.medias && post.medias.length > 0 && (
             <div className="post-details-medias">
               {post.medias.map(media => (

@@ -238,14 +238,6 @@ export default function CreateEvent() {
                     <TextInput label="Estado" size="lg" value={formData.state} onChange={(e) => handleChange("state", e.target.value)} />
                     <TextInput label="País" size="lg" value={formData.country} onChange={(e) => handleChange("country", e.target.value)} />
                   </Group>
-
-                  <Checkbox
-                    label="🔒 Este é um evento privado (Requer aprovação)"
-                    checked={formData.is_private}
-                    onChange={(e) => handleChange("is_private", e.currentTarget.checked)}
-                    color="#9f0f0f"
-                    mt="md"
-                  />
                 </Stack>
               </Flex>
             </Paper>
