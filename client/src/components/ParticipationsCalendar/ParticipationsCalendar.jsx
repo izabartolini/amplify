@@ -110,10 +110,12 @@ export default function ParticipationsCalendar({ events }) {
                         const hasEvent = dayEvents.length > 0;
                         const dayNumber = dayjs(date).date();
 
+                        const hasOrganizedEvent = dayEvents.some(e => e.is_organizer);
+
                         return (
                             <Indicator
                                 size={hasEvent ? 20 : 0}
-                                color="#e69e38"
+                                color={hasOrganizedEvent ? '#9f0f0f' : '#e69e38'}
                                 offset={4}
                                 disabled={!hasEvent}
                                 processing={hasEvent}

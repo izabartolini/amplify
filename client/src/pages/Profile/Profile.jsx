@@ -40,7 +40,7 @@ function Profile() {
           const partRes = await fetch(`http://localhost:8080/api/users/${id}/participating-events`, { headers });
           if (partRes.ok) {
             const partData = await partRes.json();
-            setParticipatingEvents(partData); // Atualiza o state do calendário
+            setParticipatingEvents(partData.map(e => ({ ...e, is_organizer: false })));
           }
         }
 
@@ -94,6 +94,7 @@ function Profile() {
           city: e.city,
           state: e.state,
           is_private: e.is_private,
+          is_organizer: true,
         })))
         setActivities(Array.isArray(activityData) ? activityData : [])
 
@@ -188,7 +189,7 @@ function Profile() {
                 : activities.map(activity => <ActivityCard key={activity.id} activity={activity} />)
             )}
             {activeTab === 'meu-calendario' && (
-              <ParticipationsCalendar events={participatingEvents} />
+              <ParticipationsCalendar events={[...events, ...participatingEvents]} />
             )}
 
           </div>
