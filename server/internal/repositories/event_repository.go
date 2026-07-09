@@ -46,19 +46,20 @@ func (r *Repository) DeleteEvent(event *models.Event) error {
 func (r *Repository) GetAllEvents() ([]models.Event, error) {
 	var events []models.Event
 	err := r.db.
-    Preload("User", func(db *gorm.DB) *gorm.DB {
-        return db.Select("id", "name", "username", "profile_picture")
-    }).
-    Preload("Participants").
-    Preload("Medias").
-    Order("date asc").
-    Find(&events).Error
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "name", "username", "profile_picture")
+		}).
+		Preload("Participants").
+		Preload("Medias").
+		Order("date asc").
+		Find(&events).Error
 	return events, err
 }
 func (r *Repository) GetParticipatingEvents(userID uint) ([]models.Event, error) {
 	var events []models.Event
 
 	err := r.db.
+		Distinct().
 		Joins("JOIN participates ON participates.event_id = events.id").
 		Where("participates.user_id = ? AND participates.status = ?", userID, "accepted").
 		Preload("User", func(db *gorm.DB) *gorm.DB {
@@ -69,5 +70,5 @@ func (r *Repository) GetParticipatingEvents(userID uint) ([]models.Event, error)
 	return events, err
 }
 func (r *Repository) RemoveParticipation(eventID uint, userID uint) error {
-    return r.db.Where("event_id = ? AND user_id = ?", eventID, userID).Delete(&models.Participate{}).Error
+	return r.db.Where("event_id = ? AND user_id = ?", eventID, userID).Delete(&models.Participate{}).Error
 }
