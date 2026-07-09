@@ -206,3 +206,6 @@ func (s *Service) GetAllEvents(userID uint) ([]models.Event, error) {
 func (s *Service) GetParticipatingEvents(userID uint) ([]models.Event, error) {
 	return s.repository.GetParticipatingEvents(userID)
 }
+func (s *Service) LeaveEvent(eventID uint, userID uint) error {
+    return s.repository.RemoveParticipation(eventID, userID)
+}

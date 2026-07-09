@@ -164,3 +164,26 @@
 
 	ctx.JSON(http.StatusOK, events)
 }
+func (c *Controller) LeaveEvent(ctx *gin.Context) {
+    eventIDStr := ctx.Param("id")
+    eventID, err := strconv.ParseUint(eventIDStr, 10, 32)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID de evento inválido"})
+        return
+    }
+
+    userIDInterface, exists := ctx.Get("userID")
+    if !exists {
+        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
+        return
+    }
+    userID := userIDInterface.(uint)
+
+    err = c.service.LeaveEvent(uint(eventID), userID)
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao processar cancelamento da participação"})
+        return
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{"message": "Você saiu do evento com sucesso"})
+}

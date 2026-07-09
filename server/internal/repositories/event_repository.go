@@ -68,3 +68,6 @@ func (r *Repository) GetParticipatingEvents(userID uint) ([]models.Event, error)
 
 	return events, err
 }
+func (r *Repository) RemoveParticipation(eventID uint, userID uint) error {
+    return r.db.Where("event_id = ? AND user_id = ?", eventID, userID).Delete(&models.Participate{}).Error
+}
