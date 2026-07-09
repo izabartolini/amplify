@@ -20,7 +20,7 @@ type Controller struct {
 func NewHandler(service *services.Service, cloud *utils.CloudinaryService) *Controller {
 	return &Controller{
 		service: service,
-		cloud: cloud,
+		cloud:   cloud,
 	}
 }
 
@@ -34,11 +34,73 @@ func (h *Controller) Register(c *gin.Context) {
 
 	user, err := h.service.RegisterUser(req)
 	if err != nil {
-		if strings.Contains(err.Error(), "já cadastrados") {
-			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
-			return
+
+		switch err.Error() {
+
+		case "CPF inválido":
+			c.JSON(http.StatusBadRequest, gin.H{
+				"field":   "cpf",
+				"message": "CPF inválido.",
+			})
+
+		case "A senha deve conter 8 caracteres, letras maiúsculas, minúsculas e caractere especial":
+			c.JSON(http.StatusBadRequest, gin.H{
+				"field":   "password",
+				"message": "A senha deve conter no mínimo 8 caracteres, uma letra maiúscula, uma minúscula e um caractere especial.",
+			})
+
+		case "Usuário inválido. Utilize apenas letras, números e ( _ ; . )":
+			c.JSON(http.StatusBadRequest, gin.H{
+				"field":   "username",
+				"message": "O nome de usuário contém caracteres inválidos.",
+			})
+
+		case "Erro interno ao processar a senha":
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Erro interno ao processar a senha.",
+			})
+
+		case "Erro ao registrar usuário no banco de dados":
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Erro ao salvar o usuário no banco de dados.",
+			})
+
+		case "Usuário criado, mas erro ao salvar os instrumentos":
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"field":   "instruments",
+				"message": "Usuário criado, porém ocorreu um erro ao salvar os instrumentos.",
+			})
+
+		default:
+			if strings.Contains(err.Error(), "email") {
+				c.JSON(http.StatusConflict, gin.H{
+					"field":   "email",
+					"message": err.Error(),
+				})
+				return
+			}
+
+			if strings.Contains(err.Error(), "username") {
+				c.JSON(http.StatusConflict, gin.H{
+					"field":   "username",
+					"message": err.Error(),
+				})
+				return
+			}
+
+			if strings.Contains(err.Error(), "cpf") {
+				c.JSON(http.StatusConflict, gin.H{
+					"field":   "cpf",
+					"message": err.Error(),
+				})
+				return
+			}
+
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+			})
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
 		return
 	}
 
@@ -130,7 +192,7 @@ func (h *Controller) UpdateUserProfile(c *gin.Context) {
 
 	var profilePictureURL string
 	file, err := c.FormFile("image")
-	
+
 	if err == nil && file != nil && file.Size > 0 && file.Filename != "" {
 		uploadedURL, uploadErr := utils.UploadToDrive(file)
 		if uploadErr != nil {
@@ -141,14 +203,14 @@ func (h *Controller) UpdateUserProfile(c *gin.Context) {
 	}
 
 	err = h.service.UpdateUserProfile(
-		userID.(uint), 
-		form.Name, 
-		form.Username, 
-		form.Bio, 
-		form.City, 
-		form.CPF, 
-		profilePictureURL, 
-		form.TagsRaw, 
+		userID.(uint),
+		form.Name,
+		form.Username,
+		form.Bio,
+		form.City,
+		form.CPF,
+		profilePictureURL,
+		form.TagsRaw,
 		form.InstrumentsRaw,
 	)
 

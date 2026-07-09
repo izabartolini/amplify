@@ -21,6 +21,7 @@ import Navbar from "../../components/Navbar/Navbar";
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
 import fotoPerfil from '../../assets/foto-perfil.jpeg';
 import './CreatePost.css'
+import { notifications } from '@mantine/notifications';
 
 import {
     IconBell,
@@ -32,6 +33,7 @@ import {
     IconUpload,
     IconUser,
     IconX,
+    IconCheck,
 } from "@tabler/icons-react";
 
 import { useState, useEffect } from "react";
@@ -95,7 +97,13 @@ export default function CreatePost() {
 
     function handleFiles(newFiles) {
         if (files.length + newFiles.length > 5) {
-            alert("Você pode enviar no máximo 5 arquivos.");
+            notifications.show({
+                title: 'Falha!',
+                message: "Erro: Você pode enviar no máximo 5 arquivos.",
+                color: 'red',
+                icon: <IconX size={18} />,
+                autoClose: 3000,
+            });
             return;
         }
         const newPreviews = newFiles.map(file => ({
@@ -133,10 +141,7 @@ export default function CreatePost() {
     }
 
     async function handlePublish() {
-        if (files.length === 0) {
-            alert("Selecione pelo menos uma mídia.");
-            return;
-        }
+        
 
         try {
             setPublishing(true);
@@ -166,13 +171,25 @@ export default function CreatePost() {
                 throw new Error(data.error || "Erro ao publicar.");
             }
 
-            alert("Post publicado com sucesso!");
+
+            notifications.show({
+                title: 'Sucesso!',
+                message: 'O post foi criado e já está disponível.',
+                color: 'green',
+                icon: <IconCheck size={18} />,
+                autoClose: 3000,
+            });
 
             navigate(`/profile/${id}`);
-
         } catch (err) {
             console.error(err);
-            alert(err.message);
+            notifications.show({
+                title: 'Falha!',
+                message: `Erro: ${err.message}`,
+                color: 'red',
+                icon: <IconX size={18} />,
+                autoClose: 3000,
+            });
         } finally {
             setPublishing(false);
         }
@@ -181,11 +198,8 @@ export default function CreatePost() {
     return (
         <Box>
             <Navbar />
-
             <Flex gap={40} mr={40}>
-
                 <ProfileSidebar user={user} isOwnProfile={true} />
-
                 <Box flex={1}>
                     <Group mb={5} mt={10} gap={4}>
                         <ActionIcon variant="transparent" size="xl" onClick={() => navigate(`/profile/${id}`)}>
@@ -193,7 +207,6 @@ export default function CreatePost() {
                             <IconUser size={40} stroke={2.2} />
                         </ActionIcon>
                     </Group>
-
                     <Paper
                         p={20}
                         radius="lg"
@@ -238,7 +251,6 @@ export default function CreatePost() {
                                                         />
                                                     </Box>
                                                 )}
-
                                                 <ActionIcon
                                                     color="#9f0f0f"
                                                     radius="xl"
@@ -265,30 +277,25 @@ export default function CreatePost() {
                                                 size={70}
                                                 color="#c98f5d"
                                             />
-
                                             <IconPlayerPlay
                                                 size={70}
                                                 color="#c98f5d"
                                             />
                                         </Group>
-
                                         <Text
                                             fw={600}
                                             size="xl"
                                         >
-                                            Drag and drop an image or video here
+                                            Arraste e solte sua imagem ou video aqui
                                         </Text>
-
-                                        <Text c="dimmed">or</Text>
-
+                                        <Text c="dimmed">ou</Text>
                                         <Button
                                             radius="xl"
                                             leftSection={<IconUpload size={18} />}
                                             component="label"
                                             color="red"
                                         >
-                                            Upload from device
-
+                                            Carregar do computador
                                             <input
                                                 hidden
                                                 multiple
@@ -301,7 +308,6 @@ export default function CreatePost() {
                                 )}
                             </Dropzone>
                         </Box>
-
                         <Flex
                             mt={20}
                             justify="space-between"
@@ -314,23 +320,21 @@ export default function CreatePost() {
                                 value={subtitle}
                                 onChange={(e) => setSubtitle(e.currentTarget.value)}
                             />
-
                             <Button
                                 radius="xl"
                                 color="gray"
                                 variant="filled"
                                 onClick={() => navigate(`/profile/${id}`)}
                             >
-                                Cancel
+                                Cancelar
                             </Button>
-
                             <Button
                                 radius="xl"
                                 color="red"
                                 onClick={handlePublish}
                                 loading={publishing}
                             >
-                                Publish
+                                Publicar
                             </Button>
                         </Flex>
                     </Paper>

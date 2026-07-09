@@ -2,6 +2,10 @@ import { useState } from 'react'
 import './Register.css'
 import Guitar from '../../assets/guitar.png'
 import { useNavigate } from 'react-router-dom';
+import { XIcon, CheckIcon } from '@phosphor-icons/react';
+import { PasswordInput, Progress, Text, Popover, Box } from '@mantine/core';
+import { notifications } from '@mantine/notifications'
+import { IconX, IconCheck } from '@tabler/icons-react'
 
 function Register() {
     const navigate = useNavigate();
@@ -34,12 +38,18 @@ function Register() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
+
+        let newValue = value;
+
+        if (name === "cpf") {
+            newValue = value.replace(/\D/g, "").slice(0, 11);
+        }
+
+        setFormData((prev) => ({
             ...prev,
-            [name]: value
+            [name]: newValue,
         }));
     };
-
     const handleNextStep = (event) => {
         if (event) event.preventDefault();
 
@@ -96,7 +106,73 @@ function Register() {
                 }
             } else {
                 const errorData = await response.json();
-                setError(errorData.message || 'Erro ao cadastrar usuário.');
+
+                switch (errorData.field) {
+                    case "cpf":
+                        setError(errorData.message);
+                        notifications.show({
+                            title: 'Falha!',
+                            message: `Erro: ${errorData.message}`,
+                            color: 'red',
+                            icon: <IconX size={18} />,
+                            autoClose: 3000,
+                        })
+                        break;
+
+                    case "email":
+                        setError(errorData.message);
+                        notifications.show({
+                            title: 'Falha!',
+                            message: `Erro: ${errorData.message}`,
+                            color: 'red',
+                            icon: <IconX size={18} />,
+                            autoClose: 3000,
+                        })
+                        break;
+
+                    case "username":
+                        setError(errorData.message);
+                        notifications.show({
+                            title: 'Falha!',
+                            message: `Erro: ${errorData.message}`,
+                            color: 'red',
+                            icon: <IconX size={18} />,
+                            autoClose: 3000,
+                        })
+                        break;
+
+                    case "password":
+                        setError(errorData.message);
+                        notifications.show({
+                            title: 'Falha!',
+                            message: `Erro: ${errorData.message}`,
+                            color: 'red',
+                            icon: <IconX size={18} />,
+                            autoClose: 3000,
+                        })
+                        break;
+
+                    case "instruments":
+                        setError(errorData.message);
+                        notifications.show({
+                            title: 'Falha!',
+                            message: `Erro: ${errorData.message}`,
+                            color: 'red',
+                            icon: <IconX size={18} />,
+                            autoClose: 3000,
+                        })
+                        break;
+
+                    default:
+                        notifications.show({
+                            title: 'Falha!',
+                            message: `Erro: ${errorData.message}`,
+                            color: 'red',
+                            icon: <IconX size={18} />,
+                            autoClose: 3000,
+                        })
+                        setError(errorData.message || "Erro ao cadastrar usuário.");
+                }
             }
         } catch (error) {
             console.error('Erro ao conectar com o servidor:', error);
@@ -132,6 +208,48 @@ function Register() {
     const removeTag = (tagToRemove) => {
         setTags(tags.filter(tag => tag !== tagToRemove));
     };
+
+    function PasswordRequirement({ meets, label }) {
+        return (
+            <Text
+                c={meets ? 'teal' : 'red'}
+                style={{ display: 'flex', alignItems: 'center' }}
+                mt={7}
+                size="sm"
+            >
+                {meets ? <CheckIcon size={14} /> : <XIcon size={14} />}
+                <Box ml={10}>{label}</Box>
+            </Text>
+        );
+    }
+
+    const requirements = [
+        { re: /[0-9]/, label: 'Contém um número' },
+        { re: /[a-z]/, label: 'Contém uma letra minúscula' },
+        { re: /[A-Z]/, label: 'Contém uma letra maiúscula' },
+        { re: /[$&+,:;=?@#|'<>.^*()%!-]/, label: 'Contém um caractere especial' },
+    ];
+
+    function getStrength(password) {
+        let multiplier = password.length > 5 ? 0 : 1;
+
+        requirements.forEach((requirement) => {
+            if (!requirement.re.test(password)) {
+                multiplier += 1;
+            }
+        });
+
+        return Math.max(100 - (100 / (requirements.length + 1)) * multiplier, 10);
+    }
+
+    const [popoverOpened, setPopoverOpened] = useState(false);
+    const checks = requirements.map((requirement, index) => (
+        <PasswordRequirement key={index} label={requirement.label} meets={requirement.re.test(formData.password)} />
+    ));
+
+    const strength = getStrength(formData.password);
+    const color = strength === 100 ? 'teal' : strength > 50 ? 'yellow' : 'red';
+
 
     return (
         <div className='main-container'>
@@ -216,31 +334,51 @@ function Register() {
 
                                         <div className='form-row'>
                                             <div className='input-group'>
-                                                <label htmlFor="password">password</label>
-                                                <div className="password-wrapper" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                                                    <input
-                                                        type={showPassword ? "text" : "password"}
-                                                        id="password"
-                                                        name="password"
-                                                        placeholder="password..."
-                                                        value={formData.password}
-                                                        onChange={handleChange}
-                                                        style={{ width: '100%', paddingRight: '40px' }}
-                                                        required
-                                                    />
-                                                    <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '10px', background: 'none', border: 'none', cursor: 'pointer' }}>
-                                                        {showPassword ? "👁️" : "🙈"}
-                                                    </button>
-                                                </div>
+                                                <label htmlFor="password">Senha</label>
+                                                <Popover opened={popoverOpened} position="bottom" width="target" transitionProps={{ transition: 'pop' }}>
+                                                    <Popover.Target>
+                                                        <div
+                                                            className="password-wrapper"
+                                                            onFocusCapture={() => setPopoverOpened(true)}
+                                                            onBlurCapture={() => setPopoverOpened(false)}
+                                                        >
+                                                            <input
+                                                                type={showPassword ? "text" : "password"}
+                                                                id="password"
+                                                                name="password"
+                                                                placeholder="senha..."
+                                                                value={formData.password}
+                                                                onChange={handleChange}
+                                                                required
+                                                            />
+
+                                                            <button
+                                                                type="button"
+                                                                className="toggle-password"
+                                                                onClick={() => setShowPassword(!showPassword)}
+                                                            >
+                                                                {showPassword ? "👁️" : "🙈"}
+                                                            </button>
+                                                        </div>
+                                                    </Popover.Target>
+                                                    <Popover.Dropdown>
+                                                        <Progress color={color} value={strength} size={5} mb="xs" />
+                                                        <PasswordRequirement
+                                                            label="Deve conter pelo menos 8 caracteres"
+                                                            meets={formData.password.length > 7}
+                                                        />
+                                                        {checks}
+                                                    </Popover.Dropdown>
+                                                </Popover>
                                             </div>
                                             <div className='input-group'>
-                                                <label htmlFor="confirmPassword">confirm password</label>
+                                                <label htmlFor="confirmPassword">Confirme sua senha</label>
                                                 <div className="password-wrapper" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                                                     <input
                                                         type={showConfirmPassword ? "text" : "password"}
                                                         id="confirmPassword"
                                                         name="confirmPassword"
-                                                        placeholder="confirm password..."
+                                                        placeholder="confirme sua senha..."
                                                         value={formData.confirmPassword}
                                                         onChange={handleChange}
                                                         style={{ width: '100%', paddingRight: '40px' }}
@@ -324,6 +462,7 @@ function Register() {
                                                     placeholder="CPF..."
                                                     value={formData.cpf}
                                                     onChange={handleChange}
+                                                    required
                                                 />
                                             </div>
                                             <div className='input-group empty'></div>

@@ -4,6 +4,8 @@ import axios from 'axios';
 import './EditProfile.css';
 import HomeIcon from '../../assets/home.png';
 import UserPlaceholder from '../../assets/user.png';
+import { notifications } from '@mantine/notifications'
+import { IconX, IconCheck } from '@tabler/icons-react'
 
 function EditProfile() {
     const navigate = useNavigate();
@@ -35,7 +37,13 @@ function EditProfile() {
         const userID = localStorage.getItem('userID');
 
         if (!token || !userID) {
-            alert('Acesso negado. Por favor, faça login novamente.');
+            notifications.show({
+                title: 'Falha!',
+                message: 'Acesso negado. Por favor, faça login novamente.',
+                color: 'red',
+                icon: <IconX size={18} />,
+                autoClose: 3000,
+            })
             navigate('/login');
             return;
         }
@@ -142,14 +150,36 @@ function EditProfile() {
         e.preventDefault();
 
         if (!formData.name.trim() || !formData.username.trim()) {
-            alert('Os campos Nome e Username são obrigatórios.');
+            notifications.show({
+                title: 'Falha!',
+                message: 'Os campos Nome e Username são obrigatórios.',
+                color: 'red',
+                icon: <IconX size={18} />,
+                autoClose: 3000,
+            })
+            return;
+        }
+        if (!formData.cpf.trim()) {
+            notifications.show({
+                title: 'Falha!',
+                message: 'CPF é obrigatório.',
+                color: 'red',
+                icon: <IconX size={18} />,
+                autoClose: 3000,
+            })
             return;
         }
 
         const token = localStorage.getItem('token');
 
         if (!token) {
-            alert('Sessão inválida ou expirada. Por favor, faça login novamente.');
+            notifications.show({
+                title: 'Erro!',
+                message: 'Sessão inválida ou expirada. Por favor, faça login novamente.',
+                color: 'red',
+                icon: <IconX size={18} />,
+                autoClose: 3000,
+            })
             navigate('/login');
             return;
         }
@@ -175,8 +205,13 @@ function EditProfile() {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-
-            alert('Alterações salvas com sucesso!');
+            notifications.show({
+                title: 'Sucesso!',
+                message: 'Alterações salvas com sucesso!',
+                color: 'green',
+                icon: <IconCheck size={18} />,
+                autoClose: 3000,
+            });
             if (response.data.profileImageUrl) {
                 setProfileImage(response.data.profileImageUrl);
                 localStorage.setItem('profile_picture', response.data.profileImageUrl)
@@ -185,9 +220,21 @@ function EditProfile() {
         } catch (error) {
             console.error("Erro detalhado retornado pelo Go no salvamento:", error);
             if (error.response && error.response.data && error.response.data.error) {
-                alert(`Erro no servidor Go: ${error.response.data.error}`);
+                notifications.show({
+                    title: 'Erro!',
+                    message: `Erro no servidor Go: ${error.response.data.error}`,
+                    color: 'red',
+                    icon: <IconX size={18} />,
+                    autoClose: 3000,
+                })
             } else {
-                alert('Erro ao salvar as alterações do perfil.');
+                notifications.show({
+                    title: 'Erro!',
+                    message: 'Erro ao salvar as alterações do perfil.',
+                    color: 'red',
+                    icon: <IconX size={18} />,
+                    autoClose: 3000,
+                })
             }
         }
     };
