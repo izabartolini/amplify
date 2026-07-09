@@ -190,15 +190,15 @@ function Navbar({ onSearch }) {
             
             <div className="dropdown-links">
               <button onClick={() => { navigate("/profile/edit"); setIsMenuOpen(false); }}>
-                Edit profile
+                Editar perfil
               </button>
               
               <button onClick={(e) => { e.preventDefault(); handleLogout(); }} className="logout-btn">
-                Logout
+                Sair
               </button>
               
               <button onClick={() => { setIsDeleteModalOpen(true); setIsMenuOpen(false); }} className="delete-btn">
-                Delete profile
+                Excluir conta
               </button>
             </div>
           </menu>
