@@ -467,6 +467,7 @@ type UserProfileResponse struct {
 	ProfilePicture string      `json:"profile_picture"`
 	Bio            string      `json:"bio"`
 	City           string      `json:"city"`
+	State          string      `json:"state"`
 	CPF            string      `json:"cpf"`
 	Tags           []string    `json:"tags"`
 	Instruments    interface{} `json:"instruments"`
@@ -524,6 +525,7 @@ func (s *Service) GetUserByID(id uint) (*UserProfileResponse, error) {
 		ProfilePicture: user.ProfilePicture,
 		Bio:            user.Bio,
 		City:           user.City,
+		State:          user.State,
 		CPF:            user.CPF,
 		Tags:           tagNames,
 		Instruments:    instParams,
