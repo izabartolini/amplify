@@ -39,25 +39,35 @@ A plataforma permite que músicos criem perfis personalizados com seus instrumen
 
 ---
 
-## Padrão de Projeto
+## Padrões de Projeto & Arquitetura
 
-O projeto utiliza o **Repository Pattern** para separar a lógica de acesso ao banco de dados da lógica de negócio.
+### Padrão Observer (Sistema de Notificações Baseado em Eventos)
 
-A arquitetura segue o fluxo:
-Routes → Controllers → Services → Repositories → Banco de dados
+A plataforma utiliza o padrão comportamental **Observer** para gerenciar interações e alertas automáticos gerados entre os músicos da comunidade (como curtidas, novos comentários ou novos seguidores) sem poluir ou acoplar as regras centrais de negócio do sistema.
 
-**Responsabilidades de cada camada:**
+#### Funcionamento e Fluxo do Ecossistema:
+Quando um usuário realiza uma ação com sucesso no sistema, o serviço encarregado atua como o emissor do evento. Ele processa a sua persistência de dados principal e, logo em seguida, invoca o método de notificações para alertar o perfil afetado.
 
-- **Routes** — define os endpoints e middlewares (autenticação JWT)
-- **Controllers** — recebe as requisições HTTP, valida o payload e chama o service
-- **Services** — contém a lógica de negócio, validações e regras do domínio
-- **Repositories** — responsável exclusivamente pelo acesso ao banco de dados via GORM
+#### Exemplo de Implementação no Código:
+O método `LikePost` valida e computa o vínculo da curtida no banco de dados e, imediatamente antes de retornar o sucesso ao cliente, delega a criação do alerta ao observador correspondente via `CreateNotification`:
 
-**Benefícios aplicados no projeto:**
-- Facilidade para trocar o banco de dados sem alterar a lógica de negócio
-- Código organizado e de fácil manutenção
-- Separação clara de responsabilidades entre as camadas
-
+```go
+func (s *Service) LikePost(userID uint, postID uint) error {
+    post, err := s.repository.GetPostByID(postID)
+    if err != nil {
+        return errors.New("post não encontrado")
+    }
+    
+    // 1. Altera o estado do banco (Registra a curtida)
+    if err := s.repository.LikePost(userID, postID); err != nil {
+        return err
+    }
+    
+    // 2. Notifica o observador (Dono do Post) sobre o evento ocorrido
+    s.CreateNotification(post.UserID, userID, "like", &postID)
+    return nil
+}
+```
 ---
 
 ## Funcionalidades
