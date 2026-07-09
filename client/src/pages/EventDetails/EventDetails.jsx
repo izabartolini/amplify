@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button, Loader, Center, Text, TextInput, Textarea, Checkbox, Group, Stack } from '@mantine/core';
+import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import Navbar from '../../components/Navbar/Navbar';
 import './EventDetails.css';
@@ -10,7 +11,7 @@ const getLoggedUserId = () => {
   if (!token) return null;
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.user_id || payload.id || payload.sub; 
+    return payload.user_id || payload.id || payload.sub;
   } catch (error) {
     return null;
   }
@@ -22,7 +23,7 @@ function EventDetails() {
 
   const [event, setEvent] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const [isRequesting, setIsRequesting] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
 
@@ -104,9 +105,9 @@ function EventDetails() {
 
     try {
       const token = localStorage.getItem("token");
-      
+
       const response = await fetch(`http://localhost:8080/api/events/${id}/delete`, {
-        method: "DELETE", 
+        method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -144,6 +145,7 @@ function EventDetails() {
       city: event.city,
       state: event.state,
       is_private: event.is_private,
+      date: new Date(event.date),
     });
     setIsEditing(true);
   };
@@ -152,18 +154,34 @@ function EventDetails() {
     setIsSaving(true);
     try {
       const token = localStorage.getItem("token");
+
+      const dateToFormat = new Date(editData.date);
+      const formattedDate = dateToFormat.toISOString();
+
+      const payload = {
+        ...editData,
+        date: formattedDate 
+      };
+
       const response = await fetch(`http://localhost:8080/api/events/${id}/update`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(editData),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        const updatedEvent = await response.json();
-        setEvent(updatedEvent); 
+        const fetchUpdatedEvent = await fetch(`http://localhost:8080/api/events/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (fetchUpdatedEvent.ok) {
+          const freshEvent = await fetchUpdatedEvent.json();
+          setEvent(freshEvent);
+        }
+
         setIsEditing(false);
         notifications.show({
           title: "Sucesso",
@@ -213,7 +231,7 @@ function EventDetails() {
 
   const date = new Date(event.date);
   const isOwner = Number(currentUserId) === Number(event.user_id || event.UserID);
-  
+
   const eventOrganizer = event.organizer || {};
   const organizerName = eventOrganizer.Name || "Usuário";
   const organizerUsername = eventOrganizer.Username || "";
@@ -229,10 +247,11 @@ function EventDetails() {
 
         <div className="event-details-card">
           <div className="event-details-header">
+
             <div className="event-date-badge-large">
-              <span className="event-day-large">{date.getDate()}</span>
+              <span className="event-day-large">{date.getUTCDate()}</span>
               <span className="event-month-large">
-                {date.toLocaleDateString('pt-BR', { month: 'short' })}
+                {date.toLocaleDateString('pt-BR', { month: 'short', timeZone: 'UTC' })}
               </span>
             </div>
 
@@ -264,6 +283,15 @@ function EventDetails() {
                 value={editData.name}
                 onChange={(e) => setEditData({ ...editData, name: e.target.value })}
               />
+
+              <DateInput
+                label="Data do Evento"
+                value={editData.date}
+                onChange={(date) => setEditData({ ...editData, date })}
+                valueFormat="DD/MM/YYYY"
+                placeholder="Selecione a nova data"
+              />
+
               <Textarea
                 label="Descrição"
                 value={editData.description}
@@ -286,7 +314,7 @@ function EventDetails() {
                   onChange={(e) => setEditData({ ...editData, state: e.target.value })}
                 />
               </Group>
-              
+
               <Checkbox
                 mt="sm"
                 label="Evento Privado"
