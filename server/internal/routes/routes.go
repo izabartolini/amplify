@@ -108,6 +108,7 @@ func SetupRoutes(r *gin.Engine) {
 			eventsAPI.POST("/:id/invites", controller.InviteUser)
 			eventsAPI.PUT("/:id/update", controller.UpdateEvent)
 			eventsAPI.DELETE("/:id/delete", controller.DeleteEvent)
+			eventsAPI.DELETE("/:id/leave", controller.LeaveEvent)
 		}
 
 		notificationsAPI := protectedAPI.Group("/notifications")
