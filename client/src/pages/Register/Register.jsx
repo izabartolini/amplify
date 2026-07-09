@@ -50,6 +50,13 @@ function Register() {
             [name]: newValue,
         }));
     };
+    const handleInvalid = (e) => {
+        e.target.setCustomValidity('Por favor, preencha este campo.');
+    };
+
+    const handleInput = (e) => {
+        e.target.setCustomValidity('');
+    };
     const handleNextStep = (event) => {
         if (event) event.preventDefault();
 
@@ -300,6 +307,8 @@ function Register() {
                                                     placeholder="nome..."
                                                     value={formData.name}
                                                     onChange={handleChange}
+                                                    onInvalid={handleInvalid}
+                                                    onInput={handleInput}
                                                     required
                                                 />
                                             </div>
@@ -312,6 +321,8 @@ function Register() {
                                                     placeholder="usuário..."
                                                     value={formData.username}
                                                     onChange={handleChange}
+                                                    onInvalid={handleInvalid}
+                                                    onInput={handleInput}
                                                     required
                                                 />
                                             </div>
@@ -326,6 +337,8 @@ function Register() {
                                                     placeholder="user@email.com..."
                                                     value={formData.email}
                                                     onChange={handleChange}
+                                                    onInvalid={handleInvalid}
+                                                    onInput={handleInput}
                                                     required
                                                 />
                                             </div>
@@ -349,6 +362,8 @@ function Register() {
                                                                 placeholder="senha..."
                                                                 value={formData.password}
                                                                 onChange={handleChange}
+                                                                onInvalid={handleInvalid}
+                                                                onInput={handleInput}
                                                                 required
                                                             />
 
@@ -381,6 +396,8 @@ function Register() {
                                                         placeholder="confirme sua senha..."
                                                         value={formData.confirmPassword}
                                                         onChange={handleChange}
+                                                        onInvalid={handleInvalid}
+                                                        onInput={handleInput}
                                                         style={{ width: '100%', paddingRight: '40px' }}
                                                         required
                                                     />
@@ -422,6 +439,8 @@ function Register() {
                                                     value={formData.city}
                                                     onChange={handleChange}
                                                     required
+                                                    onInvalid={handleInvalid}
+                                                    onInput={handleInput}
                                                 />
                                             </div>
                                             <div className='input-group'>
@@ -434,6 +453,8 @@ function Register() {
                                                     value={formData.state}
                                                     onChange={handleChange}
                                                     required
+                                                    onInvalid={handleInvalid}
+                                                    onInput={handleInput}
                                                 />
                                             </div>
                                         </div>
@@ -448,6 +469,8 @@ function Register() {
                                                     value={formData.country}
                                                     onChange={handleChange}
                                                     required
+                                                    onInvalid={handleInvalid}
+                                                    onInput={handleInput}
                                                 />
                                             </div>
                                             <div className='input-group empty'></div>
@@ -463,6 +486,8 @@ function Register() {
                                                     value={formData.cpf}
                                                     onChange={handleChange}
                                                     required
+                                                    onInvalid={handleInvalid}
+                                                    onInput={handleInput}
                                                 />
                                             </div>
                                             <div className='input-group empty'></div>
