@@ -16,7 +16,7 @@ function Navbar({ onSearch }) {
   
   const [userData, setUserData] = useState({
     name: "Usuário",
-    profilePicture: User
+    profilePicture: ''
   })
 
   const token = localStorage.getItem('token')
@@ -33,7 +33,7 @@ function Navbar({ onSearch }) {
         if (data) {
           setUserData({
             name: data.name || "Usuário",
-            profilePicture: data.profile_picture || User
+            profilePicture: data.profile_picture || ''
           })
         }
       })
@@ -93,6 +93,11 @@ function Navbar({ onSearch }) {
     localStorage.clear() 
     setIsMenuOpen(false)
     navigate("/login")
+  }
+
+  const getAvatarUrl = () => {
+    if (userData.profilePicture) return userData.profilePicture
+    return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userData.name || 'U') + '&background=8B1A1A&color=fff&size=200'
   }
 
   const handleDeleteProfile = async () => {
@@ -170,14 +175,14 @@ function Navbar({ onSearch }) {
         )}
 
         <span onClick={toggleMenu} className="avatar-trigger">
-          <img src={userData.profilePicture} alt="Perfil" className="navbar-avatar rounded-circle" />
+          <img src={getAvatarUrl()} alt="Perfil" className="navbar-avatar rounded-circle" />
         </span>
 
         {isMenuOpen && (
           <menu className="navbar-dropdown">
             <div className="dropdown-header" onClick={() => { setIsMenuOpen(false); navigate(`/profile/${loggedUserID}`); }} style={{ cursor: 'pointer' }}>
               <div className="avatar-container">
-                <img src={userData.profilePicture} alt="User Avatar" className="dropdown-avatar-img rounded-circle" />
+                <img src={getAvatarUrl()} alt="User Avatar" className="dropdown-avatar-img rounded-circle" />
               </div>
               <h1 className="dropdown-username">{userData.name}</h1>
               {userData.username && <p className="dropdown-user-handle">@{userData.username}</p>}
