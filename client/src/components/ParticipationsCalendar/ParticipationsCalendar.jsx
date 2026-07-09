@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { DatePicker } from '@mantine/dates';
-import { Indicator, Modal, Text, Card, Badge, Group, Button, Box, Paper } from '@mantine/core';
+import { Indicator, Drawer, Text, Card, Badge, Group, Button, Box, Paper, ScrollArea, Stack } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
 
+import './ParticipationsCalendar.css';
+
 export default function ParticipationsCalendar({ events }) {
     const [selectedDate, setSelectedDate] = useState(null);
-    const [modalOpened, setModalOpened] = useState(false);
+    const [drawerOpened, setDrawerOpened] = useState(false);
     const navigate = useNavigate();
 
     const getEventsForDate = (date) => {
@@ -23,13 +25,12 @@ export default function ParticipationsCalendar({ events }) {
         const dayEvents = getEventsForDate(date);
         if (dayEvents.length > 0) {
             setSelectedDate(dayEvents);
-            setModalOpened(true);
+            setDrawerOpened(true);
         }
     };
 
     return (
-        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '10px' }}>
-
+        <Box className="calendar-scroll-container">
             <Paper
                 bg="#9f0f0f"
                 p="md"
@@ -46,7 +47,6 @@ export default function ParticipationsCalendar({ events }) {
                         root: { width: '100%' },
                         calendar: { width: '100%' },
                         monthsList: { width: '100%' },
-
                         calendarHeader: {
                             width: '100%',
                             display: 'flex !important',
@@ -64,7 +64,7 @@ export default function ParticipationsCalendar({ events }) {
                             flex: '1 !important',
                             textAlign: 'center',
                             display: 'flex',
-                            justifyContent: 'center', 
+                            justifyContent: 'center',
                             margin: '0 !important',
                             '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' }
                         },
@@ -112,12 +112,13 @@ export default function ParticipationsCalendar({ events }) {
 
                         return (
                             <Indicator
-                                size={18}
+                                size={hasEvent ? 20 : 0}
                                 color="#e69e38"
                                 offset={4}
                                 disabled={!hasEvent}
-                                processing={hasEvent}   
+                                processing={hasEvent}
                                 zIndex={2}
+                                label={dayEvents.length > 1 ? dayEvents.length : null}
                                 style={{ width: '100%', height: '100%', display: 'block' }}
                             >
                                 <div style={{
@@ -135,42 +136,47 @@ export default function ParticipationsCalendar({ events }) {
                 />
             </Paper>
 
-            <Modal
-                opened={modalOpened}
-                onClose={() => setModalOpened(false)}
-                title={<Text weight={700} size="md">Eventos do dia</Text>}
-                centered
+            <Drawer
+                opened={drawerOpened}
+                onClose={() => setDrawerOpened(false)}
+                title={<Text weight={700} size="lg">Eventos do dia ({selectedDate?.length})</Text>}
+                padding="md"
+                size="md"
+                position="right"
             >
-                {selectedDate?.map((event) => (
-                    <Card key={event.id} shadow="sm" p="md" radius="md" withBorder mb="sm">
-                        <Group position="apart" mt="xs" mb="xs">
-                            <Text weight={700} size="md" c="#5d2b16">{event.name}</Text>
-                            {event.is_private && <Badge color="red" variant="light" size="sm">Privado</Badge>}
-                        </Group>
+                <ScrollArea.Autosize maxHeight="90vh" offsetScrollbars>
+                    <Stack spacing="md">
+                        {selectedDate?.map((event) => (
+                            <Card key={event.id} shadow="sm" p="md" radius="md" withBorder>
+                                <Group position="apart" mb="xs">
+                                    <Text weight={700} size="md" c="#5d2b16">{event.name}</Text>
+                                    {event.is_private && <Badge color="red" variant="light" size="sm">Privado</Badge>}
+                                </Group>
+                                
+                                <Text size="sm" color="dimmed" lineClamp={2} mb="sm">
+                                    {event.description}
+                                </Text>
+                                
+                                <Text size="xs" color="dimmed" mb="md">
+                                    📍 {event.place ? `${event.place}, ` : ''}{event.city} - {event.state}
+                                </Text>
 
-                        <Text size="sm" color="dimmed" lineClamp={3} mb="sm">
-                            {event.description}
-                        </Text>
-
-                        <Text size="xs" color="dimmed" mb="sm">
-                            📍 {event.place ? `${event.place}, ` : ''}{event.city} - {event.state}
-                        </Text>
-
-                        <Button
-                            variant="filled"
-                            color="red"
-                            bg="#9f0f0f"
-                            fullWidth
-                            mt="sm"
-                            radius="xl"
-                            size="sm"
-                            onClick={() => navigate(`/eventos/${event.id}`)}
-                        >
-                            Ver Detalhes do Evento
-                        </Button>
-                    </Card>
-                ))}
-            </Modal>
+                                <Button
+                                    variant="filled"
+                                    color="red"
+                                    bg="#9f0f0f"
+                                    fullWidth
+                                    radius="xl"
+                                    size="sm"
+                                    onClick={() => navigate(`/eventos/${event.id}`)}
+                                >
+                                    Ver Detalhes
+                                </Button>
+                            </Card>
+                        ))}
+                    </Stack>
+                </ScrollArea.Autosize>
+            </Drawer>
         </Box>
     );
 }
