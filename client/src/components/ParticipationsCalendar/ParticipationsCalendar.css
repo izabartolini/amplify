@@ -1,0 +1,16 @@
+.calendar-scroll-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    
+    overflow-y: auto; 
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+}
+
+.calendar-scroll-container::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
