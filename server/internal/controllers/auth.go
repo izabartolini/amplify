@@ -13,7 +13,7 @@ func (h *Controller) Login(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{
-			"error": err.Error(),
+			"error": "Campos obrigatórios ausentes ou payload JSON inválido",
 		})
 		return
 	}

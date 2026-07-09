@@ -218,7 +218,17 @@ func (s *Service) UpdateUserProfile(userID uint, name string, username string, b
 
 	err := s.repository.UpdateUserProfileFields(userID, updates)
 	if err != nil {
-		return err
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			switch {
+			case strings.Contains(err.Error(), "username"):
+				return errors.New("Este nome de usuário já está em uso")
+			case strings.Contains(err.Error(), "cpf"):
+				return errors.New("Este CPF já está cadastrado")
+			case strings.Contains(err.Error(), "email"):
+				return errors.New("Este e-mail já está cadastrado")
+			}
+		}
+		return errors.New("Erro ao atualizar o perfil")
 	}
 
 	if tagsRaw != "" && tagsRaw != "[]" {
